@@ -16,7 +16,7 @@ Recommended export:
 
 The site already references the images at:
 
-- `/backgrounds/sacred-wholesale-background.webp`
-- `/backgrounds/sacred-wholesale-background-light.webp`
+- `/backgrounds/maya-wholesale-background.webp`
+- `/backgrounds/maya-wholesale-background-light.webp`
 
 If an image is unavailable, the corresponding theme's solid background color remains as the fallback.
