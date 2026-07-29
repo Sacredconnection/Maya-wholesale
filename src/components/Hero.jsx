@@ -55,7 +55,7 @@ export default function Hero() {
         <div className="absolute inset-0 hidden bg-gradient-to-t from-[#131313] via-transparent to-transparent opacity-65 md:block"></div>
 
         {/* Glow decoration */}
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#989836] opacity-[0.06] blur-[150px] pointer-events-none rounded-full animate-drift-slow"></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#999933] opacity-[0.06] blur-[150px] pointer-events-none rounded-full animate-drift-slow"></div>
       </div>
 
       {/* Hero Section Content */}
@@ -77,7 +77,7 @@ export default function Hero() {
           </div>
 
           <h1 className="max-w-xl text-[2rem] font-black leading-[1.02] tracking-tighter text-white sm:text-4xl md:max-w-3xl md:text-6xl md:leading-[0.98] lg:text-7xl font-headline-lg">
-            <span className="text-[#d8c58f]">Botanical integrity</span> at wholesale scale.
+            <span className="text-[#f2f2f2]">Botanical integrity</span> at wholesale scale.
           </h1>
 
           <p className="max-w-md text-base font-normal leading-relaxed text-white/75 sm:text-lg md:max-w-2xl md:text-xl md:text-white/70 font-body-lg">
@@ -89,7 +89,7 @@ export default function Hero() {
           <div className="hidden w-full max-w-sm flex-col items-stretch gap-4 pt-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center md:flex md:pt-4">
             <Link
               href="/register"
-              className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6632]/10 hover:shadow-[#cc6632]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"
+              className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"
             >
               Register B2B Account
               <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
@@ -103,7 +103,7 @@ export default function Hero() {
       <div className="absolute inset-x-4 bottom-14 z-20 sm:bottom-16 md:hidden">
         <Link
           href="/register"
-          className="mx-auto flex w-full max-w-xs items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6632] px-7 py-4 text-sm font-bold uppercase tracking-wide text-white no-underline shadow-lg shadow-[#cc6632]/10 transition-all duration-300 hover:bg-[#b6532a] hover:shadow-[#cc6632]/20 font-label-sm"
+          className="mx-auto flex w-full max-w-xs items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] px-7 py-4 text-sm font-bold uppercase tracking-wide text-white no-underline shadow-lg shadow-[#cc6633]/10 transition-all duration-300 hover:bg-[#b6532a] hover:shadow-[#cc6633]/20 font-label-sm"
         >
           Register B2B Account
           <ArrowRight className="h-4 w-4" />
@@ -117,7 +117,7 @@ export default function Hero() {
             key={idx}
             onClick={() => setActiveIdx(idx)}
             className={`w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer border-0 p-0 ${
-              activeIdx === idx ? 'bg-[#d8c58f] w-6' : 'bg-white/30 hover:bg-white/50'
+              activeIdx === idx ? 'bg-[#f2f2f2] w-6' : 'bg-white/30 hover:bg-white/50'
             }`}
             aria-label={`Go to slide ${idx + 1}`}
           />

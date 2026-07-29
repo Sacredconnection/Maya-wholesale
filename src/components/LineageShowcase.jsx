@@ -227,7 +227,7 @@ export default function LineageShowcase() {
         {/* Controls block */}
         <div className="flex items-center gap-6 shrink-0 w-full md:w-auto justify-between md:justify-end">
           <Link
-            className="lineage-link text-[#d8c58f] hover:text-[#989836] font-label-sm text-sm uppercase tracking-widest hover:underline flex items-center gap-1.5 transition-colors"
+            className="lineage-link text-[#f2f2f2] hover:text-[#999933] font-label-sm text-sm uppercase tracking-widest hover:underline flex items-center gap-1.5 transition-colors"
             href="/catalog"
           >
             Explore Lineage <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
@@ -276,7 +276,7 @@ export default function LineageShowcase() {
                 data-tribe-id={tribe.id}
                 aria-hidden={isDuplicate || undefined}
                 tabIndex={isDuplicate ? -1 : 0}
-                className="lineage-card group cursor-pointer relative overflow-hidden rounded bg-[#1a1a1a] border border-white/5 aspect-[3/4] w-[280px] sm:w-[320px] shrink-0 p-0 text-left transition-all duration-300 hover:[border-color:var(--ethnicity-accent)] hover:shadow-xl hover:shadow-black/30 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d8c58f]"
+                className="lineage-card group cursor-pointer relative overflow-hidden rounded bg-[#1a1a1a] border border-white/5 aspect-[3/4] w-[280px] sm:w-[320px] shrink-0 p-0 text-left transition-all duration-300 hover:[border-color:var(--ethnicity-accent)] hover:shadow-xl hover:shadow-black/30 select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2f2f2]"
                 style={{
                   '--ethnicity-accent': accentColor,
                   '--ethnicity-readable': readableAccentColor,
@@ -300,7 +300,7 @@ export default function LineageShowcase() {
 
                 {/* Bottom details */}
                 <div className="lineage-glass-surface absolute bottom-0 left-0 w-full p-6 flex flex-col gap-2 backdrop-blur-sm bg-[#131313]/50 border-t border-white/10">
-                  <span className="lineage-location font-label-sm text-xs text-[#d8c58f] uppercase tracking-widest transition-colors group-hover:[color:var(--ethnicity-readable)]">
+                  <span className="lineage-location font-label-sm text-xs text-[#f2f2f2] uppercase tracking-widest transition-colors group-hover:[color:var(--ethnicity-readable)]">
                     {tribe.region}
                   </span>
                   <span className="font-headline-md text-2xl font-bold text-white">
@@ -351,7 +351,7 @@ export default function LineageShowcase() {
               </button>
 
               <div className="absolute bottom-4 left-6">
-                <span className="text-xs font-bold tracking-widest text-[#d8c58f] uppercase bg-[#989836]/20 border border-[#989836]/30 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold tracking-widest text-[#f2f2f2] uppercase bg-[#999933]/20 border border-[#999933]/30 px-3 py-1 rounded-full">
                   {selectedTribe.region}
                 </span>
                 <h3 id="tribe-dialog-title" className="lineage-modal-title font-headline-lg text-3xl font-black text-white mt-2">
@@ -362,21 +362,21 @@ export default function LineageShowcase() {
 
             {/* Modal Body */}
             <div className="p-5 sm:p-8 flex flex-col gap-5 sm:gap-6">
-              <p className="font-body-md text-[#e5e2e1] text-base leading-relaxed">
+              <p className="font-body-md text-[#f2f2f2] text-base leading-relaxed">
                 {selectedTribe.description}
               </p>
 
               {/* Grid Metadata */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-y border-white/5 py-4">
                 <div className="flex items-center gap-3">
-                  <HeartHandshake className="w-5 h-5 text-[#d8c58f] shrink-0" />
+                  <HeartHandshake className="w-5 h-5 text-[#f2f2f2] shrink-0" />
                   <div>
                     <div className="text-[10px] font-mono text-white/40 uppercase">Trade Agreement</div>
                     <div className="text-sm font-semibold text-white">{selectedTribe.sustainability}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-[#d8c58f] shrink-0" />
+                  <Globe className="w-5 h-5 text-[#f2f2f2] shrink-0" />
                   <div>
                     <div className="text-[10px] font-mono text-white/40 uppercase">Harvesting Method</div>
                     <div className="text-sm font-semibold text-white">{selectedTribe.harvest}</div>
@@ -387,7 +387,7 @@ export default function LineageShowcase() {
               {/* Formulation details */}
               <div>
                 <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-1.5 font-label-sm">
-                  <ShieldCheck className="w-4 h-4 text-[#d8c58f]" />
+                  <ShieldCheck className="w-4 h-4 text-[#f2f2f2]" />
                   Traditional Formulation Details
                 </h4>
                 <p className="text-sm text-white/60 leading-relaxed font-body-md">
@@ -406,7 +406,7 @@ export default function LineageShowcase() {
                 </button>
                 <Link
                   href={`/catalog?tribe=${encodeURIComponent(selectedTribe.name)}`}
-                  className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-sm transition-all duration-300 cursor-pointer border-0 flex items-center gap-1.5 no-underline"
+                  className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-sm transition-all duration-300 cursor-pointer border-0 flex items-center gap-1.5 no-underline"
                 >
                   Explore Products
                   <ArrowUpRight className="w-4 h-4" />

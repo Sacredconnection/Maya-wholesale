@@ -92,7 +92,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="px-5 sm:px-8 py-5 sm:py-6 border-b border-white/10 flex justify-between items-center bg-[#131313]">
               <div className="flex items-center gap-3">
-                <ShoppingBag className="w-5 h-5 text-[#d8c58f]" />
+                <ShoppingBag className="w-5 h-5 text-[#f2f2f2]" />
                 <h3 id="cart-drawer-title" className="font-headline-md text-xl font-bold text-white">
                   Bulk Order Sheet
                 </h3>
@@ -136,7 +136,7 @@ export default function CartDrawer() {
                             {item.name}
                           </h4>
                           <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
-                            <span className="text-[10px] font-bold bg-[#989836]/10 text-[#d8c58f] border border-[#989836]/30 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">
+                            <span className="text-[10px] font-bold bg-[#999933]/10 text-[#f2f2f2] border border-[#999933]/30 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">
                               {item.optionName}
                             </span>
                             <span className="text-[10px] font-semibold text-white/45">
@@ -180,7 +180,7 @@ export default function CartDrawer() {
                         <button
                           type="button"
                           onClick={() => removeFromCart(item.cartKey)}
-                          className="text-[10px] text-white/35 hover:text-[#cc6632] uppercase tracking-wider font-semibold transition-colors cursor-pointer bg-transparent border-0"
+                          className="text-[10px] text-white/35 hover:text-[#cc6633] uppercase tracking-wider font-semibold transition-colors cursor-pointer bg-transparent border-0"
                         >
                           Remove
                         </button>
@@ -203,7 +203,7 @@ export default function CartDrawer() {
                   <button
                     type="button"
                     onClick={closeCart}
-                    className="text-xs font-bold text-[#d8c58f] uppercase tracking-widest hover:underline cursor-pointer bg-transparent border-0"
+                    className="text-xs font-bold text-[#f2f2f2] uppercase tracking-widest hover:underline cursor-pointer bg-transparent border-0"
                   >
                     Browse Catalog
                   </button>
@@ -229,7 +229,7 @@ export default function CartDrawer() {
                 </div>
 
                 {perGramRates.map(({ tableKey, label, rate }) => (
-                  <div key={tableKey} className="flex justify-between items-center text-xs text-[#d8c58f] font-mono">
+                  <div key={tableKey} className="flex justify-between items-center text-xs text-[#f2f2f2] font-mono">
                     <span>VOLUME RATE: {label}</span>
                     <span className="font-bold">${rate.toFixed(2)}/g</span>
                   </div>
@@ -247,7 +247,7 @@ export default function CartDrawer() {
                 )}
 
                 {isLoggedIn && user && (
-                  <div className="flex justify-between items-center text-xs text-[#d8c58f] font-mono mt-1">
+                  <div className="flex justify-between items-center text-xs text-[#f2f2f2] font-mono mt-1">
                     <span>B2B DISCOUNT ({user.discountRate}%)</span>
                     <span>-${discountAmount.toFixed(2)}</span>
                   </div>
@@ -258,15 +258,15 @@ export default function CartDrawer() {
                   <span className="text-sm font-bold text-white uppercase tracking-widest font-label-sm">
                     {isLoggedIn && user ? 'Est. Partner Total' : 'Est. Subtotal'}
                   </span>
-                  <span className="text-2xl font-black text-[#d8c58f] font-headline-lg">
+                  <span className="text-2xl font-black text-[#f2f2f2] font-headline-lg">
                     ${(isLoggedIn && user ? finalTotal : cartSubtotal).toFixed(2)}
                   </span>
                 </div>
               </div>
 
               {/* Offline payment notice */}
-              <div className="bg-[#989836]/10 border border-[#989836]/25 rounded-sm px-4 py-3 flex items-start gap-3">
-                <PhoneCall className="w-4 h-4 text-[#d8c58f] shrink-0 mt-0.5" />
+              <div className="bg-[#999933]/10 border border-[#999933]/25 rounded-sm px-4 py-3 flex items-start gap-3">
+                <PhoneCall className="w-4 h-4 text-[#f2f2f2] shrink-0 mt-0.5" />
                 <p className="text-[11px] text-white/70 leading-relaxed">
                   No online payment is taken. Once submitted, your order is registered
                   and a member of our team will contact you to arrange payment and shipping.
@@ -277,7 +277,7 @@ export default function CartDrawer() {
                 type="button"
                 onClick={handleCheckout}
                 disabled={cart.length === 0 || (isLoggedIn && !meetsMinimumWeight)}
-                className="w-full bg-[#cc6632] hover:bg-[#b6532a] disabled:opacity-40 disabled:hover:bg-[#cc6632] text-white text-xs font-bold uppercase tracking-widest py-5 rounded-sm transition-all duration-300 shadow-lg shadow-[#cc6632]/20 hover:shadow-[#cc6632]/40 flex items-center justify-center gap-3 cursor-pointer disabled:cursor-not-allowed border-0"
+                className="w-full bg-[#cc6633] hover:bg-[#b6532a] disabled:opacity-40 disabled:hover:bg-[#cc6633] text-white text-xs font-bold uppercase tracking-widest py-5 rounded-sm transition-all duration-300 shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/40 flex items-center justify-center gap-3 cursor-pointer disabled:cursor-not-allowed border-0"
               >
                 {isLoggedIn ? (
                   <>

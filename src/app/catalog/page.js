@@ -28,6 +28,8 @@ import { useProducts } from "@/components/ProductsContext";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
 import { downloadDigitalCatalogPdf } from "@/lib/catalog-export";
 
+const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
+
 // Normalize string for accent-insensitive comparison
 // Strips diacritics, lowercases and trims — used ONLY for comparison, never for display
 const normalizeStr = (str) =>
@@ -307,13 +309,13 @@ export default function CatalogPage() {
     }
   };
 
-  // Catalog is partner-only: block until authenticated
-  if (authLoading || !isLoggedIn) {
+  // Production remains partner-only; local development can preview public catalog data.
+  if (!LOCAL_CATALOG_PREVIEW && (authLoading || !isLoggedIn)) {
     return <AuthGate loading={authLoading} />;
   }
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased">
+    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
       {/* Navigation Header */}
       <Header
         onOpenLogin={() => setIsLoginOpen(true)}
@@ -326,9 +328,9 @@ export default function CatalogPage() {
           aria-live="assertive"
           aria-label="Generating your PDF catalog. Please wait and keep this page open."
         >
-          <div className="w-full max-w-xl rounded-xl border border-[#d8c58f]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
+          <div className="w-full max-w-xl rounded-xl border border-[#f2f2f2]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
             <LoaderCircle
-              className="mx-auto h-14 w-14 animate-spin text-[#d8c58f] sm:h-16 sm:w-16"
+              className="mx-auto h-14 w-14 animate-spin text-[#f2f2f2] sm:h-16 sm:w-16"
               aria-hidden="true"
             />
             <p className="mt-7 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
@@ -347,7 +349,7 @@ export default function CatalogPage() {
         {/* Page Title Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/10 pb-6 sm:pb-8 gap-4 sm:gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#989836]/15 border border-[#989836]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#d8c58f] uppercase font-label-sm mb-3">
+            <div className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
               B2B Portal
             </div>
             <h1 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white">
@@ -364,7 +366,7 @@ export default function CatalogPage() {
             <button
               onClick={handlePublicCatalogPdf}
               disabled={pdfExporting}
-              className="flex w-full grow items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6632] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-[#cc6632]/15 transition-all duration-300 hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:grow-0"
+              className="flex w-full grow items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-[#cc6633]/15 transition-all duration-300 hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:grow-0"
             >
               {pdfExporting ? (
                 <LoaderCircle className="h-4 w-4 animate-spin text-white" aria-hidden="true" />
@@ -379,10 +381,10 @@ export default function CatalogPage() {
               onClick={() => setIsCartOpen(true)}
               className="relative flex w-full grow items-center justify-center gap-3 rounded-sm border border-white/10 bg-[#1a1a1a] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-all duration-300 hover:border-white/20 hover:bg-white/5 sm:w-auto sm:grow-0"
             >
-              <ShoppingBag className="w-4 h-4 text-[#d8c58f]" />
+              <ShoppingBag className="w-4 h-4 text-[#f2f2f2]" />
               Order Sheet
               {cartTotalItems > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#cc6632] text-[10px] font-bold text-white absolute -top-2 -right-2 animate-pulse">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#cc6633] text-[10px] font-bold text-white absolute -top-2 -right-2 animate-pulse">
                   {cartTotalItems}
                 </span>
               )}
@@ -427,7 +429,7 @@ export default function CatalogPage() {
           {/* Product Items */}
           {productsLoading ? (
             <div className="flex flex-col items-center justify-center py-16 sm:py-20 lg:py-24 gap-4">
-              <div className="w-10 h-10 border-4 border-[#989836] border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-4 border-[#999933] border-t-transparent rounded-full animate-spin"></div>
               <p className="text-xs text-white/40 font-mono uppercase tracking-widest">
                 Loading live catalog…
               </p>
@@ -440,7 +442,7 @@ export default function CatalogPage() {
               </p>
               <button
                 onClick={reload}
-                className="text-xs font-bold text-[#d8c58f] uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer"
+                className="text-xs font-bold text-[#f2f2f2] uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer"
               >
                 Retry
               </button>
@@ -450,13 +452,13 @@ export default function CatalogPage() {
               {paginatedProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="catalog-product-row grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-5 rounded-xl border border-white/10 bg-[#171717] p-5 shadow-lg shadow-black/20 transition-[background-color,border-color,box-shadow] hover:border-[#989836]/50 hover:bg-[#1b1b1b] hover:shadow-xl"
+                    className="catalog-product-row grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-5 rounded-xl border border-white/10 bg-[#171717] p-5 shadow-lg shadow-black/20 transition-[background-color,border-color,box-shadow] hover:border-[#999933]/50 hover:bg-[#1b1b1b] hover:shadow-xl"
                   >
                     {/* Image Column — product thumbnail, tribe-letter fallback */}
                     <div className="col-span-1 flex items-center">
                       <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="block">
                         {product.image ? (
-                          <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 bg-[#131313] shadow-md transition-all duration-300 hover:border-[#989836]/45 hover:shadow-lg">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 bg-[#131313] shadow-md transition-all duration-300 hover:border-[#999933]/45 hover:shadow-lg">
                             <img
                               src={product.image}
                               alt={product.name}
@@ -466,7 +468,7 @@ export default function CatalogPage() {
                           </div>
                         ) : (
                           <div
-                            className="relative flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 text-lg font-black uppercase text-white shadow-md transition-all duration-300 hover:border-[#989836]/45 hover:shadow-lg font-mono select-none"
+                            className="relative flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 text-lg font-black uppercase text-white shadow-md transition-all duration-300 hover:border-[#999933]/45 hover:shadow-lg font-mono select-none"
                             style={{ backgroundColor: getEthnicityColor(product.tribe, product.category) }}
                           >
                             <span className="transform hover:scale-110 transition-transform duration-300">
@@ -479,8 +481,8 @@ export default function CatalogPage() {
 
                     {/* Name Column */}
                     <div className="col-span-1 flex min-w-0 flex-col gap-2">
-                      <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="hover:text-[#d8c58f] transition-colors text-left no-underline group">
-                        <h3 className="catalog-product-title font-headline-md text-lg font-bold text-white group-hover:text-[#d8c58f] transition-colors flex items-center gap-2 flex-wrap">
+                      <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="hover:text-[#f2f2f2] transition-colors text-left no-underline group">
+                        <h3 className="catalog-product-title font-headline-md text-lg font-bold text-white group-hover:text-[#f2f2f2] transition-colors flex items-center gap-2 flex-wrap">
                           {product.name}
                           {product.isNew && (
                             <span className="inline-block text-[9px] font-black tracking-widest bg-emerald-500 text-white px-1.5 py-0.5 rounded-sm uppercase align-middle">
@@ -490,7 +492,7 @@ export default function CatalogPage() {
                         </h3>
                       </Link>
                       <div className="flex min-w-0 flex-wrap gap-2">
-                        <span className="max-w-full break-words text-[10px] font-semibold bg-[#989836]/15 text-[#d8c58f] border border-[#989836]/30 px-2 py-0.5 rounded-sm uppercase tracking-wide font-label-sm">
+                        <span className="max-w-full break-words text-[10px] font-semibold bg-[#999933]/15 text-[#f2f2f2] border border-[#999933]/30 px-2 py-0.5 rounded-sm uppercase tracking-wide font-label-sm">
                           {product.category}
                         </span>
                         {product.tribe && (
@@ -520,7 +522,7 @@ export default function CatalogPage() {
               <p className="text-sm text-white/40 font-medium">No wholesale remedies match the current criteria.</p>
               <button
                 onClick={handleClearFilters}
-                className="text-xs font-bold text-[#d8c58f] uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer"
+                className="text-xs font-bold text-[#f2f2f2] uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer"
               >
                 Clear all filters
               </button>
@@ -548,7 +550,7 @@ export default function CatalogPage() {
                     aria-current={currentPage === page ? "page" : undefined}
                     className={`h-10 w-10 rounded-sm border font-mono text-xs font-bold transition-all cursor-pointer ${
                       currentPage === page
-                        ? "bg-[#989836] text-white border-[#989836]"
+                        ? "bg-[#999933] text-white border-[#999933]"
                         : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
                     }`}
                   >
@@ -571,7 +573,7 @@ export default function CatalogPage() {
                       aria-current={currentPage === item ? "page" : undefined}
                       className={`h-10 w-10 shrink-0 rounded-sm border font-mono text-xs font-bold transition-all cursor-pointer ${
                         currentPage === item
-                          ? "bg-[#989836] text-white border-[#989836]"
+                          ? "bg-[#999933] text-white border-[#999933]"
                           : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white"
                       }`}
                     >

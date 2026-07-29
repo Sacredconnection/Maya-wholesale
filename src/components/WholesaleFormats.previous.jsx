@@ -32,7 +32,7 @@ export default function WholesaleFormatsPrevious() {
   return (
     <section aria-labelledby="wholesale-formats-title-previous" className="flex w-full flex-col gap-8 py-2 sm:gap-10 sm:py-4">
       <div className="max-w-3xl">
-        <span className="mb-3 block font-label-sm text-[10px] font-bold uppercase tracking-[0.2em] text-[#d8c58f] sm:text-xs">
+        <span className="mb-3 block font-label-sm text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2] sm:text-xs">
           Product Line &amp; Categories
         </span>
         <h2 id="wholesale-formats-title-previous" className="mb-3 font-headline-lg text-3xl font-black tracking-tighter text-white sm:mb-4 sm:text-4xl md:text-5xl">
@@ -50,15 +50,15 @@ export default function WholesaleFormatsPrevious() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
         {PREVIOUS_FORMATS.map(({ title, category, description, icon: Icon, image, imageAlt, sizes }, index) => (
-          <article key={title} className="group relative flex overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-[#d8c58f]/40 hover:bg-white/[0.07] hover:shadow-[0_22px_55px_rgba(0,0,0,0.18)]">
-            <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-[#d8c58f]/0 blur-3xl transition-colors duration-300 group-hover:bg-[#d8c58f]/10" />
+          <article key={title} className="group relative flex overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-[#f2f2f2]/40 hover:bg-white/[0.07] hover:shadow-[0_22px_55px_rgba(0,0,0,0.18)]">
+            <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-[#f2f2f2]/0 blur-3xl transition-colors duration-300 group-hover:bg-[#f2f2f2]/10" />
             <div className="relative flex w-full flex-col">
               <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-white/10 bg-[#131313]/35">
                 {image ? (
                   <Image src={image} alt={imageAlt} fill unoptimized sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]" />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#131313]/55 text-[#d8c58f]">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#131313]/55 text-[#f2f2f2]">
                       <Icon className="h-7 w-7" aria-hidden="true" />
                     </div>
                   </div>
@@ -66,7 +66,7 @@ export default function WholesaleFormatsPrevious() {
               </div>
               <div className="flex flex-1 flex-col p-5 sm:p-7 lg:p-8">
                 <div className="mb-5 flex items-start justify-between gap-4">
-                  <span className="font-label-sm text-[9px] font-bold uppercase tracking-[0.16em] text-[#d8c58f]/80">{category}</span>
+                  <span className="font-label-sm text-[9px] font-bold uppercase tracking-[0.16em] text-[#f2f2f2]/80">{category}</span>
                   <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-white/25">{String(index + 1).padStart(2, "0")}</span>
                 </div>
                 <h3 className="mb-3 font-headline-md text-2xl font-bold text-white">{title}</h3>

@@ -16,8 +16,8 @@ function OrderReceivedContent() {
 
   return (
     <main className="flex-grow w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col items-center text-center gap-10 sm:gap-12">
-      <div className="w-20 h-20 rounded-full bg-[#989836]/20 border border-[#989836]/45 flex items-center justify-center animate-fade-in">
-        <Check className="w-10 h-10 text-[#d8c58f]" />
+      <div className="w-20 h-20 rounded-full bg-[#999933]/20 border border-[#999933]/45 flex items-center justify-center animate-fade-in">
+        <Check className="w-10 h-10 text-[#f2f2f2]" />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -27,7 +27,7 @@ function OrderReceivedContent() {
         {(orderSummary || orderNumber) && (
           <p className="text-sm font-mono text-white/50">
             {orderSummary ? "Orders: " : "Order number: "}
-            <span className="text-[#d8c58f] font-bold">
+            <span className="text-[#f2f2f2] font-bold">
               {orderSummary || `#${orderNumber}`}
             </span>
             {total && (
@@ -40,8 +40,8 @@ function OrderReceivedContent() {
         )}
       </div>
 
-      <div className="bg-[#1a1a1a] border border-[#989836]/25 rounded-xl p-8 flex flex-col gap-4 max-w-xl">
-        <div className="flex items-center justify-center gap-3 text-[#d8c58f]">
+      <div className="bg-[#1a1a1a] border border-[#999933]/25 rounded-xl p-8 flex flex-col gap-4 max-w-xl">
+        <div className="flex items-center justify-center gap-3 text-[#f2f2f2]">
           <PhoneCall className="w-5 h-5" />
           <span className="text-xs font-bold uppercase tracking-widest font-label-sm">
             Payment arranged personally
@@ -57,7 +57,7 @@ function OrderReceivedContent() {
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <Link
           href="/my-account"
-          className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-8 rounded-sm transition-all duration-300 flex items-center justify-center gap-2 no-underline"
+          className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-8 rounded-sm transition-all duration-300 flex items-center justify-center gap-2 no-underline"
         >
           <ClipboardList className="w-4 h-4" />
           View My Orders
@@ -78,7 +78,7 @@ export default function OrderReceivedPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased">
+    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
       <Suspense fallback={<main className="flex-grow" />}>
         <OrderReceivedContent />

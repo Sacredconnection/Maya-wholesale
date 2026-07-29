@@ -82,14 +82,14 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
         </button>
 
         <div className="pr-12">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-[#d8c58f]">Select variation</span>
+          <span className="text-[10px] font-mono uppercase tracking-widest text-[#f2f2f2]">Select variation</span>
           <h2 id="product-options-title" className="mt-1 text-xl font-bold text-white font-headline-md">{product.name}</h2>
           <p className="mt-1 text-[11px] uppercase tracking-wider text-white/40">{product.storeName}</p>
         </div>
 
         {!resolvedProduct && !error && (
           <div role="status" className="flex items-center justify-center gap-3 py-12 text-sm text-white/60">
-            <Loader2 className="h-5 w-5 animate-spin text-[#d8c58f]" />
+            <Loader2 className="h-5 w-5 animate-spin text-[#f2f2f2]" />
             Loading available options...
           </div>
         )}
@@ -106,7 +106,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
                 id="modal-product-option"
                 value={selectedOptionIndex}
                 onChange={(event) => setSelectedOptionIndex(Number(event.target.value))}
-                className="w-full rounded-sm border border-white/10 bg-[#101010] px-4 py-3 text-sm text-white outline-none focus:border-[#989836]"
+                className="w-full rounded-sm border border-white/10 bg-[#101010] px-4 py-3 text-sm text-white outline-none focus:border-[#999933]"
               >
                 {resolvedProduct.options.map((option, index) => (
                   <option key={`${option.wcVariationId || option.sku}-${index}`} value={index}>
@@ -119,7 +119,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
             <div className="flex flex-wrap items-end justify-between gap-4 rounded border border-white/5 bg-black/20 p-4">
               <div>
                 <span className="block text-[10px] font-mono uppercase tracking-wider text-white/40">Unit price</span>
-                <strong className="text-2xl text-[#d8c58f]">${price?.toFixed(2)}</strong>
+                <strong className="text-2xl text-[#f2f2f2]">${price?.toFixed(2)}</strong>
               </div>
               <div className="flex items-center rounded-sm border border-white/10 bg-[#101010]">
                 <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="cursor-pointer border-0 bg-transparent p-3 text-white/60 hover:text-white" aria-label="Decrease quantity"><Minus className="h-4 w-4" /></button>
@@ -128,7 +128,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
               </div>
             </div>
 
-            <button type="button" onClick={handleAdd} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-sm border-0 bg-[#cc6632] px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#b6532a]">
+            <button type="button" onClick={handleAdd} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-sm border-0 bg-[#cc6633] px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#b6532a]">
               <ShoppingBag className="h-4 w-4" />
               Add selected option
             </button>

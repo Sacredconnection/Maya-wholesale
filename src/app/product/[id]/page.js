@@ -24,6 +24,8 @@ import {
   Globe
 } from "lucide-react";
 
+const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
+
 export default function ProductDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -46,6 +48,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!catalogProduct || catalogProduct.optionsLoaded) return undefined;
+    if (LOCAL_CATALOG_PREVIEW && !isLoggedIn) return undefined;
 
     let cancelled = false;
 
@@ -76,7 +79,7 @@ export default function ProductDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [catalogProduct]);
+  }, [catalogProduct, isLoggedIn]);
 
   const relatedProductPool = useMemo(() => {
     if (!product) return [];
@@ -134,8 +137,8 @@ export default function ProductDetailPage() {
     };
   }, [isLoggedIn, relatedProducts.length, product?.id]);
 
-  // Product pages are partner-only: block until authenticated
-  if (authLoading || !isLoggedIn) {
+  // Production remains partner-only; local development can preview public catalog data.
+  if (!LOCAL_CATALOG_PREVIEW && (authLoading || !isLoggedIn)) {
     return <AuthGate loading={authLoading} />;
   }
 
@@ -143,10 +146,10 @@ export default function ProductDetailPage() {
   // so hold off on "not found" until the live catalog finishes loading.
   if (!product && productsLoading) {
     return (
-      <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+      <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
         <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex flex-col items-center justify-center text-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#989836] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-[#999933] border-t-transparent rounded-full animate-spin" />
           <p className="text-white/50 text-xs font-mono uppercase tracking-widest">Loading product…</p>
         </main>
         <Footer />
@@ -157,7 +160,7 @@ export default function ProductDetailPage() {
   // If product doesn't exist
   if (!product) {
     return (
-      <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+      <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
         <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex flex-col items-center justify-center text-center gap-6">
           <div className="text-6xl">⚠️</div>
@@ -167,7 +170,7 @@ export default function ProductDetailPage() {
           </p>
           <Link
             href="/catalog"
-            className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 px-8 rounded-sm transition-all animate-fade-in"
+            className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 px-8 rounded-sm transition-all animate-fade-in"
           >
             Back to Catalog
           </Link>
@@ -204,7 +207,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       {/* Main Container */}
@@ -237,7 +240,7 @@ export default function ProductDetailPage() {
           <div className="lg:col-span-6 w-full">
           <div className="bg-white rounded-lg aspect-square flex items-center justify-center relative overflow-hidden group select-none shadow-lg shadow-black/15">
             {/* Ambient Background Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#989836]/5 via-transparent to-transparent opacity-60 z-0"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#999933]/5 via-transparent to-transparent opacity-60 z-0"></div>
 
             {/* Real Product Image with Fallback */}
             {!imgError ? (
@@ -251,15 +254,15 @@ export default function ProductDetailPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center gap-4 text-center px-8 relative z-10">
-                <div className="w-16 h-16 rounded-full bg-[#989836]/15 border border-[#989836]/30 flex items-center justify-center text-2xl text-[#d8c58f]">
+                <div className="w-16 h-16 rounded-full bg-[#999933]/15 border border-[#999933]/30 flex items-center justify-center text-2xl text-[#f2f2f2]">
                   📷
                 </div>
-                <span className="text-[#d8c58f] text-xs font-bold uppercase tracking-widest block mt-2">
+                <span className="text-[#f2f2f2] text-xs font-bold uppercase tracking-widest block mt-2">
                   No Image Uploaded
                 </span>
                 <span className="text-[10px] text-white/35 font-mono leading-relaxed block max-w-xs">
                   Upload a 900x900 jpg image to:<br />
-                  <code className="text-[#d8c58f] bg-black/40 px-1.5 py-0.5 rounded block mt-1.5 break-all select-all">
+                  <code className="text-[#f2f2f2] bg-black/40 px-1.5 py-0.5 rounded block mt-1.5 break-all select-all">
                     /public/products/{product.photoFolder}/{product.photo}.jpg
                   </code>
                 </span>
@@ -274,7 +277,7 @@ export default function ProductDetailPage() {
 
             {/* Product Meta Category & Tribe Badges */}
             <div className="flex flex-wrap gap-2.5">
-              <span className="inline-block text-[10px] font-bold bg-[#989836]/15 text-[#d8c58f] border border-[#989836]/30 px-3 py-1 rounded-full uppercase tracking-wider font-label-sm">
+              <span className="inline-block text-[10px] font-bold bg-[#999933]/15 text-[#f2f2f2] border border-[#999933]/30 px-3 py-1 rounded-full uppercase tracking-wider font-label-sm">
                 {product.category}
               </span>
               {product.tribe && (
@@ -302,7 +305,7 @@ export default function ProductDetailPage() {
               <div>
                 <span className="text-[10px] font-mono text-white/45 uppercase block">Est. B2B Unit Cost</span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-3xl font-black text-[#d8c58f] font-headline-lg">
+                  <span className="text-3xl font-black text-[#f2f2f2] font-headline-lg">
                     ${finalPrice.toFixed(2)}
                   </span>
                   {isLoggedIn && user && (
@@ -320,7 +323,7 @@ export default function ProductDetailPage() {
               ) : (
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="text-[10px] font-mono text-[#d8c58f] hover:text-white underline bg-transparent border-0 cursor-pointer"
+                  className="text-[10px] font-mono text-[#f2f2f2] hover:text-white underline bg-transparent border-0 cursor-pointer"
                 >
                   Log in for partner discounts
                 </button>
@@ -340,7 +343,7 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={() => setIsDescriptionExpanded((expanded) => !expanded)}
                   aria-expanded={isDescriptionExpanded}
-                  className="self-start bg-transparent border-0 p-0 text-[10px] font-bold uppercase tracking-wider text-[#d8c58f] hover:text-white transition-colors cursor-pointer"
+                  className="self-start bg-transparent border-0 p-0 text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2] hover:text-white transition-colors cursor-pointer"
                 >
                   {isDescriptionExpanded ? "Show less" : "Read full description"}
                 </button>
@@ -354,7 +357,7 @@ export default function ProductDetailPage() {
 
               {/* Size Select Dropdown */}
               {!product.optionsLoaded ? (
-                <div className="rounded border border-[#d8c58f]/20 bg-[#d8c58f]/5 px-4 py-3 text-xs text-[#d8c58f]">
+                <div className="rounded border border-[#f2f2f2]/20 bg-[#f2f2f2]/5 px-4 py-3 text-xs text-[#f2f2f2]">
                   {productLoadError || "Loading product options..."}
                 </div>
               ) : product.options.length > 1 && (
@@ -365,7 +368,7 @@ export default function ProductDetailPage() {
                   <select
                     value={selectedOptIdx}
                     onChange={(e) => setSelectedOptIdx(parseInt(e.target.value))}
-                    className="bg-[#1a1a1a] border border-white/10 text-sm text-white rounded px-4 py-3.5 focus:border-[#989836] outline-none w-full"
+                    className="bg-[#1a1a1a] border border-white/10 text-sm text-white rounded px-4 py-3.5 focus:border-[#999933] outline-none w-full"
                   >
                     {product.options.map((opt, idx) => (
                       <option key={opt.sku} value={idx}>
@@ -408,7 +411,7 @@ export default function ProductDetailPage() {
                   <button
                     onClick={handleAddToCartClick}
                     disabled={!product.optionsLoaded}
-                    className="w-full bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded shadow-lg shadow-[#cc6632]/20 hover:shadow-[#cc6632]/45 transition-all flex items-center justify-center gap-2 cursor-pointer border-0"
+                    className="w-full bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/45 transition-all flex items-center justify-center gap-2 cursor-pointer border-0"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     {product.optionsLoaded ? "Add to Basket" : "Loading options..."}
@@ -424,14 +427,14 @@ export default function ProductDetailPage() {
             {/* B2B Certifications Trust Flags */}
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               <div className="flex items-start gap-2.5">
-                <ShieldCheck className="w-5 h-5 text-[#d8c58f] shrink-0 mt-0.5" />
+                <ShieldCheck className="w-5 h-5 text-[#f2f2f2] shrink-0 mt-0.5" />
                 <div>
                   <span className="text-[11px] font-bold text-white block">Sustainably Harvested</span>
                   <span className="text-[10px] text-white/40 leading-relaxed block">Honoring natural cycles</span>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
-                <Globe className="w-5 h-5 text-[#d8c58f] shrink-0 mt-0.5" />
+                <Globe className="w-5 h-5 text-[#f2f2f2] shrink-0 mt-0.5" />
                 <div>
                   <span className="text-[11px] font-bold text-white block">Direct Indigenous Trade</span>
                   <span className="text-[10px] text-white/40 leading-relaxed block">Fair compensation share</span>
@@ -454,7 +457,7 @@ export default function ProductDetailPage() {
                 onClick={() => scrollRelatedProducts(-1)}
                 disabled={!relatedControls.previous}
                 aria-label="Show previous related product"
-                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#d8c58f] shadow-lg transition-colors hover:border-[#d8c58f] hover:text-[#eadcae] disabled:cursor-not-allowed disabled:opacity-30"
+                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#ffffff] disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -463,7 +466,7 @@ export default function ProductDetailPage() {
                 onClick={() => scrollRelatedProducts(1)}
                 disabled={!relatedControls.next}
                 aria-label="Show next related product"
-                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#d8c58f] shadow-lg transition-colors hover:border-[#d8c58f] hover:text-[#eadcae] disabled:cursor-not-allowed disabled:opacity-30"
+                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#ffffff] disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -500,7 +503,7 @@ export default function ProductDetailPage() {
                 <div
                   key={p.id}
                   data-related-product
-                  className="group flex min-w-[86%] snap-start flex-col gap-4 rounded-lg border border-white/5 bg-[#131313] p-5 text-left transition-all duration-300 hover:border-[#989836]/30 hover:shadow-lg hover:shadow-[#989836]/5 sm:min-w-[calc(50%_-_10px)] lg:min-w-[calc(25%_-_18px)]"
+                  className="group flex min-w-[86%] snap-start flex-col gap-4 rounded-lg border border-white/5 bg-[#131313] p-5 text-left transition-all duration-300 hover:border-[#999933]/30 hover:shadow-lg hover:shadow-[#999933]/5 sm:min-w-[calc(50%_-_10px)] lg:min-w-[calc(25%_-_18px)]"
                 >
                   {/* Product Image */}
                   <Link href={`/product/${p.id}?fromPage=${fromPage}`} className="block aspect-square overflow-hidden rounded-lg bg-[#1a1a1a] border border-white/5 relative">
@@ -517,12 +520,12 @@ export default function ProductDetailPage() {
 
                   <div className="flex flex-col gap-2">
                     {/* Product Title */}
-                    <Link href={`/product/${p.id}?fromPage=${fromPage}`} className="font-headline-md text-base font-bold text-white group-hover:text-[#d8c58f] transition-colors line-clamp-2 no-underline min-h-[48px] flex items-center">
+                    <Link href={`/product/${p.id}?fromPage=${fromPage}`} className="font-headline-md text-base font-bold text-white group-hover:text-[#f2f2f2] transition-colors line-clamp-2 no-underline min-h-[48px] flex items-center">
                       {displayName}
                     </Link>
 
                     {/* Price Range */}
-                    <span className="text-[#d8c58f] font-headline-md font-bold text-sm">
+                    <span className="text-[#f2f2f2] font-headline-md font-bold text-sm">
                       ${minPrice.toFixed(2)} – ${maxPrice.toFixed(2)}
                     </span>
                   </div>

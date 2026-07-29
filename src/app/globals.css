@@ -1,27 +1,33 @@
 @import "tailwindcss";
 
 @theme {
+  /* Maya Herbs core brand palette */
+  --color-brand-orange: #cc6633;
+  --color-brand-olive: #999933;
+  --color-brand-white: #ffffff;
+  --color-brand-gray: #f2f2f2;
+
   --color-on-tertiary-fixed-variant: #454747;
   --color-surface-container-highest: #353535;
   --color-outline: #889390;
   --color-on-secondary-fixed: #1a1c1c;
   --color-on-secondary: #2f3131;
   --color-on-tertiary: #2f3131;
-  --color-primary-fixed-dim: #d8c58f;
+  --color-primary-fixed-dim: #f2f2f2;
   --color-on-primary: #003730;
-  --color-surface-tint: #d8c58f;
+  --color-surface-tint: #f2f2f2;
   --color-on-secondary-fixed-variant: #454747;
-  --color-primary-fixed: #eadcae;
-  --color-on-background: #e5e2e1;
+  --color-primary-fixed: #ffffff;
+  --color-on-background: #f2f2f2;
   --color-on-primary-fixed-variant: #005046;
   --color-error: #ffb4ab;
   --color-tertiary-container: #727373;
   --color-tertiary: #c6c6c7;
   --color-on-primary-fixed: #00201b;
-  --color-inverse-surface: #e5e2e1;
+  --color-inverse-surface: #f2f2f2;
   --color-on-error-container: #ffdad6;
   --color-on-secondary-container: #b4b5b5;
-  --color-on-surface: #e5e2e1;
+  --color-on-surface: #f2f2f2;
   --color-surface-container-low: #1b1c1c;
   --color-on-surface-variant: #bec9c5;
   --color-error-container: #93000a;
@@ -41,9 +47,9 @@
   --color-surface-container-high: #2a2a2a;
   --color-inverse-primary: #6f7025;
   --color-surface-container-lowest: #0e0e0e;
-  --color-primary-container: #989836;
+  --color-primary-container: #999933;
   --color-inverse-on-surface: #303030;
-  --color-primary: #d8c58f;
+  --color-primary: #f2f2f2;
   --color-surface-dim: #25362d;
   --color-on-tertiary-container: #fafafa;
   --color-tertiary-fixed-dim: #c6c6c7;
@@ -142,7 +148,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  color: #e5e2e1;
+  color: #f2f2f2;
   overflow-x: clip;
 }
 
@@ -150,6 +156,81 @@ body {
   position: sticky !important;
   top: 0;
   z-index: 50;
+  background-color: #ffffff !important;
+  color: #1e1e1e !important;
+}
+
+.site-header #mobile-navigation {
+  background-color: #ffffff !important;
+  border-color: #f2f2f2 !important;
+}
+
+.site-header :is(a, button):not([href="/digital-catalog"], [href="/register"]) {
+  color: #1e1e1e !important;
+}
+
+.site-header :is(a, button):not([href="/digital-catalog"], [href="/register"]):hover {
+  color: #cc6633 !important;
+}
+
+.site-header nav a::after {
+  background-color: #999933 !important;
+  box-shadow: none !important;
+}
+
+.site-header a[href="/digital-catalog"] {
+  border-color: rgb(153 153 51 / 0.5) !important;
+  background-color: rgb(153 153 51 / 0.1) !important;
+  color: #1e1e1e !important;
+}
+
+.site-header a[href="/digital-catalog"]:hover,
+.site-header a[href="/digital-catalog"][aria-current="page"] {
+  border-color: #999933 !important;
+  background-color: rgb(153 153 51 / 0.2) !important;
+  color: #1e1e1e !important;
+}
+
+.site-header a[href="/register"] {
+  border-color: rgb(30 30 30 / 0.12) !important;
+  background-color: #f2f2f2 !important;
+  color: #1e1e1e !important;
+}
+
+.site-header a[href="/register"]:hover {
+  border-color: rgb(30 30 30 / 0.2) !important;
+  background-color: #e6e6e6 !important;
+  color: #1e1e1e !important;
+}
+
+.site-header #mobile-navigation a[href="/register"] {
+  border-color: #cc6633 !important;
+  background-color: #cc6633 !important;
+  color: #ffffff !important;
+}
+
+.site-header #mobile-navigation a[href="/register"]:hover {
+  border-color: #b6532a !important;
+  background-color: #b6532a !important;
+  color: #ffffff !important;
+}
+
+.site-header button[aria-label^="Open order sheet"] {
+  border-color: rgb(30 30 30 / 0.15) !important;
+  background-color: #f2f2f2 !important;
+  color: #1e1e1e !important;
+}
+
+.site-header button[aria-label^="Open order sheet"]:hover {
+  border-color: rgb(204 102 51 / 0.5) !important;
+  background-color: #ffffff !important;
+  color: #cc6633 !important;
+}
+
+.site-header button[aria-label^="Open order sheet"] span {
+  border-color: #ffffff !important;
+  background-color: #cc6633 !important;
+  color: #ffffff !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -339,7 +420,7 @@ html[data-theme="light"] [class~="before:bg-[#131313]"]::before {
   }
 }
 
-html[data-theme="light"] [class~="text-[#e5e2e1]"],
+html[data-theme="light"] [class~="text-[#f2f2f2]"],
 html[data-theme="light"] [class~="text-white"] {
   color: #17201e !important;
 }
@@ -376,7 +457,7 @@ html[data-theme="light"] :is(
   color: #5b6864 !important;
 }
 
-html[data-theme="light"] [class~="text-[#d8c58f]"] {
+html[data-theme="light"] [class~="text-[#f2f2f2]"] {
   color: #6f7025 !important;
 }
 
@@ -464,8 +545,8 @@ html[data-theme="light"] [class*="bg-black"][class*="text-white"] {
 
 /* Keep brand actions readable in both themes. */
 html[data-theme="light"] :is(
-  [class~="bg-[#cc6632]"],
-  [class~="bg-[#989836]"],
+  [class~="bg-[#cc6633]"],
+  [class~="bg-[#999933]"],
   [class~="bg-[#284e32]"],
   [class~="bg-[#93000a]"]
 )[class~="text-white"] {
@@ -571,8 +652,8 @@ html[data-theme="light"] .theme-dark-zone :is(
   color: #a3b8b0 !important;
 }
 
-html[data-theme="light"] .theme-dark-zone [class~="text-[#d8c58f]"] {
-  color: #d8c58f !important;
+html[data-theme="light"] .theme-dark-zone [class~="text-[#f2f2f2]"] {
+  color: #f2f2f2 !important;
 }
 
 html[data-theme="light"] .theme-dark-zone [class~="hover:text-white"]:hover {
@@ -731,7 +812,7 @@ html[data-theme="light"] body .lineage-showcase .lineage-link {
 }
 
 html[data-theme="light"] body .lineage-showcase .lineage-link:hover {
-  color: #989836 !important;
+  color: #999933 !important;
 }
 
 html[data-theme="light"] body .lineage-showcase .lineage-decorative-band {
@@ -842,7 +923,7 @@ html[data-theme="light"] .home-no-glass .wholesale-format-card {
   width: 0.34rem;
   height: 0.34rem;
   border-radius: 9999px;
-  background-color: #d8c58f;
+  background-color: #f2f2f2;
   box-shadow: 0 0 0 4px rgb(38 128 114 / 0.12);
 }
 
@@ -853,7 +934,7 @@ html[data-theme="light"] .home-no-glass .wholesale-format-card {
 
 .editorial-copy a,
 .editorial-contact a {
-  color: #d8c58f;
+  color: #f2f2f2;
   text-decoration: underline;
   text-decoration-color: rgb(130 214 197 / 0.35);
   text-underline-offset: 0.25rem;

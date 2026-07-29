@@ -134,7 +134,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
             {/* Header */}
             <div>
-              <span className="text-[10px] font-mono tracking-widest text-[#d8c58f] uppercase flex items-center gap-1.5 mb-1">
+              <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase flex items-center gap-1.5 mb-1">
                 <FileText className="w-3.5 h-3.5" />
                 Step 1 of 3: Vetting Application
               </span>
@@ -165,7 +165,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="e.g. John Doe"
-                  className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                  className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
                 />
                 {errors.fullName && <span role="alert" className="text-xs text-[#ffb4ab]">{errors.fullName}</span>}
               </div>
@@ -185,7 +185,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   value={formData.businessName}
                   onChange={handleChange}
                   placeholder="e.g. Forest Botanicals Ltd."
-                  className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                  className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
                 />
                 {errors.businessName && <span role="alert" className="text-xs text-[#ffb4ab]">{errors.businessName}</span>}
               </div>
@@ -204,7 +204,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   value={formData.taxId}
                   onChange={handleChange}
                   placeholder="e.g. EIN-12-3456789"
-                  className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                  className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
                 />
                 {errors.taxId && <span role="alert" className="text-xs text-[#ffb4ab]">{errors.taxId}</span>}
               </div>
@@ -225,7 +225,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="john@company.com"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
                   />
                   {errors.email && <span role="alert" className="text-xs text-[#ffb4ab]">{errors.email}</span>}
                 </div>
@@ -243,7 +243,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+1 (555) 123-4567"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
                   />
                   {errors.phone && <span role="alert" className="text-xs text-[#ffb4ab]">{errors.phone}</span>}
                 </div>
@@ -260,7 +260,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     name="volume"
                     value={formData.volume}
                     onChange={handleChange}
-                    className="bg-[#131313] border border-[#3e4946] focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors appearance-none"
+                    className="bg-[#131313] border border-[#3e4946] focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors appearance-none"
                   >
                     <option value="low">Under $1,000 / month</option>
                     <option value="medium">$1,000 - $5,000 / month</option>
@@ -277,7 +277,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     name="resaleIntent"
                     value={formData.resaleIntent}
                     onChange={handleChange}
-                    className="bg-[#131313] border border-[#3e4946] focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors appearance-none"
+                    className="bg-[#131313] border border-[#3e4946] focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors appearance-none"
                   >
                     <option value="retail">Physical Botanical/Wellness Shop</option>
                     <option value="online">Online E-Commerce store</option>
@@ -295,7 +295,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   id="agreeEthical"
                   checked={formData.agreeEthical}
                   onChange={handleChange}
-                  className="w-4 h-4 mt-0.5 rounded text-[#989836] focus:ring-[#989836] bg-[#131313] border-white/10"
+                  className="w-4 h-4 mt-0.5 rounded text-[#999933] focus:ring-[#999933] bg-[#131313] border-white/10"
                 />
                 <label htmlFor="agreeEthical" className="text-xs text-white/70 leading-relaxed font-body-md cursor-pointer select-none">
                   I agree to represent the origin of these botanical blends responsibly and support the direct profit-sharing program for producer communities.
@@ -317,7 +317,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full sm:w-auto bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6632]/15 hover:shadow-[#cc6632]/30 disabled:opacity-50"
+                className="w-full sm:w-auto bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6633]/15 hover:shadow-[#cc6633]/30 disabled:opacity-50"
               >
                 {submitting ? (
                   <>
@@ -337,7 +337,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
         ) : (
           /* Success Screen */
           <div role="status" className="p-6 sm:p-10 flex flex-col items-center text-center gap-5 sm:gap-6 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-[#989836]/10 border border-[#989836]/20 flex items-center justify-center text-[#d8c58f]">
+            <div className="w-16 h-16 rounded-full bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2]">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
@@ -353,7 +353,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
             <div className="bg-[#131313] border border-white/5 rounded-sm p-4 w-full flex flex-col gap-2 font-mono text-left max-w-sm">
               <div className="flex justify-between text-xs">
                 <span className="text-white/40">FORM CHECK:</span>
-                <span className="text-[#d8c58f] font-bold">LOCAL VALIDATION</span>
+                <span className="text-[#f2f2f2] font-bold">LOCAL VALIDATION</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-white/40">STATUS:</span>
@@ -366,14 +366,14 @@ export default function ApplicationModal({ isOpen, onClose }) {
             </div>
 
             <div className="flex items-center gap-2 text-[10px] font-mono text-white/40 uppercase">
-              <ShieldCheck className="w-4 h-4 text-[#d8c58f]" />
+              <ShieldCheck className="w-4 h-4 text-[#f2f2f2]" />
               No administrative changes were made
             </div>
 
             <Link
               href="/register"
               onClick={handleClose}
-              className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-sm transition-all border-0 cursor-pointer w-full max-w-sm shadow-md"
+              className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-sm transition-all border-0 cursor-pointer w-full max-w-sm shadow-md"
             >
               Continue to Secure Registration
             </Link>

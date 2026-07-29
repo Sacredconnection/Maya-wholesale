@@ -32,7 +32,7 @@ export default function WholesaleFormats() {
       className="flex w-full flex-col gap-8 sm:gap-10"
     >
       <div className="max-w-3xl">
-        <span className="mb-3 block font-label-sm text-[10px] font-bold uppercase tracking-[0.2em] text-[#d8c58f] sm:text-xs">
+        <span className="mb-3 block font-label-sm text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2] sm:text-xs">
           Product Line &amp; Categories
         </span>
         <h2
@@ -68,10 +68,10 @@ export default function WholesaleFormats() {
             </div>
 
             <div className="relative z-10 border-t border-white/10 pt-6">
-              <span className="wholesale-format-category mb-2 block font-label-sm text-[10px] font-bold uppercase tracking-[0.16em] text-[#eadcae]">
+              <span className="wholesale-format-category mb-2 block font-label-sm text-[10px] font-bold uppercase tracking-[0.16em] text-[#ffffff]">
                 {category}
               </span>
-              <h3 className="wholesale-format-title font-headline-md text-2xl font-bold text-white transition-colors duration-300 group-hover:text-[#eadcae]">
+              <h3 className="wholesale-format-title font-headline-md text-2xl font-bold text-white transition-colors duration-300 group-hover:text-[#ffffff]">
                 {title}
               </h3>
               <p className="wholesale-format-description mt-3 max-w-xl font-body-md text-sm leading-relaxed text-white/80">

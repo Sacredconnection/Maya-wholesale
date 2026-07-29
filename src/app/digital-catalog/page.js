@@ -307,7 +307,7 @@ export default function CatalogPage() {
   };
 
   return (
-    <div id="top" className="site-background-page flex min-h-screen flex-col bg-[#25362D] text-[#e5e2e1] antialiased">
+    <div id="top" className="site-background-page flex min-h-screen flex-col bg-[#25362D] text-[#f2f2f2] antialiased">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       {(exporting === "pdf" || exporting === "preview") && (
@@ -319,9 +319,9 @@ export default function CatalogPage() {
           aria-live="assertive"
           aria-label="Generating your PDF catalog. Please wait and keep this page open."
         >
-          <div className="w-full max-w-xl rounded-xl border border-[#d8c58f]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
+          <div className="w-full max-w-xl rounded-xl border border-[#f2f2f2]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
             <LoaderCircle
-              className="mx-auto h-14 w-14 animate-spin text-[#d8c58f] sm:h-16 sm:w-16"
+              className="mx-auto h-14 w-14 animate-spin text-[#f2f2f2] sm:h-16 sm:w-16"
               aria-hidden="true"
             />
             <p className="mt-7 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
@@ -376,7 +376,7 @@ export default function CatalogPage() {
                   type="button"
                   onClick={handlePreviewPdf}
                   disabled={Boolean(exporting)}
-                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#989836]/60 bg-[#989836]/20 px-3 text-[10px] font-black uppercase tracking-wider text-[#d8c58f] transition-colors hover:bg-[#989836]/30 disabled:cursor-wait disabled:opacity-50 sm:px-4 sm:text-xs"
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#999933]/60 bg-[#999933]/20 px-3 text-[10px] font-black uppercase tracking-wider text-[#f2f2f2] transition-colors hover:bg-[#999933]/30 disabled:cursor-wait disabled:opacity-50 sm:px-4 sm:text-xs"
                 >
                   <RefreshCw
                     className={`h-4 w-4 ${exporting === "preview" ? "animate-spin" : ""}`}
@@ -389,7 +389,7 @@ export default function CatalogPage() {
                   download="maya-herbs-wholesale-catalog.pdf"
                   className="inline-flex min-h-10 items-center justify-center gap-2 rounded-sm border border-white/15 bg-white/5 px-3 text-[10px] font-black uppercase tracking-wider text-white transition-colors hover:bg-white/10 sm:px-4 sm:text-xs"
                 >
-                  <Download className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+                  <Download className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
                   Download
                 </a>
                 <button
@@ -424,7 +424,7 @@ export default function CatalogPage() {
       <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-12 lg:px-8">
         <header className="flex flex-col gap-6 border-b border-white/10 pb-8">
           <div className="max-w-3xl">
-            <span className="mb-3 inline-flex rounded-full border border-[#989836]/40 bg-[#989836]/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#d8c58f]">
+            <span className="mb-3 inline-flex rounded-full border border-[#999933]/40 bg-[#999933]/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#f2f2f2]">
               Interactive digital catalog
             </span>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
@@ -437,11 +437,11 @@ export default function CatalogPage() {
 
           <div className="flex w-full flex-col items-stretch gap-4">
             <section
-              className="catalog-export-tip rounded-lg border border-[#d8c58f]/25 bg-[#242f27]/70 px-4 py-4 shadow-lg shadow-black/10 sm:px-5"
+              className="catalog-export-tip rounded-lg border border-[#f2f2f2]/25 bg-[#242f27]/70 px-4 py-4 shadow-lg shadow-black/10 sm:px-5"
               aria-labelledby="pdf-export-tip-title"
             >
               <div className="flex min-w-0 gap-3">
-                <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#d8c58f]" aria-hidden="true" />
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#f2f2f2]" aria-hidden="true" />
                 <div className="min-w-0">
                   <h2 id="pdf-export-tip-title" className="text-sm font-black text-white">
                     Customize your PDF catalog
@@ -454,7 +454,7 @@ export default function CatalogPage() {
                       className={`inline-flex rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] ${
                         hasActiveExportFilters
                           ? "bg-[#d99a1b]/15 text-[#ffd27a]"
-                          : "bg-[#989836]/25 text-[#d8c58f]"
+                          : "bg-[#999933]/25 text-[#f2f2f2]"
                       }`}
                       aria-live="polite"
                     >
@@ -467,7 +467,7 @@ export default function CatalogPage() {
                         type="button"
                         onClick={clearFilters}
                         disabled={loading}
-                        className="text-xs font-bold text-[#d8c58f] transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
+                        className="text-xs font-bold text-[#f2f2f2] transition-colors hover:text-white disabled:cursor-wait disabled:opacity-50"
                       >
                         Clear filters for full catalog
                       </button>
@@ -482,12 +482,12 @@ export default function CatalogPage() {
                 type="button"
                 disabled={Boolean(exporting)}
                 onClick={() => handleExport("pdf")}
-                className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white transition-colors hover:border-[#989836]/60 hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white transition-colors hover:border-[#999933]/60 hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
               >
                 {exporting === "pdf" ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin text-[#d8c58f]" aria-hidden="true" />
+                  <LoaderCircle className="h-4 w-4 animate-spin text-[#f2f2f2]" aria-hidden="true" />
                 ) : (
-                  <FileText className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+                  <FileText className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
                 )}
                 {exporting === "pdf" ? "Generating PDF" : "Generate PDF"}
               </button>
@@ -495,12 +495,12 @@ export default function CatalogPage() {
                 type="button"
                 disabled={Boolean(exporting)}
                 onClick={() => handleExport("excel")}
-                className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white transition-colors hover:border-[#989836]/60 hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white transition-colors hover:border-[#999933]/60 hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
               >
                 {exporting === "excel" ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin text-[#d8c58f]" aria-hidden="true" />
+                  <LoaderCircle className="h-4 w-4 animate-spin text-[#f2f2f2]" aria-hidden="true" />
                 ) : (
-                  <FileSpreadsheet className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+                  <FileSpreadsheet className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
                 )}
                 {exporting === "excel" ? "Preparing Excel" : "Export Excel"}
               </button>
@@ -508,12 +508,12 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={() => setIsCartOpen(true)}
-                  className="relative inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-[#1a1a1a] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-[#989836]/60"
+                  className="relative inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-[#1a1a1a] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-[#999933]/60"
                 >
-                  <ShoppingBag className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+                  <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
                   Order sheet
                   {cartTotalItems > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#cc6632] px-1 text-[10px] text-white">
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#cc6633] px-1 text-[10px] text-white">
                       {cartTotalItems}
                     </span>
                   )}
@@ -522,7 +522,7 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={() => setIsLoginOpen(true)}
-                  className="rounded-sm bg-[#cc6632] px-6 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#b6532a]"
+                  className="rounded-sm bg-[#cc6633] px-6 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#b6532a]"
                 >
                   Client login
                 </button>
@@ -569,7 +569,7 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={() => setReloadKey((key) => key + 1)}
-                  className="mt-5 rounded-sm border border-[#989836]/50 bg-[#989836]/15 px-5 py-3 text-xs font-bold uppercase tracking-wider text-[#d8c58f]"
+                  className="mt-5 rounded-sm border border-[#999933]/50 bg-[#999933]/15 px-5 py-3 text-xs font-bold uppercase tracking-wider text-[#f2f2f2]"
                 >
                   Try again
                 </button>
@@ -626,7 +626,7 @@ export default function CatalogPage() {
                           aria-label={`Go to page ${item}`}
                           className={`h-10 min-w-10 rounded-sm border px-3 text-xs font-bold transition-colors ${
                             pagination.page === item
-                              ? "border-[#989836] bg-[#989836] text-white"
+                              ? "border-[#999933] bg-[#999933] text-white"
                               : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
                           }`}
                         >
@@ -657,7 +657,7 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="mt-5 text-xs font-bold uppercase tracking-wider text-[#d8c58f]"
+                  className="mt-5 text-xs font-bold uppercase tracking-wider text-[#f2f2f2]"
                 >
                   Clear filters
                 </button>

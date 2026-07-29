@@ -115,7 +115,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="site-background-page min-h-screen bg-[#0f0f0f] text-[#e5e2e1] flex flex-col antialiased">
+    <div className="site-background-page min-h-screen bg-[#0f0f0f] text-[#f2f2f2] flex flex-col antialiased">
       {/* Top Header */}
       <div className="theme-dark-zone w-full border-b border-white/5 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between bg-[#131313] z-10">
         <Link href="/" className="flex items-center gap-2">
@@ -128,14 +128,14 @@ export default function RegisterPage() {
             className="h-14 w-auto opacity-90 transition-opacity hover:opacity-100"
           />
         </Link>
-        <Link href="/" className="text-xs font-mono text-[#d8c58f] hover:text-white transition-colors flex items-center gap-1 font-bold">
+        <Link href="/" className="text-xs font-mono text-[#f2f2f2] hover:text-white transition-colors flex items-center gap-1 font-bold">
           <ChevronLeft className="w-4 h-4" /> Back to Home
         </Link>
       </div>
 
       {/* Main Container */}
       <div className="flex-grow flex items-center justify-center py-8 sm:py-10 lg:py-12 px-4 sm:px-6 relative">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#989836]/5 blur-3xl pointer-events-none rounded-full" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#999933]/5 blur-3xl pointer-events-none rounded-full" />
 
         <div className="w-full max-w-md z-10">
           {!submitted ? (
@@ -146,7 +146,7 @@ export default function RegisterPage() {
             >
 
               <div>
-                <span className="text-[10px] font-mono tracking-widest text-[#d8c58f] uppercase block mb-1">
+                <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase block mb-1">
                   B2B Partner Portal
                 </span>
                 <h1 className="text-2xl font-bold text-white font-headline-md">
@@ -180,7 +180,7 @@ export default function RegisterPage() {
                     value={form.username}
                     onChange={set("username")}
                     placeholder="e.g. johndoe"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -199,7 +199,7 @@ export default function RegisterPage() {
                     value={form.email}
                     onChange={set("email")}
                     placeholder="name@company.com"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -219,7 +219,7 @@ export default function RegisterPage() {
                     value={form.password}
                     onChange={set("password")}
                     placeholder="12–128 characters"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -238,7 +238,7 @@ export default function RegisterPage() {
                     value={form.address}
                     onChange={set("address")}
                     placeholder="1234 Main St"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -257,7 +257,7 @@ export default function RegisterPage() {
                     value={form.city}
                     onChange={set("city")}
                     placeholder="New York"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -276,7 +276,7 @@ export default function RegisterPage() {
                     value={form.zip}
                     onChange={set("zip")}
                     placeholder="10001"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -293,7 +293,7 @@ export default function RegisterPage() {
                       autoComplete="country"
                       value={form.country}
                       onChange={handleCountryChange}
-                      className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-11 text-sm text-white outline-none transition-colors focus:border-[#989836] cursor-pointer"
+                      className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-11 text-sm text-white outline-none transition-colors focus:border-[#999933] cursor-pointer"
                       required
                     >
                       <option value="" disabled>Select a country / region...</option>
@@ -319,7 +319,7 @@ export default function RegisterPage() {
                     value={form.state}
                     onChange={set("state")}
                     placeholder="Select a state / region..."
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                   />
                 </div>
 
@@ -337,7 +337,7 @@ export default function RegisterPage() {
                     value={form.phone}
                     onChange={set("phone")}
                     placeholder="(123) 456-7890"
-                    className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
@@ -351,7 +351,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6632]/15 disabled:opacity-50 mt-2"
+                className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6633]/15 disabled:opacity-50 mt-2"
               >
                 {submitting ? (
                   <>
@@ -366,7 +366,7 @@ export default function RegisterPage() {
           ) : (
             /* Success Screen */
             <div role="status" className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-10 flex flex-col items-center text-center gap-5 sm:gap-6 shadow-2xl animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-[#989836]/10 border border-[#989836]/20 flex items-center justify-center text-[#d8c58f]">
+              <div className="w-16 h-16 rounded-full bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2]">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
@@ -387,7 +387,7 @@ export default function RegisterPage() {
               <div className="bg-[#131313] border border-white/5 rounded-lg p-4 w-full flex flex-col gap-2 font-mono text-left max-w-sm">
                 <div className="flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
                   <span className="text-white/40">USERNAME:</span>
-                  <span className="break-all text-[#d8c58f] font-bold sm:text-right">{form.username}</span>
+                  <span className="break-all text-[#f2f2f2] font-bold sm:text-right">{form.username}</span>
                 </div>
                 <div className="flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
                   <span className="text-white/40">EMAIL:</span>
@@ -401,7 +401,7 @@ export default function RegisterPage() {
 
               <Link
                 href="/"
-                className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 cursor-pointer w-full max-w-sm shadow-md text-center no-underline"
+                className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 cursor-pointer w-full max-w-sm shadow-md text-center no-underline"
               >
                 Back to Home
               </Link>

@@ -34,7 +34,7 @@ import { downloadDigitalCatalogPdf } from "@/lib/catalog-export";
 const ORDER_STATUS_STYLES = {
   "on-hold": { label: "Awaiting Contact", className: "text-yellow-400" },
   pending: { label: "Pending", className: "text-yellow-400" },
-  processing: { label: "Processing", className: "text-[#d8c58f]" },
+  processing: { label: "Processing", className: "text-[#f2f2f2]" },
   completed: { label: "Completed", className: "text-emerald-400" },
   cancelled: { label: "Cancelled", className: "text-[#ffb4ab]" },
   refunded: { label: "Refunded", className: "text-white/50" },
@@ -238,10 +238,10 @@ export default function MyAccountPage() {
   // Handle Loading State
   if (loading) {
     return (
-      <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+      <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
         <div role="status" className="flex-grow flex items-center justify-center" aria-label="Loading account">
-          <div className="w-10 h-10 border-4 border-[#989836] border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+          <div className="w-10 h-10 border-4 border-[#999933] border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
         </div>
         <Footer />
       </div>
@@ -251,12 +251,12 @@ export default function MyAccountPage() {
   // Handle Not Logged In State
   if (!isLoggedIn) {
     return (
-      <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+      <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
         <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex items-center justify-center">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 max-w-lg w-full text-center relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#989836]/10 blur-xl pointer-events-none rounded-full"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/10 blur-xl pointer-events-none rounded-full"></div>
 
             <div className="w-16 h-16 rounded-full bg-[#93000a]/10 border border-[#93000a]/30 flex items-center justify-center text-3xl mx-auto mb-6">
               <AlertCircle className="w-8 h-8 text-[#ffb4ab]" />
@@ -273,7 +273,7 @@ export default function MyAccountPage() {
               <button
                 type="button"
                 onClick={() => setIsLoginOpen(true)}
-                className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded transition-all cursor-pointer border-0 w-full shadow-lg shadow-[#cc6632]/15"
+                className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded transition-all cursor-pointer border-0 w-full shadow-lg shadow-[#cc6633]/15"
               >
                 Access Portal Login
               </button>
@@ -406,7 +406,7 @@ export default function MyAccountPage() {
   };
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       {pdfExporting && (
@@ -416,9 +416,9 @@ export default function MyAccountPage() {
           aria-live="assertive"
           aria-label="Generating your PDF catalog. Please wait and keep this page open."
         >
-          <div className="w-full max-w-xl rounded-xl border border-[#d8c58f]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
+          <div className="w-full max-w-xl rounded-xl border border-[#f2f2f2]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
             <LoaderCircle
-              className="mx-auto h-14 w-14 animate-spin text-[#d8c58f] sm:h-16 sm:w-16"
+              className="mx-auto h-14 w-14 animate-spin text-[#f2f2f2] sm:h-16 sm:w-16"
               aria-hidden="true"
             />
             <p className="mt-7 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
@@ -433,7 +433,7 @@ export default function MyAccountPage() {
 
       {/* Hero Header Section */}
       <section className="bg-[#1c1c1c] border-b border-white/15 py-8 sm:py-10 lg:py-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#989836]/10 via-transparent to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#999933]/10 via-transparent to-transparent opacity-60"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center gap-4 sm:gap-6">
           {/* Avatar */}
           <button
@@ -442,7 +442,7 @@ export default function MyAccountPage() {
             disabled={avatarSaving}
             aria-busy={avatarSaving}
             aria-label="Choose a new profile photo"
-            className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-white/20 hover:border-[#989836] cursor-pointer overflow-hidden group shrink-0 bg-[#131313] flex items-center justify-center transition-all p-0"
+            className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-white/20 hover:border-[#999933] cursor-pointer overflow-hidden group shrink-0 bg-[#131313] flex items-center justify-center transition-all p-0"
           >
             {user.avatar && !avatarLoadFailed ? (
               <img
@@ -473,14 +473,14 @@ export default function MyAccountPage() {
           />
 
           <div className="min-w-0">
-            <span className="text-[10px] font-mono tracking-widest text-[#d8c58f] uppercase">
+            <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase">
               B2B Partner Portal
             </span>
             <h1 className="break-words font-headline-md text-3xl md:text-4xl font-bold text-white mt-1">
               My Account
             </h1>
             <p className="break-words text-sm text-white/50 mt-1.5 font-mono">
-              Welcome back, <span className="text-[#d8c58f] font-bold">{user.displayName}</span> · ID: {user.accountId}
+              Welcome back, <span className="text-[#f2f2f2] font-bold">{user.displayName}</span> · ID: {user.accountId}
             </p>
           </div>
         </div>
@@ -509,11 +509,11 @@ export default function MyAccountPage() {
                   aria-pressed={active}
                   className={`flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-sm transition-all border-l-2 cursor-pointer text-left whitespace-nowrap lg:w-full select-none ${
                     active
-                      ? "bg-[#989836]/15 text-[#d8c58f] border-[#989836]"
+                      ? "bg-[#999933]/15 text-[#f2f2f2] border-[#999933]"
                       : "text-white/60 hover:text-white hover:bg-white/5 border-transparent"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? "text-[#d8c58f]" : "text-white/50"}`} />
+                  <Icon className={`w-4 h-4 ${active ? "text-[#f2f2f2]" : "text-white/50"}`} />
                   {tab.label}
                 </button>
               );
@@ -536,7 +536,7 @@ export default function MyAccountPage() {
             {activeTab === "dashboard" && (
               <div className="flex flex-col gap-10 sm:gap-12 animate-fade-in">
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 md:p-8 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#989836]/5 blur-2xl pointer-events-none rounded-full"></div>
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#999933]/5 blur-2xl pointer-events-none rounded-full"></div>
 
                   <h2 className="font-headline-md text-2xl font-bold text-white mb-4">
                     Hello, {user.firstName || user.displayName}!
@@ -544,15 +544,15 @@ export default function MyAccountPage() {
 
                   <p className="font-body-md text-sm text-white/70 leading-relaxed mb-6">
                     From your account dashboard, you can easily access your{" "}
-                    <button type="button" onClick={() => setActiveTab("orders")} className="text-[#d8c58f] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
+                    <button type="button" onClick={() => setActiveTab("orders")} className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
                       recent orders
                     </button>
                     , manage your{" "}
-                    <button type="button" onClick={() => setActiveTab("addresses")} className="text-[#d8c58f] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
+                    <button type="button" onClick={() => setActiveTab("addresses")} className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
                       shipping and billing addresses
                     </button>
                     , and update your{" "}
-                    <button type="button" onClick={() => setActiveTab("details")} className="text-[#d8c58f] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
+                    <button type="button" onClick={() => setActiveTab("details")} className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer p-0">
                       password and account details
                     </button>
                     .
@@ -563,7 +563,7 @@ export default function MyAccountPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-[#131313] border border-white/5 p-4 rounded-lg flex flex-col gap-1">
                       <span className="text-[10px] font-mono text-white/40 uppercase">Partner Discount</span>
-                      <span className="text-xl font-bold text-[#d8c58f]">{user.discountRate}% Off Base</span>
+                      <span className="text-xl font-bold text-[#f2f2f2]">{user.discountRate}% Off Base</span>
                       <span className="text-[10px] text-white/40 font-mono mt-0.5">Applied at wholesale checkout</span>
                     </div>
 
@@ -581,7 +581,7 @@ export default function MyAccountPage() {
                 {/* Active Order Mini-Card */}
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 shadow-xl flex flex-col gap-4">
                   <h3 className="font-headline-md text-sm font-bold uppercase tracking-wider text-white/80 flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-[#d8c58f]" />
+                    <Truck className="w-4 h-4 text-[#f2f2f2]" />
                     Active Orders
                   </h3>
                   {activeOrder ? (
@@ -590,7 +590,7 @@ export default function MyAccountPage() {
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                           <span className="break-all text-sm font-bold text-white">Order #{activeOrder.number}</span>
                           <span className="text-[10px] text-white/45">{activeOrder.storeName}</span>
-                          <span className="text-[10px] font-mono bg-[#989836]/20 text-[#d8c58f] border border-[#989836]/30 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-mono bg-[#999933]/20 text-[#f2f2f2] border border-[#999933]/30 px-2 py-0.5 rounded">
                             {orderStatusInfo(activeOrder.status).label}
                           </span>
                         </div>
@@ -625,7 +625,7 @@ export default function MyAccountPage() {
                 {activeOrder && (
                   <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 shadow-xl">
                     <h3 className="font-headline-md text-lg font-bold text-white mb-6 flex items-center gap-2.5">
-                      <ClipboardList className="w-5 h-5 text-[#d8c58f]" />
+                      <ClipboardList className="w-5 h-5 text-[#f2f2f2]" />
                       Active Order Tracking
                     </h3>
 
@@ -639,7 +639,7 @@ export default function MyAccountPage() {
                         </div>
                         <div>
                           <span className="text-[10px] font-mono text-white/50">Est. Total</span>
-                          <p className="text-sm font-bold text-[#d8c58f] mt-0.5">
+                          <p className="text-sm font-bold text-[#f2f2f2] mt-0.5">
                             ${Number(activeOrder.total).toFixed(2)}
                           </p>
                         </div>
@@ -648,12 +648,12 @@ export default function MyAccountPage() {
                       {/* Progress steps driven by the WooCommerce status */}
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         <div className="flex flex-col gap-2">
-                          <div className="h-1.5 bg-[#989836] rounded-full"></div>
+                          <div className="h-1.5 bg-[#999933] rounded-full"></div>
                           <span className="text-[9px] font-mono text-white/80 font-bold uppercase">1. Order Received</span>
                         </div>
                         <div className="flex flex-col gap-2">
-                          <div className={`h-1.5 rounded-full ${activeOrder.status === "processing" ? "bg-[#989836]" : "bg-white/10"}`}></div>
-                          <span className={`text-[9px] font-mono uppercase ${activeOrder.status === "processing" ? "text-[#d8c58f] font-bold" : "text-white/40"}`}>
+                          <div className={`h-1.5 rounded-full ${activeOrder.status === "processing" ? "bg-[#999933]" : "bg-white/10"}`}></div>
+                          <span className={`text-[9px] font-mono uppercase ${activeOrder.status === "processing" ? "text-[#f2f2f2] font-bold" : "text-white/40"}`}>
                             2. Payment Arranged
                           </span>
                         </div>
@@ -681,7 +681,7 @@ export default function MyAccountPage() {
 
                   {ordersLoading ? (
                     <div className="flex items-center justify-center py-12">
-                      <div className="w-8 h-8 border-4 border-[#989836] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-4 border-[#999933] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   ) : ordersError ? (
                     <div className="bg-[#93000a]/15 border border-[#ffb4ab]/20 text-[#ffb4ab] text-xs p-4 rounded flex items-center gap-2">
@@ -725,7 +725,7 @@ export default function MyAccountPage() {
                                     onClick={() =>
                                       setExpandedOrderId(expandedOrderId === order.id ? null : order.id)
                                     }
-                                    className="text-[#d8c58f] hover:underline font-bold bg-transparent border-0 cursor-pointer"
+                                    className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer"
                                   >
                                     {expandedOrderId === order.id ? "Hide Details" : "View Details"}
                                   </button>
@@ -771,7 +771,7 @@ export default function MyAccountPage() {
             {activeTab === "downloads" && (
               <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 md:p-8 shadow-xl animate-fade-in">
                 <h3 className="font-headline-md text-lg font-bold text-white mb-2 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-[#d8c58f]" />
+                  <Award className="w-5 h-5 text-[#f2f2f2]" />
                   Downloadable Partner Vault
                 </h3>
                 <p className="text-xs text-white/50 leading-relaxed mb-6">
@@ -787,7 +787,7 @@ export default function MyAccountPage() {
                   ].map((doc, idx) => (
                     <div key={idx} className="bg-[#131313] border border-white/5 rounded-lg p-5 flex flex-col justify-between hover:border-white/10 transition-colors">
                       <div className="mb-4">
-                        <FileText className="w-8 h-8 text-[#d8c58f] mb-2" />
+                        <FileText className="w-8 h-8 text-[#f2f2f2] mb-2" />
                         <h4 className="text-sm font-bold text-white mb-1">{doc.title}</h4>
                         <p className="text-xs text-white/50 leading-relaxed">{doc.desc}</p>
                       </div>
@@ -797,7 +797,7 @@ export default function MyAccountPage() {
                           type="button"
                           onClick={() => doc.isCatalog ? handleWholesaleCatalogPdf() : alert(`Downloading: ${doc.title}`)}
                           disabled={doc.isCatalog && pdfExporting}
-                          className="text-[10px] font-mono text-[#d8c58f] hover:text-white font-bold bg-transparent border-0 cursor-pointer flex items-center gap-1 disabled:cursor-wait disabled:opacity-50"
+                          className="text-[10px] font-mono text-[#f2f2f2] hover:text-white font-bold bg-transparent border-0 cursor-pointer flex items-center gap-1 disabled:cursor-wait disabled:opacity-50"
                         >
                           {doc.isCatalog && pdfExporting ? (
                             <>
@@ -842,14 +842,14 @@ export default function MyAccountPage() {
                           setEditShipping(!editShipping);
                           setShippingMessage("");
                         }}
-                        className="text-[10px] font-mono text-[#d8c58f] hover:text-white font-bold bg-transparent border-0 cursor-pointer"
+                        className="text-[10px] font-mono text-[#f2f2f2] hover:text-white font-bold bg-transparent border-0 cursor-pointer"
                       >
                         {editShipping ? "Cancel" : "Edit"}
                       </button>
                     </div>
 
                     {shippingMessage && (
-                      <p role={editShipping ? "alert" : "status"} className={`mb-3 text-xs ${editShipping ? "text-[#ffb4ab]" : "text-[#d8c58f]"}`}>
+                      <p role={editShipping ? "alert" : "status"} className={`mb-3 text-xs ${editShipping ? "text-[#ffb4ab]" : "text-[#f2f2f2]"}`}>
                         {shippingMessage}
                       </p>
                     )}
@@ -873,7 +873,7 @@ export default function MyAccountPage() {
                             autoComplete="shipping address-line1"
                             value={shippingForm.street}
                             onChange={(e) => setShippingForm(prev => ({ ...prev, street: e.target.value }))}
-                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                             required
                           />
                         </div>
@@ -886,7 +886,7 @@ export default function MyAccountPage() {
                             autoComplete="shipping address-line2"
                             value={shippingForm.neighborhood}
                             onChange={(e) => setShippingForm(prev => ({ ...prev, neighborhood: e.target.value }))}
-                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                           />
                         </div>
                         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -899,7 +899,7 @@ export default function MyAccountPage() {
                               autoComplete="shipping address-level2"
                               value={shippingForm.city}
                               onChange={(e) => setShippingForm(prev => ({ ...prev, city: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -912,7 +912,7 @@ export default function MyAccountPage() {
                               autoComplete="shipping address-level1"
                               value={shippingForm.state}
                               onChange={(e) => setShippingForm(prev => ({ ...prev, state: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -927,7 +927,7 @@ export default function MyAccountPage() {
                               autoComplete="shipping postal-code"
                               value={shippingForm.zip}
                               onChange={(e) => setShippingForm(prev => ({ ...prev, zip: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -940,14 +940,14 @@ export default function MyAccountPage() {
                               autoComplete="shipping country-name"
                               value={shippingForm.country}
                               onChange={(e) => setShippingForm(prev => ({ ...prev, country: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
                         </div>
                         <button
                           type="submit"
-                          className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-4 rounded mt-2 cursor-pointer border-0 flex items-center justify-center gap-1.5 transition-colors"
+                          className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-4 rounded mt-2 cursor-pointer border-0 flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <Save className="w-3.5 h-3.5" /> Apply Shipping Preview
                         </button>
@@ -967,14 +967,14 @@ export default function MyAccountPage() {
                           setEditBilling(!editBilling);
                           setBillingMessage("");
                         }}
-                        className="text-[10px] font-mono text-[#d8c58f] hover:text-white font-bold bg-transparent border-0 cursor-pointer"
+                        className="text-[10px] font-mono text-[#f2f2f2] hover:text-white font-bold bg-transparent border-0 cursor-pointer"
                       >
                         {editBilling ? "Cancel" : "Edit"}
                       </button>
                     </div>
 
                     {billingMessage && (
-                      <p role={editBilling ? "alert" : "status"} className={`mb-3 text-xs ${editBilling ? "text-[#ffb4ab]" : "text-[#d8c58f]"}`}>
+                      <p role={editBilling ? "alert" : "status"} className={`mb-3 text-xs ${editBilling ? "text-[#ffb4ab]" : "text-[#f2f2f2]"}`}>
                         {billingMessage}
                       </p>
                     )}
@@ -998,7 +998,7 @@ export default function MyAccountPage() {
                             autoComplete="billing address-line1"
                             value={billingForm.street}
                             onChange={(e) => setBillingForm(prev => ({ ...prev, street: e.target.value }))}
-                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                             required
                           />
                         </div>
@@ -1011,7 +1011,7 @@ export default function MyAccountPage() {
                             autoComplete="billing address-line2"
                             value={billingForm.neighborhood}
                             onChange={(e) => setBillingForm(prev => ({ ...prev, neighborhood: e.target.value }))}
-                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                            className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                           />
                         </div>
                         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1024,7 +1024,7 @@ export default function MyAccountPage() {
                               autoComplete="billing address-level2"
                               value={billingForm.city}
                               onChange={(e) => setBillingForm(prev => ({ ...prev, city: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -1037,7 +1037,7 @@ export default function MyAccountPage() {
                               autoComplete="billing address-level1"
                               value={billingForm.state}
                               onChange={(e) => setBillingForm(prev => ({ ...prev, state: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -1052,7 +1052,7 @@ export default function MyAccountPage() {
                               autoComplete="billing postal-code"
                               value={billingForm.zip}
                               onChange={(e) => setBillingForm(prev => ({ ...prev, zip: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
@@ -1065,14 +1065,14 @@ export default function MyAccountPage() {
                               autoComplete="billing country-name"
                               value={billingForm.country}
                               onChange={(e) => setBillingForm(prev => ({ ...prev, country: e.target.value }))}
-                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#989836] outline-none"
+                              className="bg-[#131313] border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-[#999933] outline-none"
                               required
                             />
                           </div>
                         </div>
                         <button
                           type="submit"
-                          className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-4 rounded mt-2 cursor-pointer border-0 flex items-center justify-center gap-1.5 transition-colors"
+                          className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-4 rounded mt-2 cursor-pointer border-0 flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <Save className="w-3.5 h-3.5" /> Apply Billing Preview
                         </button>
@@ -1090,7 +1090,7 @@ export default function MyAccountPage() {
                 {/* Profile Photo Card */}
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 md:p-8 shadow-xl">
                   <h3 className="font-headline-md text-sm font-bold uppercase tracking-wider text-white/80 flex items-center gap-2 mb-6">
-                    <Camera className="w-4 h-4 text-[#d8c58f]" />
+                    <Camera className="w-4 h-4 text-[#f2f2f2]" />
                     Profile Photo
                   </h3>
                   <div className="flex items-center gap-6">
@@ -1100,7 +1100,7 @@ export default function MyAccountPage() {
                       disabled={avatarSaving}
                       aria-busy={avatarSaving}
                       aria-label="Choose a new profile photo"
-                      className="relative w-20 h-20 rounded-full border-2 border-dashed border-white/20 hover:border-[#989836] cursor-pointer overflow-hidden group transition-all bg-[#131313] flex items-center justify-center shrink-0 p-0"
+                      className="relative w-20 h-20 rounded-full border-2 border-dashed border-white/20 hover:border-[#999933] cursor-pointer overflow-hidden group transition-all bg-[#131313] flex items-center justify-center shrink-0 p-0"
                     >
                       {user.avatar && !avatarLoadFailed ? (
                         <img
@@ -1123,7 +1123,7 @@ export default function MyAccountPage() {
                         type="button"
                         onClick={() => avatarInputRef.current?.click()}
                         disabled={avatarSaving}
-                        className="bg-[#cc6632]/15 hover:bg-[#cc6632]/30 text-[#cc6632] text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border border-[#cc6632]/30 cursor-pointer transition-all"
+                        className="bg-[#cc6633]/15 hover:bg-[#cc6633]/30 text-[#cc6633] text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border border-[#cc6633]/30 cursor-pointer transition-all"
                       >
                         {avatarSaving ? "Saving..." : "Upload New Photo"}
                       </button>
@@ -1141,7 +1141,7 @@ export default function MyAccountPage() {
                     </div>
                   </div>
                   <div id="avatar-upload-feedback" className="mt-4" aria-live="polite">
-                    {avatarMessage && <p className="text-xs text-[#d8c58f]">{avatarMessage}</p>}
+                    {avatarMessage && <p className="text-xs text-[#f2f2f2]">{avatarMessage}</p>}
                     {avatarError && <p role="alert" className="text-xs text-[#ffb4ab]">{avatarError}</p>}
                   </div>
                 </div>
@@ -1183,7 +1183,7 @@ export default function MyAccountPage() {
                         maxLength={80}
                         value={accountForm.firstName}
                         onChange={handleAccountFieldChange("firstName")}
-                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                         required
                       />
                     </div>
@@ -1197,7 +1197,7 @@ export default function MyAccountPage() {
                         maxLength={80}
                         value={accountForm.lastName}
                         onChange={handleAccountFieldChange("lastName")}
-                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                         required
                       />
                     </div>
@@ -1214,7 +1214,7 @@ export default function MyAccountPage() {
                         maxLength={160}
                         value={accountForm.displayName}
                         onChange={handleAccountFieldChange("displayName")}
-                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                         required
                       />
                       <span className="text-[10px] text-white/40 italic">This will be how your name is shown on headers and greetings.</span>
@@ -1246,7 +1246,7 @@ export default function MyAccountPage() {
                         maxLength={40}
                         value={accountForm.phone}
                         onChange={handleAccountFieldChange("phone")}
-                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                        className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                         required
                       />
                     </div>
@@ -1270,7 +1270,7 @@ export default function MyAccountPage() {
                   {/* Password Reset */}
                   <div className="rounded border border-white/10 bg-[#131313] p-4">
                     <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-1.5">
-                      <Lock className="w-4 h-4 text-[#d8c58f]" />
+                      <Lock className="w-4 h-4 text-[#f2f2f2]" />
                       Password Security
                     </h4>
                     <p className="mb-3 text-xs leading-relaxed text-white/60">
@@ -1278,7 +1278,7 @@ export default function MyAccountPage() {
                     </p>
                     <a
                       href="/api/auth/forgot-password"
-                      className="inline-flex text-xs font-bold text-[#d8c58f] transition-colors hover:text-white hover:underline"
+                      className="inline-flex text-xs font-bold text-[#f2f2f2] transition-colors hover:text-white hover:underline"
                     >
                       Open secure password management
                     </a>
@@ -1291,7 +1291,7 @@ export default function MyAccountPage() {
                           value={accountForm.currentPassword}
                           onChange={(e) => setAccountForm(prev => ({ ...prev, currentPassword: e.target.value }))}
                           placeholder="••••••••"
-                          className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                          className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                         />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1302,7 +1302,7 @@ export default function MyAccountPage() {
                             value={accountForm.newPassword}
                             onChange={(e) => setAccountForm(prev => ({ ...prev, newPassword: e.target.value }))}
                             placeholder="••••••••"
-                            className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                            className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                           />
                         </div>
                         <div className="flex flex-col gap-1.5">
@@ -1312,7 +1312,7 @@ export default function MyAccountPage() {
                             value={accountForm.confirmPassword}
                             onChange={(e) => setAccountForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                             placeholder="••••••••"
-                            className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#989836] outline-none transition-colors"
+                            className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white focus:border-[#999933] outline-none transition-colors"
                           />
                         </div>
                       </div>
@@ -1323,7 +1323,7 @@ export default function MyAccountPage() {
                     type="submit"
                     disabled={accountSaving}
                     aria-busy={accountSaving}
-                    className="bg-[#cc6632] hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-60 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 shadow-lg shadow-[#cc6632]/15 hover:shadow-[#cc6632]/30 cursor-pointer flex items-center justify-center gap-2 mt-4"
+                    className="bg-[#cc6633] hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-60 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 shadow-lg shadow-[#cc6633]/15 hover:shadow-[#cc6633]/30 cursor-pointer flex items-center justify-center gap-2 mt-4"
                   >
                     {accountSaving ? (
                       <LoaderCircle className="w-4 h-4 animate-spin" />

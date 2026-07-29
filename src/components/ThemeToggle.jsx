@@ -45,7 +45,7 @@ export default function ThemeToggle() {
       aria-label={isLight ? "Use dark theme" : "Use light theme"}
       aria-pressed={isLight}
       title={isLight ? "Dark theme" : "Light theme"}
-      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/80 transition-all duration-300 hover:border-[#d8c58f]/50 hover:bg-white/10 hover:text-[#d8c58f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8c58f] cursor-pointer"
+      className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#1e1e1e]/15 bg-[#f2f2f2] text-[#1e1e1e] transition-all duration-300 hover:border-[#cc6633]/50 hover:bg-white hover:text-[#cc6633] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#cc6633]"
     >
       {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
     </button>

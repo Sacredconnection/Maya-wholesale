@@ -113,7 +113,7 @@ export default function Onboarding() {
 
           {/* Animated fill on top of the line */}
           <div
-            className={`hidden md:block absolute top-7 left-[15%] right-[15%] h-px bg-gradient-to-r from-[#989836] to-[#d8c58f] -z-10 connector-line-fill${visible ? ' animate' : ''}`}
+            className={`hidden md:block absolute top-7 left-[15%] right-[15%] h-px bg-gradient-to-r from-[#999933] to-[#f2f2f2] -z-10 connector-line-fill${visible ? ' animate' : ''}`}
           />
 
           {steps.map((step, i) => (
@@ -126,14 +126,14 @@ export default function Onboarding() {
                 <>
                   <div className="absolute -bottom-11 left-6 top-6 w-px bg-white/10 md:hidden" />
                   <div
-                    className={`connector-line-fill-vertical absolute -bottom-11 left-6 top-6 w-px bg-gradient-to-b from-[#989836] to-[#d8c58f] md:hidden${visible ? ' animate' : ''}`}
+                    className={`connector-line-fill-vertical absolute -bottom-11 left-6 top-6 w-px bg-gradient-to-b from-[#999933] to-[#f2f2f2] md:hidden${visible ? ' animate' : ''}`}
                   />
                 </>
               )}
               <div
-                className="step-circle relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#131313] shadow-xl transition-colors duration-300 group-hover:border-[#d8c58f] md:h-14 md:w-14"
+                className="step-circle relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#131313] shadow-xl transition-colors duration-300 group-hover:border-[#f2f2f2] md:h-14 md:w-14"
               >
-                <span className="font-headline-md text-base font-bold text-white/50 group-hover:text-[#d8c58f] transition-colors duration-300">
+                <span className="font-headline-md text-base font-bold text-white/50 group-hover:text-[#f2f2f2] transition-colors duration-300">
                   {step.num}
                 </span>
               </div>
@@ -152,7 +152,7 @@ export default function Onboarding() {
         >
           <Link
             href="/register"
-            className="w-full sm:w-auto bg-[#cc6632] text-white font-label-sm text-xs font-bold uppercase tracking-widest py-3.5 px-8 sm:px-10 lg:px-12 rounded-sm hover:bg-[#b6532a] transition-all duration-300 shadow-lg shadow-[#cc6632]/20 hover:shadow-[#cc6632]/40 cursor-pointer border-0 no-underline text-center"
+            className="w-full sm:w-auto bg-[#cc6633] text-white font-label-sm text-xs font-bold uppercase tracking-widest py-3.5 px-8 sm:px-10 lg:px-12 rounded-sm hover:bg-[#b6532a] transition-all duration-300 shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/40 cursor-pointer border-0 no-underline text-center"
           >
             Create B2B Account
           </Link>

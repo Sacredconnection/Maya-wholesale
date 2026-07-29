@@ -4,15 +4,15 @@
   <defs>
     <style>
       .st0, .st1 {
-        fill: #cc6632;
+        fill: #cc6633;
       }
 
       .st2 {
-        fill: #989836;
+        fill: #999933;
       }
 
       .st1 {
-        stroke: #cc6632;
+        stroke: #cc6633;
         stroke-width: 1.45px;
       }
     </style>

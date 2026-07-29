@@ -8,6 +8,8 @@ import { useAuth } from "@/components/AuthContext";
 
 const ProductsContext = createContext(null);
 const CLIENT_CATALOG_TIMEOUT_MS = 35000;
+const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
+const LOCAL_CATALOG_TIMEOUT_MS = 120000;
 
 export function ProductsProvider({ children }) {
   const { isLoggedIn, loading: authLoading, invalidateSession } = useAuth();
@@ -60,7 +62,7 @@ export function ProductsProvider({ children }) {
     let cancelled = false;
 
     if (authLoading) return () => {};
-    if (!isLoggedIn) {
+    if (!isLoggedIn && !LOCAL_CATALOG_PREVIEW) {
       const clearTimer = window.setTimeout(() => {
         setProducts([]);
         setError("");
@@ -73,17 +75,32 @@ export function ProductsProvider({ children }) {
     async function loadCatalog() {
       setLoading(true);
       setError("");
-      setWarning("");
+      setWarning(
+        LOCAL_CATALOG_PREVIEW && !isLoggedIn
+          ? "Local catalog preview uses public Maya Herbs pricing. Sign in to verify partner-specific pricing."
+          : ""
+      );
 
       try {
-        const response = await fetch("/api/products", {
+        const isLocalAnonymousPreview =
+          LOCAL_CATALOG_PREVIEW && !isLoggedIn;
+        const response = await fetch(
+          isLocalAnonymousPreview
+            ? "/api/catalog?export=true"
+            : "/api/products",
+          {
           credentials: "same-origin",
           cache: "no-store",
-          signal: AbortSignal.timeout(CLIENT_CATALOG_TIMEOUT_MS),
-        });
+          signal: AbortSignal.timeout(
+            isLocalAnonymousPreview
+              ? LOCAL_CATALOG_TIMEOUT_MS
+              : CLIENT_CATALOG_TIMEOUT_MS
+          ),
+          }
+        );
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          if (response.status === 401) {
+          if (response.status === 401 && !isLocalAnonymousPreview) {
             invalidateSession();
             return;
           }

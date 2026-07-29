@@ -66,7 +66,7 @@ export default function FilterSidebar({
   return (
     <aside className="flex flex-col gap-5 rounded-xl border border-white/5 bg-[#1a1a1a] p-5 sm:gap-6 sm:p-6 lg:p-8">
       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
-        <Filter className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+        <Filter className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
         Filter Products
       </div>
 
@@ -94,7 +94,7 @@ export default function FilterSidebar({
               onChange={(event) => update("search", event.target.value)}
               placeholder="Name or SKU..."
               autoComplete="off"
-              className="w-full rounded-sm border border-white/10 bg-[#131313] py-4 pl-12 pr-4 text-sm text-white outline-none transition-colors placeholder:text-white/35 focus:border-[#989836]"
+              className="w-full rounded-sm border border-white/10 bg-[#131313] py-4 pl-12 pr-4 text-sm text-white outline-none transition-colors placeholder:text-white/35 focus:border-[#999933]"
             />
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function FilterSidebar({
               id="catalog-category"
               value={filters.category}
               onChange={(event) => updateCategory(event.target.value)}
-              className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#989836]"
+              className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#999933]"
             >
               <option value={allValue}>All Categories</option>
               {categories.map((category) => (
@@ -140,7 +140,7 @@ export default function FilterSidebar({
                 id="catalog-tribe"
                 value={filters.tribe}
                 onChange={(event) => updateTribe(event.target.value)}
-                className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#989836]"
+                className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#999933]"
               >
                 <option value={allValue}>{allTribesLabel}</option>
                 {tribes.map((tribe) => (
@@ -185,7 +185,7 @@ export default function FilterSidebar({
                     )
                   }
                   disabled={attribute.options.length === 0}
-                  className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#989836] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="w-full cursor-pointer appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-4 text-sm text-white outline-none transition-colors focus:border-[#999933] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   <option value="">All {attribute.name}</option>
                   {attribute.options.map((option) => (

@@ -3,13 +3,13 @@
 import { optionPriceForUser } from "@/lib/pricing";
 
 const BRAND_DARK = "FF1A1A1A";
-const BRAND_GREEN = "FF268072";
-const BRAND_MINT = "FF82D6C5";
-const BRAND_RED = "FFEC2300";
+const BRAND_GREEN = "FF999933";
+const BRAND_MINT = "FFF2F2F2";
+const BRAND_RED = "FFCC6633";
 
 const DEFAULT_ETHNICITY_COLOR = [38, 128, 114];
-const MAYA_PRIMARY = [204, 102, 50];
-const MAYA_SECONDARY = [152, 152, 54];
+const MAYA_PRIMARY = [204, 102, 51];
+const MAYA_SECONDARY = [153, 153, 51];
 const MAYA_STORE_ID = "maya-herbs";
 const ETHNICITY_COLORS = {
   apurina: [74, 115, 13],
@@ -110,7 +110,7 @@ function preparePdfDelivery() {
   previewWindow.document.body.innerHTML = `
     <main style="box-sizing:border-box;min-height:100vh;display:grid;place-items:center;margin:0;padding:32px;background:#242f27;color:#fff;font-family:Arial,sans-serif;text-align:center">
       <div>
-        <div style="width:44px;height:44px;margin:0 auto 24px;border:4px solid rgba(130,214,197,.25);border-top-color:#d8c58f;border-radius:50%;animation:catalog-spin .8s linear infinite"></div>
+        <div style="width:44px;height:44px;margin:0 auto 24px;border:4px solid rgba(153,153,51,.25);border-top-color:#f2f2f2;border-radius:50%;animation:catalog-spin .8s linear infinite"></div>
         <h1 style="margin:0;font-size:24px">Generating your PDF catalog...</h1>
         <p style="margin:14px 0 0;color:rgba(255,255,255,.72);font-size:16px;line-height:1.6">Please keep this tab open. The document will appear here when it is ready.</p>
       </div>

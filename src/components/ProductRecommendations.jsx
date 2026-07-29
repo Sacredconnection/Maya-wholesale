@@ -38,10 +38,10 @@ export default function ProductRecommendations({
   const isDrawer = variant === "drawer";
 
   return (
-    <section className={`${isDrawer ? "border-t border-white/10 pt-5" : "rounded-lg border border-[#989836]/25 bg-[#242f27]/45 p-4 sm:p-5"}`}>
+    <section className={`${isDrawer ? "border-t border-white/10 pt-5" : "rounded-lg border border-[#999933]/25 bg-[#242f27]/45 p-4 sm:p-5"}`}>
       <div className="mb-4">
         {eyebrow && (
-          <span className="mb-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#d8c58f]">
+          <span className="mb-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#f2f2f2]">
             <Sparkles className="h-3 w-3" />
             {eyebrow}
           </span>

@@ -66,7 +66,7 @@ export default function TrustBar() {
           {/* Card 1: B2B Program */}
           <div className="home-green-outline group relative flex flex-col items-start gap-4 overflow-hidden rounded-lg border bg-[#25362D] p-4 transition-[background-color,border-color,box-shadow] duration-300 ease-out hover:bg-[#304638] hover:shadow-[0_12px_30px_rgba(0,0,0,0.16)] motion-reduce:transition-none sm:p-5 lg:p-7">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-[#d8c58f]/10 border border-[#d8c58f]/20 flex items-center justify-center text-[#d8c58f] transition-colors duration-500 group-hover:bg-[#d8c58f]/15 group-hover:border-[#d8c58f]/30">
+              <div className="w-9 h-9 rounded-full bg-[#f2f2f2]/10 border border-[#f2f2f2]/20 flex items-center justify-center text-[#f2f2f2] transition-colors duration-500 group-hover:bg-[#f2f2f2]/15 group-hover:border-[#f2f2f2]/30">
                 <BriefcaseBusiness className="w-4 h-4" aria-hidden="true" />
               </div>
               <span className="text-xs font-bold uppercase tracking-widest text-white font-label-sm">
@@ -88,7 +88,7 @@ export default function TrustBar() {
           {/* Card 2: Sustainability */}
           <div className="home-green-outline group relative flex flex-col items-start gap-4 overflow-hidden rounded-lg border bg-[#25362D] p-4 transition-[background-color,border-color,box-shadow] duration-300 ease-out hover:bg-[#304638] hover:shadow-[0_12px_30px_rgba(0,0,0,0.16)] motion-reduce:transition-none sm:p-5 lg:p-7">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-[#d8c58f]/10 border border-[#d8c58f]/20 flex items-center justify-center text-[#d8c58f] transition-colors duration-500 group-hover:bg-[#d8c58f]/15 group-hover:border-[#d8c58f]/30">
+              <div className="w-9 h-9 rounded-full bg-[#f2f2f2]/10 border border-[#f2f2f2]/20 flex items-center justify-center text-[#f2f2f2] transition-colors duration-500 group-hover:bg-[#f2f2f2]/15 group-hover:border-[#f2f2f2]/30">
                 <Leaf className="w-4 h-4 transition-transform duration-500 group-hover:-rotate-3 motion-reduce:transform-none" aria-hidden="true" />
               </div>
               <span className="text-xs font-bold uppercase tracking-widest text-white font-label-sm">
@@ -99,7 +99,7 @@ export default function TrustBar() {
               <h3 className="text-base font-bold leading-snug text-white font-headline-md lg:text-lg">
                 Why Maya Herbs Wholesale?
               </h3>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-xs leading-relaxed text-white/50 font-body-md marker:text-[#d8c58f] sm:text-sm">
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-xs leading-relaxed text-white/50 font-body-md marker:text-[#f2f2f2] sm:text-sm">
                 <li>Established producer and supplier relationships.</li>
                 <li>Batch and quality checks before wholesale release.</li>
                 <li>Dedicated support for approved trade partners.</li>
@@ -110,7 +110,7 @@ export default function TrustBar() {
           {/* Card 3: Metrics */}
           <div className="home-green-outline group relative col-span-1 flex flex-col gap-4 overflow-hidden rounded-lg border bg-[#25362D] p-4 transition-[background-color,border-color,box-shadow] duration-300 ease-out hover:bg-[#304638] hover:shadow-[0_12px_30px_rgba(0,0,0,0.16)] motion-reduce:transition-none sm:p-5 md:col-span-2 lg:col-span-1 lg:p-7">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d8c58f]/20 bg-[#d8c58f]/10 text-[#d8c58f] transition-colors duration-500 group-hover:border-[#d8c58f]/30 group-hover:bg-[#d8c58f]/15">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f2f2f2]/20 bg-[#f2f2f2]/10 text-[#f2f2f2] transition-colors duration-500 group-hover:border-[#f2f2f2]/30 group-hover:bg-[#f2f2f2]/15">
                 <TrendingUp className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none" aria-hidden="true" />
               </div>
               <span className="text-xs font-bold uppercase tracking-widest text-white font-label-sm">

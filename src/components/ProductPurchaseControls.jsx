@@ -75,7 +75,7 @@ export default function ProductPurchaseControls({
           onChange={(event) => setSelectedOptionIndex(Number(event.target.value))}
           disabled={!activeProduct || Boolean(error)}
           aria-label={`Select an option for ${product.name}`}
-          className={`w-full rounded-sm border border-white/10 bg-[#131313] text-white outline-none transition-colors focus:border-[#989836] disabled:cursor-wait disabled:opacity-60 ${
+          className={`w-full rounded-sm border border-white/10 bg-[#131313] text-white outline-none transition-colors focus:border-[#999933] disabled:cursor-wait disabled:opacity-60 ${
             compact ? "px-2.5 py-2 text-[11px]" : "px-3 py-2.5 text-xs"
           }`}
         >
@@ -113,7 +113,7 @@ export default function ProductPurchaseControls({
             <span className="block truncate text-[9px] uppercase tracking-wider text-white/35">
               {selectedOption?.sku || (activeProduct ? "SKU unavailable" : "Loading price")}
             </span>
-            <strong className={`block text-[#d8c58f] ${compact ? "text-sm" : "text-base"}`}>
+            <strong className={`block text-[#f2f2f2] ${compact ? "text-sm" : "text-base"}`}>
               {price == null ? "—" : `$${price.toFixed(2)}`}
             </strong>
           </div>
@@ -142,7 +142,7 @@ export default function ProductPurchaseControls({
             type="button"
             onClick={handleAdd}
             disabled={!canAdd}
-            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border-0 bg-[#cc6632] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-45 ${
+            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border-0 bg-[#cc6633] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-45 ${
               compact ? "px-3 py-2.5 text-[9px]" : "px-4 py-3 text-[10px]"
             }`}
           >

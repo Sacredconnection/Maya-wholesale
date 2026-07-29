@@ -26,7 +26,7 @@ export default function Footer() {
               href="#top"
               onClick={handleLogoClick}
               aria-label="Back to the top of this page"
-              className="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d8c58f]"
+              className="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2f2f2]"
             >
               <Image
                 src="/banner/maya-wholesale/logo-maya-wholesale.svg"
@@ -43,7 +43,7 @@ export default function Footer() {
             ethnobotanicals supplied with experience, care and respect for
             origin.
           </p>
-          <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-[#d8c58f] uppercase font-label-sm">
+          <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-[#f2f2f2] uppercase font-label-sm">
             <ShieldCheck className="w-4 h-4" />
             Professional botanical sourcing
           </div>
@@ -55,13 +55,13 @@ export default function Footer() {
             Resources
           </h5>
           <nav className="flex flex-col gap-4">
-            <Link className="font-body-md text-base text-white/60 hover:text-[#d8c58f] transition-colors" href="/about">
+            <Link className="font-body-md text-base text-white/60 hover:text-[#f2f2f2] transition-colors" href="/about">
               About
             </Link>
-            <Link className="font-body-md text-base text-white/60 hover:text-[#d8c58f] transition-colors" href="/catalog">
+            <Link className="font-body-md text-base text-white/60 hover:text-[#f2f2f2] transition-colors" href="/catalog">
               Catalog
             </Link>
-            <Link className="font-body-md text-base text-white/60 hover:text-[#d8c58f] transition-colors" href="/contact">
+            <Link className="font-body-md text-base text-white/60 hover:text-[#f2f2f2] transition-colors" href="/contact">
               Contact
             </Link>
           </nav>
@@ -73,10 +73,10 @@ export default function Footer() {
             Legal
           </h5>
           <nav className="flex flex-col gap-4">
-            <Link className="font-body-md text-base text-white/60 hover:text-[#d8c58f] transition-colors" href="/shipping-and-returns-policy">
+            <Link className="font-body-md text-base text-white/60 hover:text-[#f2f2f2] transition-colors" href="/shipping-and-returns-policy">
               Shipping and Returns Policy
             </Link>
-            <Link className="font-body-md text-base text-white/60 hover:text-[#d8c58f] transition-colors" href="/privacy-policy">
+            <Link className="font-body-md text-base text-white/60 hover:text-[#f2f2f2] transition-colors" href="/privacy-policy">
               Privacy Policy
             </Link>
           </nav>
@@ -91,9 +91,9 @@ export default function Footer() {
             Haarlem, the Netherlands · Sourcing &amp; production in Brazil
           </p>
           <div className="flex gap-6 text-white/30">
-            <Leaf className="w-5 h-5 hover:text-[#d8c58f] transition-colors" />
-            <Globe className="w-5 h-5 hover:text-[#d8c58f] transition-colors" />
-            <Users className="w-5 h-5 hover:text-[#d8c58f] transition-colors" />
+            <Leaf className="w-5 h-5 hover:text-[#f2f2f2] transition-colors" />
+            <Globe className="w-5 h-5 hover:text-[#f2f2f2] transition-colors" />
+            <Users className="w-5 h-5 hover:text-[#f2f2f2] transition-colors" />
           </div>
         </div>
       </div>

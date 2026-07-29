@@ -82,7 +82,7 @@ export default function LoginModal({ isOpen, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#989836]/15 blur-xl pointer-events-none rounded-full"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/15 blur-xl pointer-events-none rounded-full"></div>
 
         {/* Close Button */}
         <button
@@ -101,7 +101,7 @@ export default function LoginModal({ isOpen, onClose }) {
           className="p-5 sm:p-8 flex flex-col gap-5 sm:gap-6"
         >
           <div>
-            <span className="text-[10px] font-mono tracking-widest text-[#d8c58f] uppercase flex items-center gap-1.5 mb-1">
+            <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase flex items-center gap-1.5 mb-1">
               <Key className="w-3.5 h-3.5" />
               Secure Portal Access
             </span>
@@ -136,7 +136,7 @@ export default function LoginModal({ isOpen, onClose }) {
                   setError('');
                 }}
                 placeholder="name@company.com"
-                className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
+                className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors"
               />
             </div>
 
@@ -158,7 +158,7 @@ export default function LoginModal({ isOpen, onClose }) {
                     setError('');
                   }}
                   placeholder="••••••••"
-                  className="bg-[#131313] border border-white/10 focus:border-[#989836] text-sm text-white px-4 py-3 pr-10 rounded-sm outline-none transition-colors w-full"
+                  className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 pr-10 rounded-sm outline-none transition-colors w-full"
                 />
                 <button
                   type="button"
@@ -172,7 +172,7 @@ export default function LoginModal({ isOpen, onClose }) {
               <div className="flex justify-end pt-1">
                 <a
                   href="/api/auth/forgot-password"
-                  className="text-[11px] font-semibold text-[#d8c58f] transition-colors hover:text-white hover:underline"
+                  className="text-[11px] font-semibold text-[#f2f2f2] transition-colors hover:text-white hover:underline"
                 >
                   Forgot your password?
                 </a>
@@ -183,7 +183,7 @@ export default function LoginModal({ isOpen, onClose }) {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#cc6632] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6632]/15 hover:shadow-[#cc6632]/30 disabled:opacity-50 mt-2"
+            className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-lg shadow-[#cc6633]/15 hover:shadow-[#cc6633]/30 disabled:opacity-50 mt-2"
           >
             {submitting ? (
               <>
@@ -203,7 +203,7 @@ export default function LoginModal({ isOpen, onClose }) {
             <Link
               href="/register"
               onClick={onClose}
-              className="text-[#d8c58f] hover:text-white font-semibold transition-colors"
+              className="text-[#f2f2f2] hover:text-white font-semibold transition-colors"
             >
               Register as a wholesale partner
             </Link>

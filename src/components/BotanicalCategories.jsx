@@ -15,14 +15,14 @@ const CATEGORIES = [
     description:
       "Blue Lotus, Kanna, Mulungu, Guayusa and carefully selected botanical blends.",
     icon: Flower2,
-    tone: "from-[#cc6632]/22 to-[#cc6632]/5",
+    tone: "from-[#cc6633]/22 to-[#cc6633]/5",
   },
   {
     name: "Aya Plants",
     description:
       "Caapi vine, Chacruna, Chaliponga and related South American botanicals.",
     icon: TreePine,
-    tone: "from-[#989836]/24 to-[#989836]/5",
+    tone: "from-[#999933]/24 to-[#999933]/5",
   },
   {
     name: "Kratom",
@@ -63,7 +63,7 @@ export default function BotanicalCategories() {
     >
       <div className="mb-8 flex flex-col gap-5 sm:mb-10 md:flex-row md:items-end md:justify-between">
         <div className="max-w-3xl">
-          <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.22em] text-[#d8c58f] sm:text-xs">
+          <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.22em] text-[#f2f2f2] sm:text-xs">
             One source, six core ranges
           </span>
           <h2
@@ -80,7 +80,7 @@ export default function BotanicalCategories() {
 
         <Link
           href="/digital-catalog"
-          className="inline-flex shrink-0 items-center gap-2 self-start border-b border-[#d8c58f]/45 pb-1 text-xs font-black uppercase tracking-[0.16em] text-[#d8c58f] transition-colors hover:border-white hover:text-white md:self-auto"
+          className="inline-flex shrink-0 items-center gap-2 self-start border-b border-[#f2f2f2]/45 pb-1 text-xs font-black uppercase tracking-[0.16em] text-[#f2f2f2] transition-colors hover:border-white hover:text-white md:self-auto"
         >
           Explore digital catalog
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -92,7 +92,7 @@ export default function BotanicalCategories() {
           ({ name, description, icon: CategoryIcon, tone }, index) => (
             <article
               key={name}
-              className={`group relative min-h-60 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${tone} p-6 shadow-[0_18px_50px_rgba(0,0,0,0.14)] transition-all duration-300 hover:-translate-y-1 hover:border-[#d8c58f]/45 hover:shadow-[0_24px_65px_rgba(0,0,0,0.24)] sm:p-7`}
+              className={`group relative min-h-60 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${tone} p-6 shadow-[0_18px_50px_rgba(0,0,0,0.14)] transition-all duration-300 hover:-translate-y-1 hover:border-[#f2f2f2]/45 hover:shadow-[0_24px_65px_rgba(0,0,0,0.24)] sm:p-7`}
             >
               <div
                 aria-hidden="true"
@@ -101,7 +101,7 @@ export default function BotanicalCategories() {
                 {String(index + 1).padStart(2, "0")}
               </div>
               <div className="relative flex h-full flex-col">
-                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full border border-[#d8c58f]/25 bg-black/15 text-[#d8c58f] transition-colors group-hover:border-[#d8c58f]/55 group-hover:bg-[#d8c58f]/10">
+                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full border border-[#f2f2f2]/25 bg-black/15 text-[#f2f2f2] transition-colors group-hover:border-[#f2f2f2]/55 group-hover:bg-[#f2f2f2]/10">
                   <CategoryIcon className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-white">{name}</h3>

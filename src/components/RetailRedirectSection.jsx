@@ -15,7 +15,7 @@ export default function RetailRedirectSection() {
 
       <div className="relative z-10 mx-auto flex min-h-[430px] w-full max-w-7xl items-start px-4 pb-14 pt-8 sm:min-h-[380px] sm:px-6 sm:pb-16 sm:pt-10 md:items-center md:py-16 lg:min-h-[420px] lg:px-8 lg:py-20">
           <div className="mx-auto max-w-xl text-center md:mx-0 md:text-left">
-            <p className="mb-3 font-label-sm text-xs font-bold uppercase tracking-[0.18em] text-[#d8c58f]">
+            <p className="mb-3 font-label-sm text-xs font-bold uppercase tracking-[0.18em] text-[#f2f2f2]">
               Individual Orders &amp; Retail
             </p>
 
@@ -34,7 +34,7 @@ export default function RetailRedirectSection() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Explore the Maya Herbs retail store in a new tab"
-              className="absolute inset-x-4 bottom-6 mt-0 inline-flex items-center justify-center gap-2 rounded-lg border border-white bg-white px-6 py-3.5 font-label-sm text-xs font-bold uppercase tracking-[0.14em] text-[#131313] shadow-[0_10px_30px_rgba(0,0,0,0.55)] transition-[color,background-color,transform,box-shadow] duration-300 active:scale-[0.98] hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d8c58f] sm:static sm:mt-8 sm:w-auto sm:border-white/40 sm:bg-transparent sm:text-white sm:shadow-none sm:active:scale-100"
+              className="absolute inset-x-4 bottom-6 mt-0 inline-flex items-center justify-center gap-2 rounded-lg border border-white bg-white px-6 py-3.5 font-label-sm text-xs font-bold uppercase tracking-[0.14em] text-[#131313] shadow-[0_10px_30px_rgba(0,0,0,0.55)] transition-[color,background-color,transform,box-shadow] duration-300 active:scale-[0.98] hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2f2f2] sm:static sm:mt-8 sm:w-auto sm:border-white/40 sm:bg-transparent sm:text-white sm:shadow-none sm:active:scale-100"
             >
               Explore Retail Store
               <svg

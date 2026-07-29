@@ -76,13 +76,13 @@ export default function ContactPage() {
   };
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#e5e2e1] min-h-screen flex flex-col font-sans antialiased justify-between">
+    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col gap-10 sm:gap-12">
         {/* Page Title */}
         <div className="border-b border-white/10 pb-6 sm:pb-8">
-          <span className="inline-flex items-center gap-2 bg-[#989836]/15 border border-[#989836]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#d8c58f] uppercase font-label-sm mb-3">
+          <span className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
             Get In Touch
           </span>
           <h1 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white">
@@ -99,7 +99,7 @@ export default function ContactPage() {
 
           {/* Left Column: Contact Form */}
           <div className="lg:col-span-7 bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-10 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#989836]/5 blur-2xl pointer-events-none rounded-full"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/5 blur-2xl pointer-events-none rounded-full"></div>
 
             <h2 className="font-headline-md text-2xl font-bold text-white mb-6">
               Send a Message
@@ -138,7 +138,7 @@ export default function ContactPage() {
                     value={form.name}
                     onChange={handleChange("name")}
                     placeholder="Your name"
-                    className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#989836] outline-none transition-colors"
+                    className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#999933] outline-none transition-colors"
                     required
                   />
                 </div>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                     value={form.email}
                     onChange={handleChange("email")}
                     placeholder="name@company.com"
-                    className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#989836] outline-none transition-colors"
+                    className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#999933] outline-none transition-colors"
                     required
                   />
                 </div>
@@ -174,7 +174,7 @@ export default function ContactPage() {
                   value={form.subject}
                   onChange={handleChange("subject")}
                   placeholder="How can we help you?"
-                  className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#989836] outline-none transition-colors"
+                  className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#999933] outline-none transition-colors"
                   required
                 />
               </div>
@@ -191,7 +191,7 @@ export default function ContactPage() {
                   onChange={handleChange("message")}
                   placeholder="Tell us about your store, volume requirements, or inquiry..."
                   rows="5"
-                  className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#989836] outline-none transition-colors resize-none"
+                  className="bg-[#131313] border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/30 focus:border-[#999933] outline-none transition-colors resize-none"
                   required
                 ></textarea>
               </div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#cc6632] hover:bg-[#b6532a] disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 shadow-lg shadow-[#cc6632]/15 hover:shadow-[#cc6632]/30 cursor-pointer flex items-center justify-center gap-2 mt-2"
+                className="bg-[#cc6633] hover:bg-[#b6532a] disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-sm transition-all border-0 shadow-lg shadow-[#cc6633]/15 hover:shadow-[#cc6633]/30 cursor-pointer flex items-center justify-center gap-2 mt-2"
               >
                 {loading ? (
                   <>
@@ -228,13 +228,13 @@ export default function ContactPage() {
               <div className="flex flex-col gap-5">
                 {/* Email */}
                 <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded bg-[#989836]/10 border border-[#989836]/20 flex items-center justify-center text-[#d8c58f] shrink-0">
+                  <div className="w-10 h-10 rounded bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2] shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-[10px] font-mono text-white/40 uppercase tracking-wide">Email</span>
                     <p className="mt-0.5">
-                      <a href="mailto:info@mayaherbs.com" className="break-all text-sm font-bold text-white no-underline transition-colors hover:text-[#d8c58f] font-mono">
+                      <a href="mailto:info@mayaherbs.com" className="break-all text-sm font-bold text-white no-underline transition-colors hover:text-[#f2f2f2] font-mono">
                         info@mayaherbs.com
                       </a>
                     </p>
@@ -243,13 +243,13 @@ export default function ContactPage() {
 
                 {/* Telephone */}
                 <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded bg-[#989836]/10 border border-[#989836]/20 flex items-center justify-center text-[#d8c58f] shrink-0">
+                  <div className="w-10 h-10 rounded bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2] shrink-0">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-[10px] font-mono text-white/40 uppercase tracking-wide">Phone</span>
                     <p className="mt-0.5">
-                      <a href="tel:+31235325192" className="text-white hover:text-[#d8c58f] transition-colors text-sm font-bold no-underline font-mono">
+                      <a href="tel:+31235325192" className="text-white hover:text-[#f2f2f2] transition-colors text-sm font-bold no-underline font-mono">
                         +31 23 532 5192
                       </a>
                     </p>
@@ -258,7 +258,7 @@ export default function ContactPage() {
 
                 {/* Address */}
                 <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded bg-[#989836]/10 border border-[#989836]/20 flex items-center justify-center text-[#d8c58f] shrink-0">
+                  <div className="w-10 h-10 rounded bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2] shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
@@ -276,7 +276,7 @@ export default function ContactPage() {
             {/* Business Hours Card */}
             <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-8 shadow-xl flex flex-col gap-4">
               <h3 className="font-headline-md text-sm font-bold uppercase tracking-wider text-white/80 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#d8c58f]" />
+                <Clock className="w-4 h-4 text-[#f2f2f2]" />
                 Support Hours
               </h3>
               <p className="text-xs text-white/50 leading-relaxed">
@@ -290,7 +290,7 @@ export default function ContactPage() {
               </div>
               <div className="flex flex-col gap-1 text-xs text-white/70 sm:flex-row sm:items-center sm:justify-between font-mono">
                 <span>Saturday – Sunday</span>
-                <span className="text-[#d8c58f] font-bold">Closed</span>
+                <span className="text-[#f2f2f2] font-bold">Closed</span>
               </div>
             </div>
 

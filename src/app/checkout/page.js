@@ -65,7 +65,7 @@ function Field({ id, label, className = "", ...props }) {
       </label>
       <input
         id={id}
-        className="w-full rounded-sm border border-white/10 bg-[#131313] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#d8c58f] disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-sm border border-white/10 bg-[#131313] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-60"
         {...props}
       />
     </div>
@@ -140,7 +140,7 @@ function AddressFields({ prefix, value, onChange }) {
             autoComplete={`${prefix} country`}
             value={value.country}
             onChange={set("country")}
-            className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-10 text-sm text-white outline-none transition-colors focus:border-[#d8c58f]"
+            className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-10 text-sm text-white outline-none transition-colors focus:border-[#f2f2f2]"
             required
           >
             <option value="" disabled>Select a country</option>
@@ -294,17 +294,17 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div id="top" className="site-background-page min-h-screen bg-[#25362D] text-[#e5e2e1]">
+    <div id="top" className="site-background-page min-h-screen bg-[#25362D] text-[#f2f2f2]">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 border-b border-white/10 pb-7">
-          <Link href="/catalog" className="inline-flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#d8c58f] transition-colors hover:text-white">
+          <Link href="/catalog" className="inline-flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#f2f2f2] transition-colors hover:text-white">
             <ArrowLeft className="h-4 w-4" />
             Return to catalog
           </Link>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#d8c58f]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2]">
               Secure wholesale request
             </span>
             <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">
@@ -326,16 +326,16 @@ export default function CheckoutPage() {
                 key={label}
                 aria-current={active ? "step" : undefined}
                 className={`relative flex min-w-0 items-center justify-center gap-2 border-r border-white/10 px-2 py-4 last:border-r-0 sm:gap-3 sm:px-5 ${
-                  active ? "bg-[#989836]/20 text-white" : complete ? "text-[#d8c58f]" : "text-white/35"
+                  active ? "bg-[#999933]/20 text-white" : complete ? "text-[#f2f2f2]" : "text-white/35"
                 }`}
               >
-                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border ${active || complete ? "border-[#d8c58f]/50 bg-[#989836]/20" : "border-white/15"}`}>
+                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border ${active || complete ? "border-[#f2f2f2]/50 bg-[#999933]/20" : "border-white/15"}`}>
                   {complete ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 </span>
                 <span className="truncate text-[10px] font-bold uppercase tracking-wider sm:text-xs">
                   <span className="hidden sm:inline">{index + 1}. </span>{label}
                 </span>
-                {active && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[#d8c58f]" />}
+                {active && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[#f2f2f2]" />}
               </li>
             );
           })}
@@ -346,7 +346,7 @@ export default function CheckoutPage() {
             <ShoppingBag className="h-12 w-12 text-white/25" />
             <h2 className="mt-5 text-xl font-bold text-white">Your order sheet is empty</h2>
             <p className="mt-2 text-sm text-white/50">Add products from the wholesale catalog before starting checkout.</p>
-            <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#cc6632] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white">
+            <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#cc6633] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white">
               Browse catalog <ArrowRight className="h-4 w-4" />
             </Link>
           </section>
@@ -375,8 +375,8 @@ export default function CheckoutPage() {
                     <Field id="checkout-phone" label="Phone number" type="tel" autoComplete="tel" maxLength={40} value={contact.phone} onChange={setContactField("phone")} required />
                     <Field id="checkout-email" label="Account email" type="email" autoComplete="email" value={contact.email} disabled className="sm:col-span-2" />
                   </div>
-                  <div className="flex items-start gap-3 rounded-sm border border-[#989836]/25 bg-[#989836]/10 p-4">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#d8c58f]" />
+                  <div className="flex items-start gap-3 rounded-sm border border-[#999933]/25 bg-[#999933]/10 p-4">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
                     <p className="text-xs leading-relaxed text-white/60">
                       Your account email identifies the approved wholesale buyer and cannot be changed during checkout.
                     </p>
@@ -398,7 +398,7 @@ export default function CheckoutPage() {
                       type="checkbox"
                       checked={billingMatchesShipping}
                       onChange={(event) => setBillingMatchesShipping(event.target.checked)}
-                      className="mt-0.5 h-4 w-4 accent-[#989836]"
+                      className="mt-0.5 h-4 w-4 accent-[#999933]"
                     />
                     <span>
                       <span className="block text-sm font-bold text-white">Billing address is the same as delivery</span>
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="rounded-lg border border-white/10 bg-[#131313] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
-                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#d8c58f]">Contact</h3>
+                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2]">Contact</h3>
                         <button type="button" onClick={() => setStep(0)} className="border-0 bg-transparent text-[10px] font-bold uppercase text-white/45 hover:text-white">Edit</button>
                       </div>
                       <p className="text-sm font-bold text-white">{contact.firstName} {contact.lastName}</p>
@@ -436,7 +436,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="rounded-lg border border-white/10 bg-[#131313] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
-                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#d8c58f]">Delivery</h3>
+                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2]">Delivery</h3>
                         <button type="button" onClick={() => setStep(1)} className="border-0 bg-transparent text-[10px] font-bold uppercase text-white/45 hover:text-white">Edit</button>
                       </div>
                       <p className="text-xs leading-relaxed text-white/65">{addressLine(shippingAddress)}</p>
@@ -452,8 +452,8 @@ export default function CheckoutPage() {
                     limit={2}
                   />
 
-                  <div className="flex items-start gap-3 rounded-sm border border-[#989836]/30 bg-[#989836]/10 p-4">
-                    <PhoneCall className="mt-0.5 h-4 w-4 shrink-0 text-[#d8c58f]" />
+                  <div className="flex items-start gap-3 rounded-sm border border-[#999933]/30 bg-[#999933]/10 p-4">
+                    <PhoneCall className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
                     <p className="text-xs leading-relaxed text-white/65">
                       No online payment is taken. Maya Herbs will contact you to confirm stock,
                       calculate shipping, and arrange payment.
@@ -468,7 +468,7 @@ export default function CheckoutPage() {
                         setConfirmed(event.target.checked);
                         setError("");
                       }}
-                      className="mt-0.5 h-4 w-4 accent-[#989836]"
+                      className="mt-0.5 h-4 w-4 accent-[#999933]"
                     />
                     <span className="text-xs leading-relaxed text-white/65">
                       I confirm that the contact, delivery, and order details are correct and understand
@@ -497,7 +497,7 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={goForward}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6632] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a]"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a]"
                   >
                     Continue <ArrowRight className="h-4 w-4" />
                   </button>
@@ -507,7 +507,7 @@ export default function CheckoutPage() {
                     onClick={submitOrder}
                     disabled={isSubmitting || !confirmed || !meetsMinimumWeight}
                     aria-busy={isSubmitting}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6632] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     {isSubmitting ? (
                       <>Placing order <Loader2 className="h-4 w-4 animate-spin" /></>
@@ -521,7 +521,7 @@ export default function CheckoutPage() {
 
             <aside className="rounded-xl border border-white/10 bg-[#171717] shadow-2xl lg:sticky lg:top-28">
               <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-                <ShoppingBag className="h-4 w-4 text-[#d8c58f]" />
+                <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" />
                 <h2 className="text-sm font-bold text-white">Order summary</h2>
                 <span className="ml-auto text-xs text-white/45">{cartTotalItems} items</span>
               </div>
@@ -542,7 +542,7 @@ export default function CheckoutPage() {
               <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-5 text-xs">
                 <div className="flex justify-between text-white/50"><span>Subtotal</span><span>${cartSubtotal.toFixed(2)}</span></div>
                 {discountPercentage > 0 && (
-                  <div className="flex justify-between text-[#d8c58f]"><span>B2B discount ({discountPercentage}%)</span><span>-${discountAmount.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-[#f2f2f2]"><span>B2B discount ({discountPercentage}%)</span><span>-${discountAmount.toFixed(2)}</span></div>
                 )}
                 <div className="flex justify-between text-white/50">
                   <span>Est. weight</span>
@@ -551,10 +551,10 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-white/50"><span>Shipping</span><span>Calculated later</span></div>
                 <div className="mt-2 flex items-end justify-between border-t border-white/10 pt-4">
                   <span className="font-bold uppercase tracking-wider text-white">Estimated total</span>
-                  <span className="text-2xl font-black text-[#d8c58f]">${finalTotal.toFixed(2)}</span>
+                  <span className="text-2xl font-black text-[#f2f2f2]">${finalTotal.toFixed(2)}</span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 text-[10px] leading-relaxed text-white/35">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#d8c58f]" />
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
                   Final freight and availability are confirmed by our team.
                 </div>
               </div>
