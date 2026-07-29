@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" role="img" aria-labelledby="title">
+  <title id="title">Flag of the United Kingdom</title>
+  <path fill="#012169" d="M0 0h30v20H0z"/>
+  <path stroke="#fff" stroke-width="4" d="m0 0 30 20M30 0 0 20"/>
+  <path stroke="#c8102e" stroke-width="1.8" d="m0 0 30 20M30 0 0 20"/>
+  <path fill="#fff" d="M12 0h6v20h-6zM0 7h30v6H0z"/>
+  <path fill="#c8102e" d="M13.5 0h3v20h-3zM0 8.5h30v3H0z"/>
+</svg>

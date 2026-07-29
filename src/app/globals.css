@@ -1,0 +1,958 @@
+@import "tailwindcss";
+
+@theme {
+  --color-on-tertiary-fixed-variant: #454747;
+  --color-surface-container-highest: #353535;
+  --color-outline: #889390;
+  --color-on-secondary-fixed: #1a1c1c;
+  --color-on-secondary: #2f3131;
+  --color-on-tertiary: #2f3131;
+  --color-primary-fixed-dim: #d8c58f;
+  --color-on-primary: #003730;
+  --color-surface-tint: #d8c58f;
+  --color-on-secondary-fixed-variant: #454747;
+  --color-primary-fixed: #eadcae;
+  --color-on-background: #e5e2e1;
+  --color-on-primary-fixed-variant: #005046;
+  --color-error: #ffb4ab;
+  --color-tertiary-container: #727373;
+  --color-tertiary: #c6c6c7;
+  --color-on-primary-fixed: #00201b;
+  --color-inverse-surface: #e5e2e1;
+  --color-on-error-container: #ffdad6;
+  --color-on-secondary-container: #b4b5b5;
+  --color-on-surface: #e5e2e1;
+  --color-surface-container-low: #1b1c1c;
+  --color-on-surface-variant: #bec9c5;
+  --color-error-container: #93000a;
+  --color-secondary-fixed: #e2e2e2;
+  --color-secondary-container: #454747;
+  --color-surface: #25362d;
+  --color-secondary: #c6c6c7;
+  --color-surface-bright: #393939;
+  --color-surface-variant: #353535;
+  --color-secondary-fixed-dim: #c6c6c7;
+  --color-surface-container: #202020;
+  --color-on-tertiary-fixed: #1a1c1c;
+  --color-on-primary-container: #e7fff8;
+  --color-tertiary-fixed: #e2e2e2;
+  --color-outline-variant: #3e4946;
+  --color-background: #25362d;
+  --color-surface-container-high: #2a2a2a;
+  --color-inverse-primary: #6f7025;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-primary-container: #989836;
+  --color-inverse-on-surface: #303030;
+  --color-primary: #d8c58f;
+  --color-surface-dim: #25362d;
+  --color-on-tertiary-container: #fafafa;
+  --color-tertiary-fixed-dim: #c6c6c7;
+  --color-on-error: #690005;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 9999px;
+
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 20px;
+  --spacing-unit: 8px;
+  --spacing-container-max: 1440px;
+  --spacing-margin-desktop: 64px;
+
+  /* One font family across every Tailwind font utility. */
+  --font-sans: var(--font-roboto), Arial, sans-serif;
+  --font-mono: var(--font-roboto), Arial, sans-serif;
+  --font-headline-lg: var(--font-roboto), sans-serif;
+  --font-label-sm: var(--font-roboto), sans-serif;
+  --font-headline-md: var(--font-roboto), sans-serif;
+  --font-body-md: var(--font-roboto), sans-serif;
+  --font-body-lg: var(--font-roboto), sans-serif;
+  --font-headline-lg-mobile: var(--font-roboto), sans-serif;
+  --font-display-lg: var(--font-roboto), sans-serif;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, 20px); }
+}
+
+.animate-drift-slow {
+  animation: drift 15s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+@keyframes number-rise {
+  from {
+    opacity: 0.2;
+    transform: translateY(45%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-number-rise {
+  animation: number-rise 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-number-rise {
+    animation: none;
+  }
+}
+
+@layer base {
+html {
+  font-family: var(--font-roboto), Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-size: 100%;
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--font-roboto), sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  background-color: #25362d;
+  background-image:
+    linear-gradient(rgb(35 64 59 / 0.58), rgb(35 64 59 / 0.72)),
+    url("/backgrounds/maya-wholesale-background.webp");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  color: #e5e2e1;
+  overflow-x: clip;
+}
+
+.site-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 50;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-roboto), sans-serif;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: clamp(1.375rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h5, h6 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-roboto), Arial, sans-serif;
+}
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* User-selectable color theme. Dark photographic sections stay intentionally dark. */
+html {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+body,
+header,
+footer,
+main,
+section,
+aside,
+input,
+select,
+textarea {
+  transition-property: background-color, border-color, color;
+  transition-duration: 250ms;
+  transition-timing-function: ease;
+}
+
+html[data-theme="light"] body {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.68), rgb(255 255 255 / 0.82)),
+    url("/backgrounds/maya-wholesale-background-light.webp");
+  color: #17201e;
+}
+
+html[data-theme="light"] [class~="bg-[#25362D]"] {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] .trust-bar-grid > .group:hover {
+  background-color: #f5f7f6 !important;
+}
+
+.home-green-outline.home-green-outline {
+  border-color: rgb(130 214 197 / 0.38) !important;
+}
+
+html[data-theme="light"] .home-green-outline.home-green-outline {
+  border-color: rgb(38 128 114 / 0.42) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-green-outline.home-green-outline:hover {
+    border-color: rgb(130 214 197 / 0.95) !important;
+  }
+
+  html[data-theme="light"] .home-green-outline.home-green-outline:hover {
+    border-color: rgb(0 107 94 / 0.9) !important;
+  }
+}
+
+/* Page shells stay transparent so the white global background remains visible. */
+html[data-theme="light"] body .site-background-page,
+html[data-theme="light"] body .site-background-page > main {
+  background-color: transparent !important;
+}
+
+html[data-theme="dark"] body .site-background-page,
+html[data-theme="dark"] body .site-background-page > main {
+  background-color: transparent !important;
+}
+
+/* Accessible secondary-text hierarchy on dark surfaces. */
+html[data-theme="dark"] :is(
+  [class~="text-white/20"],
+  [class~="text-white/25"],
+  [class~="text-white/30"],
+  [class~="text-white/35"],
+  [class~="text-white/40"],
+  [class~="text-white/45"]
+) {
+  color: #a3b8b0 !important;
+}
+
+html[data-theme="dark"] :is(
+  [class~="text-white/50"],
+  [class~="text-white/55"],
+  [class~="text-white/60"]
+) {
+  color: #b8c8c2 !important;
+}
+
+html[data-theme="dark"] :is(
+  [class~="placeholder-white/30"],
+  [class~="placeholder-white/35"],
+  [class~="placeholder:text-white/30"],
+  [class~="placeholder:text-white/35"]
+)::placeholder {
+  color: #a3b8b0 !important;
+  opacity: 1;
+}
+
+html[data-theme="light"] [class~="bg-[#131313]"],
+html[data-theme="light"] [class~="bg-[#131313]/60"] {
+  background-color: #f5f7f6 !important;
+}
+
+html[data-theme="light"] [class~="bg-[#1a1a1a]"],
+html[data-theme="light"] [class~="bg-[#212121]"] {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] [class~="before:bg-[#131313]"]::before {
+  background-color: #f5f7f6 !important;
+}
+
+.maya-wholesale-banner {
+  background-image: url("/banner/maya-wholesale/maya-wholesale-banner-desktop.webp");
+}
+
+@media (max-width: 639px) {
+  .maya-wholesale-banner {
+    background-image: url("/banner/maya-wholesale/maya-wholesale-banner-mobile.webp");
+    background-position: center;
+  }
+}
+
+html[data-theme="light"] [class~="text-[#e5e2e1]"],
+html[data-theme="light"] [class~="text-white"] {
+  color: #17201e !important;
+}
+
+html[data-theme="light"] [class~="text-white/80"] {
+  color: rgb(23 32 30 / 0.8) !important;
+}
+
+html[data-theme="light"] [class~="text-white/75"] {
+  color: rgb(23 32 30 / 0.75) !important;
+}
+
+html[data-theme="light"] [class~="text-white/70"] {
+  color: rgb(23 32 30 / 0.7) !important;
+}
+
+html[data-theme="light"] :is(
+  [class~="text-white/50"],
+  [class~="text-white/55"],
+  [class~="text-white/60"],
+  [class~="text-white/65"]
+) {
+  color: #46524e !important;
+}
+
+html[data-theme="light"] :is(
+  [class~="text-white/20"],
+  [class~="text-white/25"],
+  [class~="text-white/30"],
+  [class~="text-white/35"],
+  [class~="text-white/40"],
+  [class~="text-white/45"]
+) {
+  color: #5b6864 !important;
+}
+
+html[data-theme="light"] [class~="text-[#d8c58f]"] {
+  color: #6f7025 !important;
+}
+
+html[data-theme="light"] .catalog-export-tip {
+  background-color: rgb(255 255 255 / 0.88) !important;
+  border-color: rgb(23 32 30 / 0.14) !important;
+  box-shadow: 0 12px 30px rgb(23 32 30 / 0.08) !important;
+}
+
+html[data-theme="light"] .catalog-format-tag {
+  background-color: #ffffff !important;
+  border-color: rgb(23 32 30 / 0.16) !important;
+  color: #27322f !important;
+}
+
+/* Catalog products use distinct card surfaces at every breakpoint. */
+html[data-theme="light"] .catalog-product-row {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] .catalog-product-title,
+html[data-theme="light"] .catalog-product-title:hover {
+  color: #17201e !important;
+}
+
+html[data-theme="light"] [class~="hover:text-white"]:hover {
+  color: #17201e !important;
+}
+
+html[data-theme="light"] [class~="border-white/5"] {
+  border-color: rgb(23 32 30 / 0.08) !important;
+}
+
+html[data-theme="light"] [class~="border-white/10"] {
+  border-color: rgb(23 32 30 / 0.13) !important;
+}
+
+html[data-theme="light"] [class~="border-white/15"] {
+  border-color: rgb(23 32 30 / 0.18) !important;
+}
+
+html[data-theme="light"] [class~="border-white/20"] {
+  border-color: rgb(23 32 30 / 0.24) !important;
+}
+
+html[data-theme="light"] [class~="border-white/40"] {
+  border-color: rgb(23 32 30 / 0.42) !important;
+}
+
+html[data-theme="light"] [class~="bg-white/5"] {
+  background-color: rgb(23 32 30 / 0.04) !important;
+}
+
+html[data-theme="light"] [class~="bg-white/10"] {
+  background-color: rgb(23 32 30 / 0.07) !important;
+}
+
+html[data-theme="light"] [class~="hover:bg-white/5"]:hover {
+  background-color: rgb(23 32 30 / 0.06) !important;
+}
+
+html[data-theme="light"] [class~="hover:bg-white/10"]:hover {
+  background-color: rgb(23 32 30 / 0.1) !important;
+}
+
+html[data-theme="light"] [class~="placeholder-white/30"]::placeholder,
+html[data-theme="light"] [class~="placeholder-white/35"]::placeholder,
+html[data-theme="light"] [class~="placeholder:text-white/30"]::placeholder,
+html[data-theme="light"] [class~="placeholder:text-white/35"]::placeholder {
+  color: #5b6864 !important;
+  opacity: 1;
+}
+
+html[data-theme="light"] [class~="divide-white/5"] > :not(:last-child) {
+  border-color: rgb(23 32 30 / 0.08) !important;
+}
+
+html[data-theme="light"] [class~="divide-white/10"] > :not(:last-child) {
+  border-color: rgb(23 32 30 / 0.13) !important;
+}
+
+html[data-theme="light"] [class*="bg-black"][class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* Keep brand actions readable in both themes. */
+html[data-theme="light"] :is(
+  [class~="bg-[#cc6632]"],
+  [class~="bg-[#989836]"],
+  [class~="bg-[#284e32]"],
+  [class~="bg-[#93000a]"]
+)[class~="text-white"] {
+  color: #ffffff !important;
+}
+
+/* The NGO partnership card follows the selected theme. */
+.ngo-logo-light {
+  display: none;
+}
+
+html[data-theme="light"] .ngo-section-card {
+  background-color: #ffffff !important;
+  border-color: rgb(23 32 30 / 0.14) !important;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.1) !important;
+}
+
+html[data-theme="light"] .ngo-section-card:hover {
+  border-color: rgb(40 78 50 / 0.34) !important;
+}
+
+html[data-theme="light"] .ngo-logo-dark {
+  display: none;
+}
+
+html[data-theme="light"] .ngo-logo-light {
+  display: block;
+}
+
+html[data-theme="light"] .ngo-section-watermark {
+  filter: brightness(0) saturate(100%) invert(24%) sepia(18%) saturate(1227%) hue-rotate(81deg) brightness(91%) contrast(90%);
+  mix-blend-mode: multiply;
+  opacity: 0.04;
+}
+
+/* Header, hero, lineage, retail banner and footer retain their dark treatment. */
+html[data-theme="light"] .theme-dark-zone[class~="bg-[#25362D]"] {
+  background-color: #25362d !important;
+}
+
+html[data-theme="light"] .theme-dark-zone[class~="bg-[#212121]"],
+html[data-theme="light"] .theme-dark-zone [class~="bg-[#212121]"] {
+  background-color: #212121 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="bg-[#131313]"],
+html[data-theme="light"] .theme-dark-zone [class~="bg-[#131313]/50"] {
+  background-color: #131313 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone[class~="bg-[#131313]"] {
+  background-color: #131313 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="bg-[#1a1a1a]"] {
+  background-color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .theme-dark-zone[class~="bg-[#1a1a1a]"] {
+  background-color: #1a1a1a !important;
+}
+
+html[data-theme="light"] .theme-dark-zone[class~="before:bg-[#131313]"]::before {
+  background-color: #131313 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-white"] {
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-white/80"] {
+  color: rgb(255 255 255 / 0.8) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-white/75"] {
+  color: rgb(255 255 255 / 0.75) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-white/70"] {
+  color: rgb(255 255 255 / 0.7) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone :is(
+  [class~="text-white/50"],
+  [class~="text-white/55"],
+  [class~="text-white/60"]
+) {
+  color: #b8c8c2 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-white/65"] {
+  color: rgb(255 255 255 / 0.65) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone :is(
+  [class~="text-white/20"],
+  [class~="text-white/25"],
+  [class~="text-white/30"],
+  [class~="text-white/35"],
+  [class~="text-white/40"],
+  [class~="text-white/45"]
+) {
+  color: #a3b8b0 !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="text-[#d8c58f]"] {
+  color: #d8c58f !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="hover:text-white"]:hover {
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="border-white/5"] {
+  border-color: rgb(255 255 255 / 0.05) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone .lineage-card {
+  box-shadow: 0 8px 24px rgb(23 32 30 / 0.06) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone .lineage-card:hover {
+  border-color: var(--ethnicity-accent) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--ethnicity-accent) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--ethnicity-accent) 32%, transparent),
+    0 14px 36px rgb(23 32 30 / 0.12) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone .lineage-card:hover .lineage-location {
+  color: var(--ethnicity-readable) !important;
+}
+
+@property --lineage-trace-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.lineage-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--lineage-trace-angle),
+    transparent 0deg 300deg,
+    color-mix(in srgb, var(--ethnicity-accent) 45%, transparent) 326deg,
+    var(--ethnicity-accent) 342deg,
+    transparent 360deg
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+html[data-theme="light"] .theme-dark-zone .lineage-card::after {
+  padding: 2px;
+  background: conic-gradient(
+    from var(--lineage-trace-angle),
+    transparent 0deg 250deg,
+    color-mix(in srgb, var(--ethnicity-accent) 75%, transparent) 292deg,
+    var(--ethnicity-accent) 326deg 346deg,
+    transparent 360deg
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lineage-card:hover::after {
+    opacity: 0.7;
+    animation: lineage-trace-orbit 3.8s linear infinite;
+  }
+
+  html[data-theme="light"] .theme-dark-zone .lineage-card:hover::after {
+    opacity: 1;
+    filter: drop-shadow(
+      0 0 9px color-mix(in srgb, var(--ethnicity-accent) 55%, transparent)
+    );
+  }
+}
+
+@keyframes lineage-trace-orbit {
+  to {
+    --lineage-trace-angle: 360deg;
+  }
+}
+
+html[data-theme="light"] .wholesale-format-card {
+  background-color: rgb(255 255 255 / 0.72) !important;
+  box-shadow: 0 18px 48px rgb(23 32 30 / 0.1);
+}
+
+html[data-theme="light"] .wholesale-format-image {
+  filter: drop-shadow(0 4px 8px rgb(23 32 30 / 0.08)) !important;
+}
+
+html[data-theme="light"] .wholesale-format-category {
+  color: #6f7025 !important;
+}
+
+html[data-theme="light"] .wholesale-format-badge {
+  border-color: rgb(23 32 30 / 0.13) !important;
+  background-color: rgb(238 244 241 / 0.9) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme="light"] .wholesale-format-card:hover {
+    background-color: rgb(255 255 255 / 0.88) !important;
+    box-shadow: 0 24px 58px rgb(23 32 30 / 0.14);
+  }
+
+  html[data-theme="light"] .wholesale-format-card:hover .wholesale-format-title {
+    color: #6f7025 !important;
+  }
+
+  html[data-theme="light"] .wholesale-format-card:hover .wholesale-format-badge {
+    border-color: rgb(38 128 114 / 0.25) !important;
+  }
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="border-white/10"] {
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="border-white/15"] {
+  border-color: rgb(255 255 255 / 0.15) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="bg-white/5"] {
+  background-color: rgb(255 255 255 / 0.05) !important;
+}
+
+html[data-theme="light"] .theme-dark-zone [class~="bg-white/10"] {
+  background-color: rgb(255 255 255 / 0.1) !important;
+}
+
+html[data-theme="light"] body .lineage-showcase.theme-dark-zone::before,
+html[data-theme="light"] body .lineage-showcase.theme-dark-zone .lineage-track-shell {
+  background-color: #f5f7f6 !important;
+}
+
+html[data-theme="light"] body .lineage-showcase .lineage-heading {
+  color: #17201e !important;
+}
+
+html[data-theme="light"] .lineage-modal-title {
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] body .lineage-showcase .lineage-description {
+  color: #454747 !important;
+}
+
+html[data-theme="light"] body .lineage-showcase .lineage-link {
+  color: #6f7025 !important;
+}
+
+html[data-theme="light"] body .lineage-showcase .lineage-link:hover {
+  color: #989836 !important;
+}
+
+html[data-theme="light"] body .lineage-showcase .lineage-decorative-band {
+  background-image: url("/decorations/lineage-decorative-band-light.webp") !important;
+}
+
+/* Reversible no-glass preview for the Home. Remove `home-no-glass` from
+   HomeClient to restore the preserved glassmorphism version. */
+.home-no-glass [class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.home-no-glass .hero-tribe-badge {
+  background-color: #18201e !important;
+}
+
+.home-no-glass .wholesale-format-card {
+  background-color: #1a1a1a !important;
+}
+
+html[data-theme="dark"] .wholesale-format-description {
+  color: #d1d9d5;
+}
+
+html[data-theme="dark"] .wholesale-format-detail {
+  color: #a3b8b0;
+}
+
+.home-no-glass .lineage-glass-surface {
+  background-color: #131313 !important;
+}
+
+html[data-theme="light"] .related-carousel-button {
+  background-color: #ffffff !important;
+  border-color: rgb(38 128 114 / 0.38) !important;
+  color: #6f7025 !important;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.12);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme="light"] .related-carousel-button:hover:not(:disabled) {
+    background-color: #eef4f1 !important;
+    border-color: rgb(0 107 94 / 0.72) !important;
+    color: #004f46 !important;
+  }
+}
+
+html[data-theme="light"] .home-no-glass .wholesale-format-card {
+  background-color: #ffffff !important;
+}
+
+/* Shared editorial treatment for About and policy pages. */
+.editorial-hero {
+  border-bottom: 0;
+  background-color: #131313;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgb(19 19 19 / 0.98) 0%,
+      rgb(19 19 19 / 0.92) 42%,
+      rgb(19 19 19 / 0.56) 68%,
+      rgb(19 19 19 / 0.24) 100%
+    ),
+    var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
+  background-position: center, var(--editorial-banner-position, center);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.editorial-card,
+.editorial-toc {
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.2);
+}
+
+.editorial-content {
+  position: relative;
+  z-index: 1;
+  margin-top: -1px;
+  background-color: transparent;
+}
+
+.editorial-copy > p + p,
+.editorial-copy > ul + p,
+.editorial-copy > p + ul {
+  margin-top: 1.25rem;
+}
+
+.editorial-copy ul {
+  padding-left: 1.35rem;
+  list-style: none;
+}
+
+.editorial-copy li {
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.editorial-copy li + li {
+  margin-top: 0.65rem;
+}
+
+.editorial-copy li::before {
+  content: "";
+  position: absolute;
+  top: 0.78rem;
+  left: 0;
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 9999px;
+  background-color: #d8c58f;
+  box-shadow: 0 0 0 4px rgb(38 128 114 / 0.12);
+}
+
+.editorial-copy strong {
+  color: rgb(255 255 255 / 0.86);
+  font-weight: 600;
+}
+
+.editorial-copy a,
+.editorial-contact a {
+  color: #d8c58f;
+  text-decoration: underline;
+  text-decoration-color: rgb(130 214 197 / 0.35);
+  text-underline-offset: 0.25rem;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
+}
+
+.editorial-copy a:hover,
+.editorial-contact a:hover {
+  color: #ffffff;
+  text-decoration-color: currentColor;
+}
+
+html[data-theme="light"] .editorial-hero {
+  background-color: #f5f7f6;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.98) 0%,
+      rgb(255 255 255 / 0.94) 42%,
+      rgb(245 247 246 / 0.65) 68%,
+      rgb(245 247 246 / 0.28) 100%
+    ),
+    var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background-light.webp"));
+}
+
+html[data-theme="light"] .editorial-card,
+html[data-theme="light"] .editorial-toc {
+  box-shadow: 0 24px 70px rgb(23 32 30 / 0.1);
+}
+
+html[data-theme="light"] .editorial-content {
+  background-color: rgb(255 255 255 / 0.74);
+}
+
+html[data-theme="light"] .editorial-value-card {
+  background-color: #f5f7f6 !important;
+  border-color: rgb(38 128 114 / 0.16) !important;
+}
+
+html[data-theme="light"] .editorial-section-number {
+  color: #6f7025 !important;
+  border-color: rgb(38 128 114 / 0.28) !important;
+  background-color: rgb(38 128 114 / 0.08) !important;
+}
+
+html[data-theme="light"] .editorial-notice {
+  background-color: rgb(38 128 114 / 0.07) !important;
+}
+
+html[data-theme="light"] .editorial-copy,
+html[data-theme="light"] .editorial-notice [class~="text-white/65"],
+html[data-theme="light"] .editorial-contact [class~="text-white/65"] {
+  color: rgb(23 32 30 / 0.68) !important;
+}
+
+html[data-theme="light"] .editorial-copy strong {
+  color: rgb(23 32 30 / 0.9);
+}
+
+html[data-theme="light"] .editorial-copy a,
+html[data-theme="light"] .editorial-contact a {
+  color: #6f7025;
+  text-decoration-color: rgb(0 107 94 / 0.35);
+}
+
+html[data-theme="light"] .editorial-copy a:hover,
+html[data-theme="light"] .editorial-contact a:hover {
+  color: #17201e;
+}
+
+@media (max-width: 767px) {
+  .editorial-hero {
+    background-image:
+      linear-gradient(90deg, rgb(19 19 19 / 0.96), rgb(19 19 19 / 0.76)),
+      var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
+  }
+
+  html[data-theme="light"] .editorial-hero {
+    background-image:
+      linear-gradient(90deg, rgb(255 255 255 / 0.97), rgb(245 247 246 / 0.82)),
+      var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background-light.webp"));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  header,
+  footer,
+  main,
+  section,
+  aside,
+  input,
+  select,
+  textarea {
+    transition-duration: 0s;
+  }
+
+  .lineage-card:hover::after {
+    animation: none;
+  }
+
+}
