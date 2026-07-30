@@ -5,6 +5,8 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { useCart } from "@/components/CartContext";
+import { useProducts } from "@/components/ProductsContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
@@ -17,18 +19,21 @@ import {
   Settings,
   LogOut,
   ClipboardList,
-  Award,
   Check,
-  ChevronRight,
   Truck,
   AlertCircle,
-  FileText,
   Save,
   Lock,
   Camera,
   LoaderCircle,
+  RotateCcw,
 } from "lucide-react";
-import { downloadDigitalCatalogPdf } from "@/lib/catalog-export";
+import {
+  findCatalogProduct,
+  findOptionIndex,
+  isStockedOption,
+  mapWithClientConcurrency,
+} from "@/lib/order-suggestions";
 
 // WooCommerce order status → UI label/color
 const ORDER_STATUS_STYLES = {
@@ -51,6 +56,8 @@ const formatOrderDate = (iso) =>
 
 export default function MyAccountPage() {
   const { isLoggedIn, user, loading, logout, updateUser } = useAuth();
+  const { products, loading: productsLoading, resolveProduct } = useProducts();
+  const { addSelectionsToCart } = useCart();
   const router = useRouter();
   const avatarInputRef = useRef(null);
   const [avatarMessage, setAvatarMessage] = useState("");
@@ -125,8 +132,6 @@ export default function MyAccountPage() {
   // Modal states
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isApplyOpen, setIsApplyOpen] = useState(false);
-  const [pdfExporting, setPdfExporting] = useState(false);
-  const [pdfExportError, setPdfExportError] = useState("");
 
   // Address edit toggles and form states
   const [editShipping, setEditShipping] = useState(false);
@@ -172,6 +177,9 @@ export default function MyAccountPage() {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [reorderingOrderId, setReorderingOrderId] = useState("");
+  const [reorderMessage, setReorderMessage] = useState("");
+  const [reorderError, setReorderError] = useState("");
 
   useEffect(() => {
     if (!user?.email) return;
@@ -302,22 +310,6 @@ export default function MyAccountPage() {
     router.refresh();
   };
 
-  const handleWholesaleCatalogPdf = async () => {
-    if (pdfExporting) return;
-    setPdfExporting(true);
-    setPdfExportError("");
-
-    try {
-      await downloadDigitalCatalogPdf();
-    } catch (exportFailure) {
-      setPdfExportError(
-        exportFailure.message || "The PDF catalog could not be generated."
-      );
-    } finally {
-      setPdfExporting(false);
-    }
-  };
-
   // Handle Account Update
   const handleAccountSubmit = async (e) => {
     e.preventDefault();
@@ -368,6 +360,84 @@ export default function MyAccountPage() {
     }
   };
 
+  const handleRepeatOrder = async (order) => {
+    if (reorderingOrderId || productsLoading) return;
+    setReorderingOrderId(order.id);
+    setReorderMessage("");
+    setReorderError("");
+
+    try {
+      const results = await mapWithClientConcurrency(
+        order.items || [],
+        4,
+        async (item) => {
+          const product = findCatalogProduct(products, item, order.storeId);
+          if (!product) return { unavailable: item.name };
+          try {
+            const resolved = product.optionsLoaded
+              ? product
+              : await resolveProduct(product);
+            const optionIndex = findOptionIndex(resolved, item);
+            if (optionIndex < 0) return { unavailable: item.name };
+            const option = resolved.options?.[optionIndex];
+            const requestedQuantity = Math.max(1, Number(item.quantity) || 1);
+            if (!isStockedOption(option, 1)) return { unavailable: item.name };
+            const quantity =
+              option.stockQuantity == null
+                ? requestedQuantity
+                : Math.min(requestedQuantity, Number(option.stockQuantity));
+            if (!isStockedOption(option, quantity)) {
+              return { unavailable: item.name };
+            }
+            return {
+              selection: {
+                product: resolved,
+                optionIndex,
+                quantity,
+              },
+              adjusted: quantity < requestedQuantity ? item.name : null,
+            };
+          } catch {
+            return { unavailable: item.name };
+          }
+        }
+      );
+
+      const selections = results.flatMap((result) =>
+        result.selection ? [result.selection] : []
+      );
+      const unavailable = results.flatMap((result) =>
+        result.unavailable ? [result.unavailable] : []
+      );
+      const adjusted = results.flatMap((result) =>
+        result.adjusted ? [result.adjusted] : []
+      );
+      if (selections.length === 0) {
+        throw new Error(
+          "None of the products from this order are currently available."
+        );
+      }
+
+      addSelectionsToCart(selections);
+      const notes = [];
+      if (unavailable.length > 0) {
+        notes.push(`${unavailable.length} unavailable product(s) were skipped.`);
+      }
+      if (adjusted.length > 0) {
+        notes.push(`${adjusted.length} quantity value(s) were limited to current stock.`);
+      }
+      setReorderMessage(
+        `Order #${order.number} was added to your cart. ${notes.join(" ")}`.trim()
+      );
+    } catch (repeatError) {
+      setReorderError(
+        repeatError.message || "This order could not be added again."
+      );
+    } finally {
+      setReorderingOrderId("");
+    }
+  };
+
   // Handle Address Updates
   const handleShippingSubmit = (e) => {
     e.preventDefault();
@@ -408,28 +478,6 @@ export default function MyAccountPage() {
   return (
     <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
-
-      {pdfExporting && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#242f27]/95 px-5 backdrop-blur-sm xl:hidden"
-          role="status"
-          aria-live="assertive"
-          aria-label="Generating your PDF catalog. Please wait and keep this page open."
-        >
-          <div className="w-full max-w-xl rounded-xl border border-[#f2f2f2]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
-            <LoaderCircle
-              className="mx-auto h-14 w-14 animate-spin text-[#f2f2f2] sm:h-16 sm:w-16"
-              aria-hidden="true"
-            />
-            <p className="mt-7 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
-              Generating your PDF catalog...
-            </p>
-            <p className="mx-auto mt-4 max-w-md text-base font-semibold leading-7 text-white/75 sm:text-lg">
-              This may take a moment. Please wait and keep this page open until the PDF is ready.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Hero Header Section */}
       <section className="bg-[#1c1c1c] border-b border-white/15 py-8 sm:py-10 lg:py-12 relative overflow-hidden">
@@ -679,6 +727,19 @@ export default function MyAccountPage() {
                     Order History
                   </h3>
 
+                  {(reorderMessage || reorderError) && (
+                    <div
+                      role="status"
+                      className={`mb-4 rounded border p-3 text-xs ${
+                        reorderError
+                          ? "border-red-300/20 bg-red-400/10 text-red-100"
+                          : "border-[#f2f2f2]/25 bg-[#999933]/10 text-[#eadcae]"
+                      }`}
+                    >
+                      {reorderError || reorderMessage}
+                    </div>
+                  )}
+
                   {ordersLoading ? (
                     <div className="flex items-center justify-center py-12">
                       <div className="w-8 h-8 border-4 border-[#999933] border-t-transparent rounded-full animate-spin"></div>
@@ -690,7 +751,7 @@ export default function MyAccountPage() {
                     </div>
                   ) : orders.length === 0 ? (
                     <p className="text-sm text-white/40 py-8 text-center">
-                      No orders yet. Submit a wholesale order sheet from the catalog and it will appear here.
+                      No orders yet. Submit a wholesale order from the catalog and it will appear here.
                     </p>
                   ) : (
                     <div className="overflow-x-auto">
@@ -720,15 +781,30 @@ export default function MyAccountPage() {
                                   </span>
                                 </td>
                                 <td className="py-4 px-4 text-right">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setExpandedOrderId(expandedOrderId === order.id ? null : order.id)
-                                    }
-                                    className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer"
-                                  >
-                                    {expandedOrderId === order.id ? "Hide Details" : "View Details"}
-                                  </button>
+                                  <div className="flex min-w-max items-center justify-end gap-3">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setExpandedOrderId(expandedOrderId === order.id ? null : order.id)
+                                      }
+                                      className="text-[#f2f2f2] hover:underline font-bold bg-transparent border-0 cursor-pointer"
+                                    >
+                                      {expandedOrderId === order.id ? "Hide Details" : "View Details"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRepeatOrder(order)}
+                                      disabled={Boolean(reorderingOrderId) || productsLoading}
+                                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-white transition-colors hover:border-[#f2f2f2]/40 hover:bg-[#999933]/10 disabled:cursor-wait disabled:opacity-50"
+                                    >
+                                      {reorderingOrderId === order.id ? (
+                                        <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                                      ) : (
+                                        <RotateCcw className="h-3.5 w-3.5" />
+                                      )}
+                                      {reorderingOrderId === order.id ? "Adding" : "Reorder"}
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                               {expandedOrderId === order.id && (
@@ -769,56 +845,10 @@ export default function MyAccountPage() {
 
             {/* 3. DOWNLOADS TAB */}
             {activeTab === "downloads" && (
-              <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 md:p-8 shadow-xl animate-fade-in">
-                <h3 className="font-headline-md text-lg font-bold text-white mb-2 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-[#f2f2f2]" />
-                  Downloadable Partner Vault
-                </h3>
-                <p className="text-xs text-white/50 leading-relaxed mb-6">
-                  Access official botanical certificates, wholesale catalogs, pricing lists, and lineage agreements.
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { title: "Chemical Purity Lab Reports", desc: "Tsunu & Cumaru gas chromatography tests.", size: "PDF - 2.4 MB" },
-                    { title: "Wholesale Catalog", desc: "Complete public digital catalog.", size: "Generated PDF", isCatalog: true },
-                    { title: "Amazon Rainforest Fair Trade Agreement", desc: "Indigenous alliance certification.", size: "PDF - 1.8 MB" },
-                    { title: "Rapeh Administration Guidelines", desc: "Dosages, warnings and best practices.", size: "PDF - 920 KB" }
-                  ].map((doc, idx) => (
-                    <div key={idx} className="bg-[#131313] border border-white/5 rounded-lg p-5 flex flex-col justify-between hover:border-white/10 transition-colors">
-                      <div className="mb-4">
-                        <FileText className="w-8 h-8 text-[#f2f2f2] mb-2" />
-                        <h4 className="text-sm font-bold text-white mb-1">{doc.title}</h4>
-                        <p className="text-xs text-white/50 leading-relaxed">{doc.desc}</p>
-                      </div>
-                      <div className="flex justify-between items-center border-t border-white/5 pt-3">
-                        <span className="text-[10px] font-mono text-white/40">{doc.size}</span>
-                        <button
-                          type="button"
-                          onClick={() => doc.isCatalog ? handleWholesaleCatalogPdf() : alert(`Downloading: ${doc.title}`)}
-                          disabled={doc.isCatalog && pdfExporting}
-                          className="text-[10px] font-mono text-[#f2f2f2] hover:text-white font-bold bg-transparent border-0 cursor-pointer flex items-center gap-1 disabled:cursor-wait disabled:opacity-50"
-                        >
-                          {doc.isCatalog && pdfExporting ? (
-                            <>
-                              Generating <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
-                            </>
-                          ) : (
-                            <>
-                              Download <ChevronRight className="w-3.5 h-3.5" />
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {pdfExportError && (
-                  <p className="mt-4 text-xs leading-5 text-[#ff9b88]" role="alert">
-                    {pdfExportError}
-                  </p>
-                )}
-              </div>
+              <div
+                className="min-h-[32rem] rounded-xl border border-white/10 bg-[#1a1a1a] shadow-xl animate-fade-in"
+                aria-label="Downloads"
+              />
             )}
 
             {/* 4. ADDRESSES TAB */}

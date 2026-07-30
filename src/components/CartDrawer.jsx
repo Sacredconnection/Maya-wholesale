@@ -1,16 +1,20 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- Cart images retain runtime WooCommerce error fallbacks. */
+/* eslint-disable @next/next/no-img-element -- Cart images come from WooCommerce. */
 
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCart } from './CartContext';
-import { useAuth } from './AuthContext';
-import LoginModal from './LoginModal';
-import ProductRecommendations from './ProductRecommendations';
-import { ShoppingBag, X, Minus, Plus, ArrowRight, PhoneCall, Scale } from 'lucide-react';
-import { MIN_ORDER_GRAMS, NEW_CUSTOMER_ROLE, progressivePerGramRate, progressiveTableKeyFor } from '@/lib/pricing';
-import { useDialogAccessibility } from '@/lib/use-dialog-accessibility';
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Minus, Package, Plus, ShoppingBag, X } from "lucide-react";
+import { useAuth } from "./AuthContext";
+import { useCart } from "./CartContext";
+import LoginModal from "./LoginModal";
+import ProductRecommendations from "./ProductRecommendations";
+import {
+  NEW_CUSTOMER_ROLE,
+  progressivePerGramRate,
+  progressiveTableKeyFor,
+} from "@/lib/pricing";
+import { useDialogAccessibility } from "@/lib/use-dialog-accessibility";
 
 export default function CartDrawer() {
   const { isLoggedIn, user } = useAuth();
@@ -23,9 +27,8 @@ export default function CartDrawer() {
     removeFromCart,
     cartSubtotal,
     cartTotalItems,
-    cartTotalWeightGrams
+    cartTotalWeightGrams,
   } = useCart();
-
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const drawerRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -38,266 +41,228 @@ export default function CartDrawer() {
 
   if (!isCartOpen && !isLoginOpen) return null;
 
-  const meetsMinimumWeight = cartTotalWeightGrams >= MIN_ORDER_GRAMS;
-
-  // Progressive per-gram tiers applied to New Customer orders (by total
-  // weight) — one rate per product line present in the cart.
   const perGramRates =
     isLoggedIn && user?.role === NEW_CUSTOMER_ROLE
-      ? [...new Set(cart.filter((i) => i.weightGrams > 0).map((i) => progressiveTableKeyFor(i.category)))]
+      ? [...new Set(
+          cart
+            .filter((item) => item.weightGrams > 0)
+            .map((item) => progressiveTableKeyFor(item.category))
+        )]
           .map((tableKey) => ({
             tableKey,
             label: tableKey === "shamanic" ? "SHAMANIC" : "INDIGENOUS",
             rate: progressivePerGramRate(cartTotalWeightGrams, tableKey),
           }))
-          .filter((r) => r.rate != null)
+          .filter(({ rate }) => rate != null)
       : [];
+
+  const discountPercentage = isLoggedIn && user ? user.discountRate : 0;
+  const discountAmount = cartSubtotal * (discountPercentage / 100);
+  const finalTotal = cartSubtotal - discountAmount;
 
   const handleCheckout = () => {
     if (!isLoggedIn || !user) {
       setIsLoginOpen(true);
       return;
     }
-    if (!meetsMinimumWeight) return;
-
-    setIsCartOpen(false);
+    closeCart();
     router.push("/checkout");
   };
-
-  const discountPercentage = isLoggedIn && user ? user.discountRate : 0;
-  const discountAmount = cartSubtotal * (discountPercentage / 100);
-  const finalTotal = cartSubtotal - discountAmount;
 
   return (
     <>
       {isCartOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          {/* Backdrop Overlay */}
           <div
             aria-hidden="true"
             onClick={closeCart}
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
-          ></div>
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+          />
 
-          {/* Drawer Panel */}
           <div
             ref={drawerRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-drawer-title"
             tabIndex={-1}
-            className="absolute inset-y-0 right-0 max-w-md w-full bg-[#1a1a1a] border-l border-white/10 shadow-2xl flex flex-col justify-between animate-fade-in-left"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-white/10 bg-[#1a1a1a] shadow-2xl animate-fade-in-left"
           >
-
-            {/* Header */}
-            <div className="px-5 sm:px-8 py-5 sm:py-6 border-b border-white/10 flex justify-between items-center bg-[#131313]">
+            <div className="flex items-center justify-between border-b border-white/10 bg-[#131313] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex items-center gap-3">
-                <ShoppingBag className="w-5 h-5 text-[#f2f2f2]" />
-                <h3 id="cart-drawer-title" className="font-headline-md text-xl font-bold text-white">
-                  Bulk Order Sheet
-                </h3>
+                <ShoppingBag className="h-5 w-5 text-[#f2f2f2]" aria-hidden="true" />
+                <h2 id="cart-drawer-title" className="font-headline-md text-xl font-bold text-white">
+                  Cart
+                </h2>
               </div>
               <button
                 ref={closeButtonRef}
                 type="button"
-                aria-label="Close bulk order sheet"
+                aria-label="Close cart"
                 onClick={closeCart}
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white flex items-center justify-center transition-all cursor-pointer border-0"
+                className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border-0 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
 
-            {/* Body: Cart Items */}
-            <div className="flex-grow overflow-y-auto px-5 sm:px-8 py-5 sm:py-6 flex flex-col gap-5 sm:gap-6 scrollbar-none">
+            <div className="flex-grow overflow-y-auto scrollbar-none">
               {cart.length > 0 ? (
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-5 divide-y divide-white/5">
+                <div className="flex flex-col">
+                  <div className="flex flex-col gap-5 divide-y divide-white/5 px-5 py-5 sm:px-8 sm:py-6">
                     {cart.map((item, index) => (
-                    <div key={item.cartKey} className={`flex flex-col items-start justify-between gap-4 sm:flex-row ${index > 0 ? "pt-5" : ""}`}>
-                      <div className="flex w-full min-w-0 flex-grow gap-3">
-                        <div className="w-10 h-10 rounded bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0 select-none overflow-hidden">
-                          {item.image ? (
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.parentElement.textContent = "🍃";
-                              }}
-                            />
-                          ) : (
-                            "🍃"
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-sm font-bold text-white leading-snug">
-                            {item.name}
-                          </h4>
-                          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
-                            <span className="text-[10px] font-bold bg-[#999933]/10 text-[#f2f2f2] border border-[#999933]/30 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">
-                              {item.optionName}
-                            </span>
-                            <span className="text-[10px] font-semibold text-white/45">
-                              {item.storeName}
-                            </span>
-                            <span className="break-all text-[10px] font-mono text-white/35">
-                              {item.sku}
-                            </span>
+                      <div
+                        key={item.cartKey}
+                        className={`flex flex-col items-start justify-between gap-4 sm:flex-row ${
+                          index > 0 ? "pt-5" : ""
+                        }`}
+                      >
+                        <div className="flex w-full min-w-0 flex-grow gap-3">
+                          <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-white/10 bg-white/5 text-[#f2f2f2]">
+                            {item.image ? (
+                              <img
+                                src={item.image}
+                                alt=""
+                                className="h-full w-full object-cover"
+                                onError={(event) => {
+                                  event.currentTarget.style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <Package className="h-4 w-4" aria-hidden="true" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-sm font-bold leading-snug text-white">
+                              {item.name}
+                            </h3>
+                            <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+                              <span className="rounded-sm border border-[#999933]/30 bg-[#999933]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#f2f2f2]">
+                                {item.optionName}
+                              </span>
+                              <span className="break-all font-mono text-[10px] text-white/35">
+                                {item.sku}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex w-full min-w-0 shrink-0 flex-row items-center justify-between gap-3 sm:h-full sm:w-auto sm:min-w-[100px] sm:flex-col sm:items-end">
-                        <span className="text-sm font-bold text-white font-mono">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </span>
-
-                        {/* Quantity controls */}
-                        <div className="flex items-center bg-[#131313] border border-white/10 rounded-sm">
-                          <button
-                            type="button"
-                            aria-label={`Decrease quantity of ${item.name}`}
-                            onClick={() => updateQuantity(item.cartKey, -1)}
-                            className="p-1.5 text-white/50 hover:text-white cursor-pointer bg-transparent border-0"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="w-7 text-center text-xs font-bold text-white font-mono">
-                            {item.quantity}
+                        <div className="flex w-full min-w-0 shrink-0 items-center justify-between gap-3 sm:w-auto sm:min-w-[100px] sm:flex-col sm:items-end">
+                          <span className="font-mono text-sm font-bold text-white">
+                            ${(item.price * item.quantity).toFixed(2)}
                           </span>
+                          <div className="flex items-center rounded-sm border border-white/10 bg-[#131313]">
+                            <button
+                              type="button"
+                              aria-label={`Decrease quantity of ${item.name}`}
+                              onClick={() => updateQuantity(item.cartKey, -1)}
+                              className="cursor-pointer border-0 bg-transparent p-1.5 text-white/50 hover:text-white"
+                            >
+                              <Minus className="h-3 w-3" aria-hidden="true" />
+                            </button>
+                            <span className="w-7 text-center font-mono text-xs font-bold text-white">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              aria-label={`Increase quantity of ${item.name}`}
+                              onClick={() => updateQuantity(item.cartKey, 1)}
+                              disabled={
+                                item.stockQuantity != null &&
+                                item.quantity >= item.stockQuantity
+                              }
+                              className="cursor-pointer border-0 bg-transparent p-1.5 text-white/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-25"
+                            >
+                              <Plus className="h-3 w-3" aria-hidden="true" />
+                            </button>
+                          </div>
                           <button
                             type="button"
-                            aria-label={`Increase quantity of ${item.name}`}
-                            onClick={() => updateQuantity(item.cartKey, 1)}
-                            className="p-1.5 text-white/50 hover:text-white cursor-pointer bg-transparent border-0"
+                            onClick={() => removeFromCart(item.cartKey)}
+                            className="cursor-pointer border-0 bg-transparent text-[10px] font-semibold uppercase tracking-wider text-white/35 transition-colors hover:text-[#cc6633]"
                           >
-                            <Plus className="w-3 h-3" />
+                            Remove
                           </button>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.cartKey)}
-                          className="text-[10px] text-white/35 hover:text-[#cc6633] uppercase tracking-wider font-semibold transition-colors cursor-pointer bg-transparent border-0"
-                        >
-                          Remove
-                        </button>
                       </div>
-                    </div>
                     ))}
                   </div>
-                  <ProductRecommendations
-                    eyebrow="Recommended add-ons"
-                    title="Frequently bought together"
-                    description="Related products you can add without leaving your order."
-                    variant="drawer"
-                    limit={2}
-                  />
+
+                  <div className="border-y border-[#999933]/25 bg-[#242f27] px-5 py-6 sm:px-8">
+                    <ProductRecommendations
+                      eyebrow="Optional add-ons"
+                      title="You may also like"
+                      description="These suggestions are separate from your current order and are added only when you select Add."
+                      variant="drawer"
+                      limit={2}
+                    />
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-64 text-center gap-4 text-white/30">
-                  <ShoppingBag className="w-12 h-12 stroke-[1.5]" />
-                  <p className="text-sm font-semibold">Your B2B order sheet is currently empty.</p>
+                <div className="flex h-64 flex-col items-center justify-center gap-4 px-5 text-center text-white/30 sm:px-8">
+                  <ShoppingBag className="h-12 w-12 stroke-[1.5]" aria-hidden="true" />
+                  <p className="text-sm font-semibold">Your cart is currently empty.</p>
                   <button
                     type="button"
                     onClick={closeCart}
-                    className="text-xs font-bold text-[#f2f2f2] uppercase tracking-widest hover:underline cursor-pointer bg-transparent border-0"
+                    className="cursor-pointer border-0 bg-transparent text-xs font-bold uppercase tracking-widest text-[#f2f2f2] hover:underline"
                   >
-                    Browse Catalog
+                    Browse catalog
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Footer Summary */}
-            <div className="px-5 sm:px-8 py-5 sm:py-6 bg-[#131313] border-t border-white/10 flex flex-col gap-5 sm:gap-6">
+            <div className="flex flex-col gap-5 border-t border-white/10 bg-[#131313] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center text-xs text-white/50 uppercase tracking-wider font-label-sm">
-                  <span>Total Items</span>
-                  <span className="font-bold text-white font-mono">{cartTotalItems}</span>
+                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-white/50">
+                  <span>Total items</span>
+                  <span className="font-mono font-bold text-white">{cartTotalItems}</span>
                 </div>
-                <div className="flex justify-between items-center text-xs text-white/50 font-mono">
+                <div className="flex items-center justify-between font-mono text-xs text-white/50">
                   <span>EST. WEIGHT</span>
-                  <span className={`font-bold font-mono ${meetsMinimumWeight ? "text-white" : "text-yellow-400"}`}>
+                  <span className="font-bold text-white">
                     {cartTotalWeightGrams >= 1000
                       ? `${(cartTotalWeightGrams / 1000).toFixed(2)} kg`
-                      : `${Math.round(cartTotalWeightGrams)} g`
-                    }
+                      : `${Math.round(cartTotalWeightGrams)} g`}
                   </span>
                 </div>
-
                 {perGramRates.map(({ tableKey, label, rate }) => (
-                  <div key={tableKey} className="flex justify-between items-center text-xs text-[#f2f2f2] font-mono">
+                  <div key={tableKey} className="flex items-center justify-between font-mono text-xs text-[#f2f2f2]">
                     <span>VOLUME RATE: {label}</span>
                     <span className="font-bold">${rate.toFixed(2)}/g</span>
                   </div>
                 ))}
-
-                {/* Minimum order weight indicator */}
-                {cart.length > 0 && !meetsMinimumWeight && (
-                  <div className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/25 text-yellow-400 text-[11px] px-3 py-2.5 rounded-sm mt-1">
-                    <Scale className="w-3.5 h-3.5 shrink-0" />
-                    <span>
-                      Minimum wholesale order is <strong>{MIN_ORDER_GRAMS}g</strong>; add{" "}
-                      {Math.ceil(MIN_ORDER_GRAMS - cartTotalWeightGrams)}g more to submit.
-                    </span>
-                  </div>
-                )}
-
                 {isLoggedIn && user && (
-                  <div className="flex justify-between items-center text-xs text-[#f2f2f2] font-mono mt-1">
+                  <div className="mt-1 flex items-center justify-between font-mono text-xs text-[#f2f2f2]">
                     <span>B2B DISCOUNT ({user.discountRate}%)</span>
                     <span>-${discountAmount.toFixed(2)}</span>
                   </div>
                 )}
-
-                <div className="h-px bg-white/5 my-2"></div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-white uppercase tracking-widest font-label-sm">
-                    {isLoggedIn && user ? 'Est. Partner Total' : 'Est. Subtotal'}
+                <div className="my-2 h-px bg-white/5" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold uppercase tracking-widest text-white">
+                    Est. partner total
                   </span>
-                  <span className="text-2xl font-black text-[#f2f2f2] font-headline-lg">
+                  <span className="font-headline-lg text-2xl font-black text-[#f2f2f2]">
                     ${(isLoggedIn && user ? finalTotal : cartSubtotal).toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              {/* Offline payment notice */}
-              <div className="bg-[#999933]/10 border border-[#999933]/25 rounded-sm px-4 py-3 flex items-start gap-3">
-                <PhoneCall className="w-4 h-4 text-[#f2f2f2] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-white/70 leading-relaxed">
-                  No online payment is taken. Once submitted, your order is registered
-                  and a member of our team will contact you to arrange payment and shipping.
-                </p>
-              </div>
-
               <button
                 type="button"
                 onClick={handleCheckout}
-                disabled={cart.length === 0 || (isLoggedIn && !meetsMinimumWeight)}
-                className="w-full bg-[#cc6633] hover:bg-[#b6532a] disabled:opacity-40 disabled:hover:bg-[#cc6633] text-white text-xs font-bold uppercase tracking-widest py-5 rounded-sm transition-all duration-300 shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/40 flex items-center justify-center gap-3 cursor-pointer disabled:cursor-not-allowed border-0"
+                disabled={cart.length === 0}
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] py-5 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-[#cc6633]/20 transition-all hover:bg-[#b6532a] hover:shadow-[#cc6633]/40 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {isLoggedIn ? (
-                  <>
-                    Proceed to Checkout
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                ) : (
-                  <>
-                    Sign In to Submit Order
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                {isLoggedIn ? "Proceed to checkout" : "Sign in to submit order"}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* Login prompt for guests trying to submit */}
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </>
   );

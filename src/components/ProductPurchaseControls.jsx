@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Check, Loader2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import { useProducts } from "@/components/ProductsContext";
@@ -24,6 +24,13 @@ export default function ProductPurchaseControls({
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
   const [retryKey, setRetryKey] = useState(0);
+  const [addedAt, setAddedAt] = useState(0);
+
+  useEffect(() => {
+    if (!addedAt) return undefined;
+    const timer = window.setTimeout(() => setAddedAt(0), 1800);
+    return () => window.clearTimeout(timer);
+  }, [addedAt]);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,23 +63,33 @@ export default function ProductPurchaseControls({
     ? optionPriceForUser(selectedOption, user, activeProduct.category)
     : null;
   const canAdd = Boolean(selectedOption && selectedOption.inStock !== false && !error);
+  const showOptionSelector = Boolean(
+    activeProduct &&
+      (activeProduct.productType === "variable" ||
+        activeProduct.options?.length > 1)
+  );
 
   const handleAdd = () => {
     if (!activeProduct || !canAdd) return;
     addToCart(activeProduct, selectedOptionIndex, quantity);
     setQuantity(1);
+    setAddedAt(Date.now());
     onAdded?.(activeProduct, selectedOptionIndex);
   };
 
   return (
     <div className={`flex w-full flex-col ${compact ? "gap-2.5" : "gap-3"}`}>
-      <label className="flex flex-col gap-1.5">
+      <label className={`${activeProduct && !showOptionSelector ? "hidden" : "flex"} flex-col gap-1.5`}>
         <span className="text-[9px] font-bold uppercase tracking-wider text-white/40">
           Product option
         </span>
         <select
           value={selectedOptionIndex}
-          onChange={(event) => setSelectedOptionIndex(Number(event.target.value))}
+          onChange={(event) => {
+            setSelectedOptionIndex(Number(event.target.value));
+            setAddedAt(0);
+            setQuantity(1);
+          }}
           disabled={!activeProduct || Boolean(error)}
           aria-label={`Select an option for ${product.name}`}
           className={`w-full rounded-sm border border-white/10 bg-[#131313] text-white outline-none transition-colors focus:border-[#999933] disabled:cursor-wait disabled:opacity-60 ${
@@ -130,7 +147,17 @@ export default function ProductPurchaseControls({
             <span className="w-7 text-center text-xs font-bold text-white">{quantity}</span>
             <button
               type="button"
-              onClick={() => setQuantity((value) => value + 1)}
+              onClick={() =>
+                setQuantity((value) =>
+                  selectedOption?.stockQuantity == null
+                    ? value + 1
+                    : Math.min(value + 1, Number(selectedOption.stockQuantity))
+                )
+              }
+              disabled={
+                selectedOption?.stockQuantity != null &&
+                quantity >= Number(selectedOption.stockQuantity)
+              }
               aria-label={`Increase quantity of ${product.name}`}
               className={`${compact ? "p-2" : "p-2.5"} cursor-pointer border-0 bg-transparent text-white/55 hover:text-white`}
             >
@@ -148,10 +175,12 @@ export default function ProductPurchaseControls({
           >
             {!activeProduct ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : addedAt ? (
+              <Check className="h-3.5 w-3.5" />
             ) : (
               <ShoppingBag className="h-3.5 w-3.5" />
             )}
-            {buttonLabel}
+            {addedAt ? "Added" : buttonLabel}
           </button>
         </div>
       )}

@@ -21,7 +21,6 @@ import {
   toWcAddress,
 } from "@/lib/wc-mappers";
 import {
-  MIN_ORDER_GRAMS,
   NEW_CUSTOMER_ROLE,
   progressivePerGramRate,
   progressiveTableKeyFor,
@@ -35,6 +34,7 @@ import {
 } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
 import { isSupportedCountryCode } from "@/lib/countries";
+import { createHash } from "node:crypto";
 
 const ORDER_CUSTOMER_NOTE =
   process.env.WHOLESALE_ORDER_NOTE?.replace(/\\n/g, "\n").trim() ||
@@ -54,6 +54,45 @@ const missingBackendsResponse = () => {
 
 const orderErrorStatus = (err) =>
   err instanceof WooCommerceApiError && err.status >= 400 ? 502 : 500;
+
+const orderMetaValue = (order, key) => {
+  const entries = order?.meta_data || [];
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    if (entries[index]?.key === key) return String(entries[index].value || "");
+  }
+  return "";
+};
+
+const productCanFulfill = (product, quantity) =>
+  Boolean(
+    product &&
+      product.purchasable !== false &&
+      product.stock_status !== "outofstock" &&
+      (product.stock_quantity == null ||
+        Number(product.stock_quantity) >= quantity)
+  );
+
+async function mapWithConcurrency(items, concurrency, mapper) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    for (;;) {
+      const index = nextIndex;
+      nextIndex += 1;
+      if (index >= items.length) return;
+      results[index] = await mapper(items[index], index);
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(Math.max(1, concurrency), items.length) },
+      () => worker()
+    )
+  );
+  return results;
+}
 
 const sanitizedAddress = (address) => {
   if (!address || typeof address !== "object" || Array.isArray(address)) return null;
@@ -124,6 +163,10 @@ export async function POST(request) {
   if (!session) return securityError("Authentication required.", 401);
   const configurationError = missingBackendsResponse();
   if (configurationError) return configurationError;
+  const idempotencyKey = request.headers.get("idempotency-key")?.trim() || "";
+  if (!/^[A-Za-z0-9._:-]{8,200}$/.test(idempotencyKey)) {
+    return securityError("A valid idempotency key is required.", 400);
+  }
 
   let body;
   try {
@@ -140,20 +183,18 @@ export async function POST(request) {
           firstName: cleanText(body.checkout.firstName, 80),
           lastName: cleanText(body.checkout.lastName, 80),
           company: cleanText(body.checkout.company, 160),
-          phone: cleanText(body.checkout.phone, 40),
           shippingAddress: sanitizedAddress(body.checkout.shippingAddress),
           billingAddress: sanitizedAddress(body.checkout.billingAddress),
         }
       : null;
   if (!Array.isArray(items) || items.length === 0 || items.length > 100) {
-    return securityError("The order sheet must contain between 1 and 100 items.", 400);
+    return securityError("The cart must contain between 1 and 100 items.", 400);
   }
   if (
     body.checkout &&
     (!checkout ||
       !checkout.firstName ||
       !checkout.lastName ||
-      !checkout.phone ||
       !addressIsComplete(checkout.shippingAddress) ||
       !addressIsComplete(checkout.billingAddress))
   ) {
@@ -171,16 +212,33 @@ export async function POST(request) {
     const stores = getRequiredCommerceStores();
     const storeById = new Map(stores.map((store) => [store.id, store]));
 
-    const resolved = [];
-    const unresolved = [];
-    let totalWeightGrams = 0;
+    const validatedItems = [];
     const productCache = new Map();
+    const variationCache = new Map();
+    const skuCache = new Map();
     const getParentProduct = async (storeId, id) => {
       const key = `${storeId}:${id}`;
       if (!productCache.has(key)) {
-        productCache.set(key, await getProductById(id, storeId));
+        productCache.set(key, getProductById(id, storeId));
       }
       return productCache.get(key);
+    };
+    const getVariation = async (storeId, productId, variationId) => {
+      const key = `${storeId}:${productId}:${variationId}`;
+      if (!variationCache.has(key)) {
+        variationCache.set(
+          key,
+          getVariationById(productId, variationId, storeId)
+        );
+      }
+      return variationCache.get(key);
+    };
+    const getBySku = async (storeId, sku) => {
+      const key = `${storeId}:${sku.toLowerCase()}`;
+      if (!skuCache.has(key)) {
+        skuCache.set(key, findProductBySku(sku, storeId));
+      }
+      return skuCache.get(key);
     };
     const tableKeyFromCategories = (categories = []) =>
       categories.some((category) => progressiveTableKeyFor(category.name) === "shamanic")
@@ -208,50 +266,101 @@ export async function POST(request) {
         return securityError("Invalid product identifier.", 400);
       }
 
-      let payload = null;
-      let productId = null;
-      let variationId = null;
-      if (requestedProductId && requestedVariationId) {
-        payload = await getVariationById(requestedProductId, requestedVariationId, storeId);
-        productId = requestedProductId;
-        variationId = requestedVariationId;
-      } else if (requestedProductId) {
-        payload = await getProductById(requestedProductId, storeId);
-        productId = requestedProductId;
-      } else if (sku) {
-        const found = await findProductBySku(sku, storeId);
-        if (found) {
-          payload = found;
-          productId = found.parent_id || found.id;
-          variationId = found.parent_id ? found.id : null;
-        }
-      }
-
-      if (!payload) {
-        unresolved.push(`${store.name}: ${sku || "unknown item"}`);
-        continue;
-      }
-
-      const optionText =
-        (payload.attributes || []).map((attribute) => attribute.option).filter(Boolean).join(" ") ||
-        payload.name;
-      const weightGrams = extractWeightGrams(optionText, payload.weight) || 0;
-      totalWeightGrams += weightGrams * quantity;
-      const categories = variationId
-        ? (await getParentProduct(storeId, productId)).categories
-        : payload.categories;
-
-      resolved.push({
+      validatedItems.push({
         store,
-        productId,
-        variationId,
+        storeId,
         quantity,
-        weightGrams,
-        tableKey: tableKeyFromCategories(categories),
-        rolePrice: role ? roleBasedPrices(payload.meta_data)[role] : undefined,
-        basePrice: parseFloat(payload.price) || 0,
+        requestedProductId,
+        requestedVariationId,
+        sku,
       });
     }
+
+    const resolutionResults = await mapWithConcurrency(
+      validatedItems,
+      8,
+      async ({
+        store,
+        storeId,
+        quantity,
+        requestedProductId,
+        requestedVariationId,
+        sku,
+      }) => {
+        let payload = null;
+        let productId = null;
+        let variationId = null;
+        let categories = [];
+
+        if (requestedProductId && requestedVariationId) {
+          const [variation, parentProduct] = await Promise.all([
+            getVariation(storeId, requestedProductId, requestedVariationId),
+            getParentProduct(storeId, requestedProductId),
+          ]);
+          payload = variation;
+          productId = requestedProductId;
+          variationId = requestedVariationId;
+          categories = parentProduct.categories;
+        } else if (requestedProductId) {
+          payload = await getParentProduct(storeId, requestedProductId);
+          productId = requestedProductId;
+          categories = payload.categories;
+        } else if (sku) {
+          const found = await getBySku(storeId, sku);
+          if (found) {
+            payload = found;
+            productId = found.parent_id || found.id;
+            variationId = found.parent_id ? found.id : null;
+            categories = variationId
+              ? (await getParentProduct(storeId, productId)).categories
+              : found.categories;
+          }
+        }
+
+        if (!payload) {
+          return { unresolved: `${store.name}: ${sku || "unknown item"}` };
+        }
+        if (!productCanFulfill(payload, quantity)) {
+          return {
+            unavailable: `${store.name}: ${sku || payload.name || "unknown item"}`,
+          };
+        }
+
+        const optionText =
+          (payload.attributes || [])
+            .map((attribute) => attribute.option)
+            .filter(Boolean)
+            .join(" ") || payload.name;
+        const weightGrams = extractWeightGrams(optionText, payload.weight) || 0;
+        return {
+          entry: {
+            store,
+            productId,
+            variationId,
+            quantity,
+            weightGrams,
+            tableKey: tableKeyFromCategories(categories),
+            rolePrice: role ? roleBasedPrices(payload.meta_data)[role] : undefined,
+            basePrice: parseFloat(payload.price) || 0,
+          },
+          lineWeightGrams: weightGrams * quantity,
+        };
+      }
+    );
+
+    const resolved = resolutionResults.flatMap((result) =>
+      result.entry ? [result.entry] : []
+    );
+    const unresolved = resolutionResults.flatMap((result) =>
+      result.unresolved ? [result.unresolved] : []
+    );
+    const unavailable = resolutionResults.flatMap((result) =>
+      result.unavailable ? [result.unavailable] : []
+    );
+    const totalWeightGrams = resolutionResults.reduce(
+      (total, result) => total + (result.lineWeightGrams || 0),
+      0
+    );
 
     if (unresolved.length > 0) {
       return Response.json(
@@ -259,15 +368,15 @@ export async function POST(request) {
         { status: 422 }
       );
     }
-    if (totalWeightGrams < MIN_ORDER_GRAMS) {
+    if (unavailable.length > 0) {
       return Response.json(
         {
-          error: `Minimum wholesale order is ${MIN_ORDER_GRAMS}g; this order sheet totals ${Math.round(totalWeightGrams)}g.`,
+          error: `Some items are unavailable in the requested quantity: ${unavailable.join(", ")}.`,
+          unavailable,
         },
-        { status: 422 }
+        { status: 409, headers: { "Cache-Control": "no-store" } }
       );
     }
-
     const isProgressive = role === NEW_CUSTOMER_ROLE;
     const entriesByStore = new Map();
     for (const entry of resolved) {
@@ -278,7 +387,7 @@ export async function POST(request) {
     const orderFirstName = checkout?.firstName || customer.firstName || "";
     const orderLastName = checkout?.lastName || customer.lastName || "";
     const orderCompany = checkout?.company || customer.company || "";
-    const orderPhone = checkout?.phone || customer.phone || "";
+    const orderPhone = customer.phone || "";
     const orderBillingAddress = checkout?.billingAddress || customer.billingAddress;
     const orderShippingAddress = checkout?.shippingAddress || customer.shippingAddress;
     const billing = {
@@ -297,6 +406,10 @@ export async function POST(request) {
     };
 
     const storesInOrder = stores.filter((store) => entriesByStore.has(store.id));
+    const requestReference = createHash("sha256")
+      .update(`${session.customerId}:${idempotencyKey}`)
+      .digest("hex")
+      .slice(0, 32);
     const creationResults = await Promise.allSettled(
       storesInOrder.map(async (store) => {
         const appliedRates = {};
@@ -321,10 +434,12 @@ export async function POST(request) {
           };
         });
 
-        const order = await createOrder(
+        try {
+          const order = await createOrder(
           {
             status: "on-hold",
             set_paid: false,
+            customer_id: wcCustomer.id,
             payment_method: "sc_offline",
             payment_method_title: "Offline: Maya Herbs team will contact you to arrange payment",
             billing,
@@ -334,6 +449,7 @@ export async function POST(request) {
             meta_data: [
               { key: "sc_channel", value: "wholesale-portal" },
               { key: "sc_source_store", value: store.id },
+              { key: "sc_request_reference", value: requestReference },
               { key: "sc_access_level", value: role || "none (base prices)" },
               { key: "sc_total_weight_grams", value: String(Math.round(totalWeightGrams)) },
               ...(Object.keys(appliedRates).length > 0
@@ -352,7 +468,23 @@ export async function POST(request) {
           },
           store.id
         );
-        return mapOrder(order, store);
+          return mapOrder(order, store);
+        } catch (creationError) {
+          try {
+            const recentOrders = await getOrdersByEmail(customer.email, store.id);
+            const recoveredOrder = recentOrders.find(
+              (order) =>
+                orderMetaValue(order, "sc_request_reference") === requestReference
+            );
+            if (recoveredOrder) return mapOrder(recoveredOrder, store);
+          } catch (reconciliationError) {
+            console.error(
+              `Order reconciliation failed for ${store.id}:`,
+              reconciliationError
+            );
+          }
+          throw creationError;
+        }
       })
     );
 
@@ -363,13 +495,27 @@ export async function POST(request) {
       if (result.status === "fulfilled") return [];
       const store = storesInOrder[index];
       console.error(`POST /api/orders failed for ${store.id}:`, result.reason);
-      return [{ storeId: store.id, storeName: store.name }];
+      return [{
+        storeId: store.id,
+        storeName: store.name,
+        uncertain:
+          !(result.reason instanceof WooCommerceApiError) ||
+          result.reason.status >= 500,
+      }];
     });
 
     if (orders.length === 0) {
+      const uncertain = failures.some((failure) => failure.uncertain);
       return Response.json(
-        { error: "Failed to register the order in the configured WooCommerce stores.", orders, failures },
-        { status: 502 }
+        {
+          error: uncertain
+            ? "We could not confirm the order response. Check My Account before submitting it again."
+            : "Failed to register the order in the configured WooCommerce stores.",
+          orders,
+          failures,
+          uncertain,
+        },
+        { status: 502, headers: { "Cache-Control": "no-store" } }
       );
     }
 

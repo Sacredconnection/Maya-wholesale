@@ -1,6 +1,6 @@
 import { verifyWpCredentials } from "@/lib/wp-auth";
 import { getCustomerByEmail, isWooCommerceConfigured } from "@/lib/woocommerce";
-import { mapCustomerToUser } from "@/lib/wc-mappers";
+import { isApprovedWholesaleCustomer, mapCustomerToUser } from "@/lib/wc-mappers";
 import {
   cleanText,
   isSameOrigin,
@@ -10,8 +10,6 @@ import {
   securityError,
 } from "@/lib/request-security";
 import { createSession } from "@/lib/session";
-
-const PENDING_ROLES = ["pending", "customer"];
 
 export async function POST(request) {
   if (!isSameOrigin(request)) return securityError("Cross-origin request rejected.", 403);
@@ -38,7 +36,8 @@ export async function POST(request) {
 
     authenticationStage = "WooCommerce customer lookup";
     const customer = await getCustomerByEmail(email);
-    if (!customer || PENDING_ROLES.includes((customer.role || "").toLowerCase())) {
+    if (!customer) return securityError("Invalid email or password.", 401);
+    if (!isApprovedWholesaleCustomer(customer)) {
       return securityError(
         "Your wholesale account is pending approval by the administration.",
         403

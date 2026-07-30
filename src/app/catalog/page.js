@@ -21,14 +21,10 @@ import {
   ChevronRight,
   ArrowRight,
   PackageOpen,
-  LoaderCircle,
 } from "lucide-react";
 
 import { useProducts } from "@/components/ProductsContext";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
-import { downloadDigitalCatalogPdf } from "@/lib/catalog-export";
-
-const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
 
 // Normalize string for accent-insensitive comparison
 // Strips diacritics, lowercases and trims — used ONLY for comparison, never for display
@@ -38,6 +34,24 @@ const normalizeStr = (str) =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
+
+const productHasAttribute = (product, key, value) =>
+  (product.attributes || []).some(
+    (attribute) =>
+      attribute.key === key &&
+      (attribute.values || []).some(
+        (attributeValue) =>
+          normalizeStr(attributeValue) === normalizeStr(value)
+      )
+  );
+
+const matchesAttributeFilters = (product, filters, ignoredKey = "") =>
+  Object.entries(filters || {}).every(
+    ([key, value]) =>
+      !value ||
+      key === ignoredKey ||
+      productHasAttribute(product, key, value)
+  );
 
 const getPaginationItems = (currentPage, totalPages) => {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -55,15 +69,16 @@ const getPaginationItems = (currentPage, totalPages) => {
 export default function CatalogPage() {
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
-  const { setIsCartOpen, cartTotalItems } = useCart();
+  const { setIsCartOpen, cartSubtotal, cartTotalItems } = useCart();
+  const cartTotal =
+    cartSubtotal * (1 - Number(user?.discountRate || 0) / 100);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [pdfExporting, setPdfExporting] = useState(false);
-  const [pdfExportError, setPdfExportError] = useState("");
 
   // Filter States
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [tribe, setTribe] = useState("All");
+  const [subcategory, setSubcategory] = useState("All");
+  const [childCategory, setChildCategory] = useState("All");
   const [attributeFilters, setAttributeFilters] = useState({});
 
   // Pagination State
@@ -75,13 +90,15 @@ export default function CatalogPage() {
   useEffect(() => {
     const syncTimer = window.setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
-      const tribeParam = params.get("tribe");
-      if (tribeParam) {
+      const subcategoryParam = params.get("subcategory") || params.get("tribe");
+      if (subcategoryParam) {
         const match = products.find(
-          (p) => normalizeStr(p.tribe) === normalizeStr(tribeParam)
+          (product) =>
+            normalizeStr(product.subcategory || product.tribe) ===
+            normalizeStr(subcategoryParam)
         );
         setCategory(match?.category || "All");
-        setTribe(match?.tribe || "All");
+        setSubcategory(match?.subcategory || match?.tribe || "All");
       }
       const pageParam = params.get("page");
       if (pageParam) {
@@ -113,54 +130,100 @@ export default function CatalogPage() {
       } else {
         params.delete("page");
       }
-      if (tribe !== "All") {
-        params.set("tribe", tribe.toLowerCase());
+      if (subcategory !== "All") {
+        params.set("subcategory", subcategory.toLowerCase());
       } else {
+        params.delete("subcategory");
         params.delete("tribe");
+      }
+      if (childCategory !== "All") {
+        params.set("childCategory", childCategory.toLowerCase());
+      } else {
+        params.delete("childCategory");
       }
       const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
       window.history.replaceState(null, '', newUrl);
     } else {
       isMounted.current = true;
     }
-  }, [currentPage, tribe]);
+  }, [childCategory, currentPage, subcategory]);
 
   // Extract Categories and Tribes dynamically for dropdowns (A–Z, accent-insensitive dedup)
   const categories = useMemo(() => {
     const seen = new Map(); // normalised key → original string
-    products.forEach((p) => {
-      const key = normalizeStr(p.category);
-      if (key && !seen.has(key)) seen.set(key, p.category);
-    });
+    products
+      .filter(
+        (product) =>
+          matchesAttributeFilters(product, attributeFilters) &&
+          (subcategory === "All" ||
+            normalizeStr(product.subcategory || product.tribe) ===
+              normalizeStr(subcategory)) &&
+          (childCategory === "All" ||
+            normalizeStr(product.childCategory) === normalizeStr(childCategory))
+      )
+      .forEach((product) => {
+        const key = normalizeStr(product.category);
+        if (key && !seen.has(key)) seen.set(key, product.category);
+      });
     const unique = [...seen.values()].sort((a, b) =>
       normalizeStr(a).localeCompare(normalizeStr(b))
     );
     return ["All", ...unique];
-  }, [products]);
+  }, [attributeFilters, childCategory, products, subcategory]);
 
-  const tribes = useMemo(() => {
+  const subcategories = useMemo(() => {
     if (category === "All") return [];
 
     const normalizedCategory = normalizeStr(category);
     const seen = new Map();
     products
-      .filter((p) => normalizeStr(p.category) === normalizedCategory)
+      .filter(
+        (product) =>
+          normalizeStr(product.category) === normalizedCategory &&
+          matchesAttributeFilters(product, attributeFilters) &&
+          (childCategory === "All" ||
+            normalizeStr(product.childCategory) === normalizeStr(childCategory))
+      )
       .forEach((p) => {
-        const key = normalizeStr(p.tribe);
+        const value = p.subcategory || p.tribe;
+        const key = normalizeStr(value);
         if (key && key !== normalizedCategory && !seen.has(key)) {
-          seen.set(key, p.tribe);
+          seen.set(key, value);
         }
       });
     return [...seen.values()].sort((a, b) =>
       normalizeStr(a).localeCompare(normalizeStr(b))
     );
-  }, [products, category]);
+  }, [attributeFilters, category, childCategory, products]);
+
+  const childCategories = useMemo(() => {
+    if (subcategory === "All") return [];
+    const normalizedCategory = normalizeStr(category);
+    const normalizedSubcategory = normalizeStr(subcategory);
+    const seen = new Map();
+    products
+      .filter(
+        (product) =>
+          normalizeStr(product.category) === normalizedCategory &&
+          normalizeStr(product.subcategory || product.tribe) === normalizedSubcategory &&
+          matchesAttributeFilters(product, attributeFilters)
+      )
+      .forEach((product) => {
+        const value = product.childCategory;
+        const key = normalizeStr(value);
+        if (key && !seen.has(key)) seen.set(key, value);
+      });
+    return [...seen.values()].sort((left, right) =>
+      normalizeStr(left).localeCompare(normalizeStr(right))
+    );
+  }, [attributeFilters, category, products, subcategory]);
 
   // Filtered Products – accent-insensitive matching, sorted A–Z
   const filteredProducts = useMemo(() => {
     const normSearch  = normalizeStr(search);
     const normCat     = normalizeStr(category);
-    const normTribe   = normalizeStr(tribe);
+    const normSubcategory = normalizeStr(subcategory);
+    const normChildCategory = normalizeStr(childCategory);
 
     return products
       .filter((product) => {
@@ -169,12 +232,16 @@ export default function CatalogPage() {
           normalizeStr(product.sku).includes(normSearch);
         const matchesCategory =
           category === "All" || normalizeStr(product.category) === normCat;
-        const matchesTribe =
-          tribe === "All" || normalizeStr(product.tribe) === normTribe;
-        return matchesSearch && matchesCategory && matchesTribe;
+        const matchesSubcategory =
+          subcategory === "All" ||
+          normalizeStr(product.subcategory || product.tribe) === normSubcategory;
+        const matchesChildCategory =
+          childCategory === "All" ||
+          normalizeStr(product.childCategory) === normChildCategory;
+        return matchesSearch && matchesCategory && matchesSubcategory && matchesChildCategory;
       })
       .sort((a, b) => normalizeStr(a.name).localeCompare(normalizeStr(b.name)));
-  }, [products, search, category, tribe]);
+  }, [products, search, category, subcategory, childCategory]);
 
   const { availableAttributes, compoundFilteredProducts } = useMemo(() => {
     const selectedAttributes = Object.fromEntries(
@@ -239,7 +306,10 @@ export default function CatalogPage() {
       })
       .filter(
         (attribute) =>
-          attribute.options.length > 0 || selectedAttributes[attribute.key]
+          ["effects", "effect", "plant-part", "plantpart"].includes(
+            normalizeStr(attribute.key).replace(/\s+/g, "-")
+          ) &&
+          (attribute.options.length > 0 || selectedAttributes[attribute.key])
       )
       .sort((a, b) =>
         normalizeStr(a.name).localeCompare(normalizeStr(b.name))
@@ -288,29 +358,14 @@ export default function CatalogPage() {
   const handleClearFilters = () => {
     setSearch("");
     setCategory("All");
-    setTribe("All");
+    setSubcategory("All");
+    setChildCategory("All");
     setAttributeFilters({});
     setCurrentPage(1);
   };
 
-  const handlePublicCatalogPdf = async () => {
-    if (pdfExporting) return;
-    setPdfExporting(true);
-    setPdfExportError("");
-
-    try {
-      await downloadDigitalCatalogPdf();
-    } catch (exportFailure) {
-      setPdfExportError(
-        exportFailure.message || "The PDF catalog could not be generated."
-      );
-    } finally {
-      setPdfExporting(false);
-    }
-  };
-
-  // Production remains partner-only; local development can preview public catalog data.
-  if (!LOCAL_CATALOG_PREVIEW && (authLoading || !isLoggedIn)) {
+  // Catalog is partner-only: block until authenticated
+  if (authLoading || !isLoggedIn) {
     return <AuthGate loading={authLoading} />;
   }
 
@@ -320,28 +375,6 @@ export default function CatalogPage() {
       <Header
         onOpenLogin={() => setIsLoginOpen(true)}
       />
-
-      {pdfExporting && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#242f27]/95 px-5 backdrop-blur-sm xl:hidden"
-          role="status"
-          aria-live="assertive"
-          aria-label="Generating your PDF catalog. Please wait and keep this page open."
-        >
-          <div className="w-full max-w-xl rounded-xl border border-[#f2f2f2]/45 bg-[#303f32] px-6 py-10 text-center shadow-2xl shadow-black/50 sm:px-10 sm:py-14">
-            <LoaderCircle
-              className="mx-auto h-14 w-14 animate-spin text-[#f2f2f2] sm:h-16 sm:w-16"
-              aria-hidden="true"
-            />
-            <p className="mt-7 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
-              Generating your PDF catalog...
-            </p>
-            <p className="mx-auto mt-4 max-w-md text-base font-semibold leading-7 text-white/75 sm:text-lg">
-              This may take a moment. Please wait and keep this page open until the PDF is ready.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Main Container */}
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col gap-10 sm:gap-12">
@@ -356,33 +389,19 @@ export default function CatalogPage() {
               Wholesale Product Catalog
             </h1>
             <p className="font-body-md text-base text-white/60 max-w-2xl mt-2 leading-relaxed">
-              Verify pricing options and add products to your bulk order draft. Submitting the request drafts an order sheet for our verification team.
+              Verify pricing options, add products to your cart, and submit the order for review by our wholesale team.
             </p>
           </div>
 
           {/* Header Action Buttons */}
           <div className="flex w-full shrink-0 flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
-            {/* Download Catalog PDF Button */}
-            <button
-              onClick={handlePublicCatalogPdf}
-              disabled={pdfExporting}
-              className="flex w-full grow items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-[#cc6633]/15 transition-all duration-300 hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:grow-0"
-            >
-              {pdfExporting ? (
-                <LoaderCircle className="h-4 w-4 animate-spin text-white" aria-hidden="true" />
-              ) : (
-                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              )}
-              {pdfExporting ? "Generating PDF" : "PDF Catalog"}
-            </button>
-
             {/* Quick Cart Summary Button */}
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative flex w-full grow items-center justify-center gap-3 rounded-sm border border-white/10 bg-[#1a1a1a] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-all duration-300 hover:border-white/20 hover:bg-white/5 sm:w-auto sm:grow-0"
             >
               <ShoppingBag className="w-4 h-4 text-[#f2f2f2]" />
-              Order Sheet
+              Cart · ${cartTotal.toFixed(2)}
               {cartTotalItems > 0 && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#cc6633] text-[10px] font-bold text-white absolute -top-2 -right-2 animate-pulse">
                   {cartTotalItems}
@@ -392,25 +411,65 @@ export default function CatalogPage() {
           </div>
         </div>
 
-        {pdfExportError && (
-          <div
-            className="rounded-sm border border-red-300/25 bg-red-950/45 px-4 py-3 text-sm font-semibold text-red-100"
-            role="alert"
-          >
-            {pdfExportError}
-          </div>
-        )}
-
         <FilterSidebar
-          filters={{ search, category, tribe, attributes: attributeFilters }}
+          filters={{ search, category, subcategory, childCategory, attributes: attributeFilters }}
           categories={categories.slice(1)}
-          tribes={tribes}
+          subcategories={subcategories}
+          childCategories={childCategories}
           attributes={availableAttributes}
           allValue="All"
           onChange={(nextFilters) => {
+            const compatibleProducts = products.filter((product) =>
+              matchesAttributeFilters(product, nextFilters.attributes || {})
+            );
+            let nextCategory = nextFilters.category;
+            let nextSubcategory = nextFilters.subcategory;
+            let nextChildCategory = nextFilters.childCategory;
+
+            if (
+              nextCategory !== "All" &&
+              !compatibleProducts.some(
+                (product) =>
+                  normalizeStr(product.category) === normalizeStr(nextCategory)
+              )
+            ) {
+              nextCategory = "All";
+              nextSubcategory = "All";
+              nextChildCategory = "All";
+            }
+            if (
+              nextSubcategory !== "All" &&
+              !compatibleProducts.some(
+                (product) =>
+                  (nextCategory === "All" ||
+                    normalizeStr(product.category) === normalizeStr(nextCategory)) &&
+                  normalizeStr(product.subcategory || product.tribe) ===
+                    normalizeStr(nextSubcategory)
+              )
+            ) {
+              nextSubcategory = "All";
+              nextChildCategory = "All";
+            }
+            if (
+              nextChildCategory !== "All" &&
+              !compatibleProducts.some(
+                (product) =>
+                  (nextCategory === "All" ||
+                    normalizeStr(product.category) === normalizeStr(nextCategory)) &&
+                  (nextSubcategory === "All" ||
+                    normalizeStr(product.subcategory || product.tribe) ===
+                      normalizeStr(nextSubcategory)) &&
+                  normalizeStr(product.childCategory) ===
+                    normalizeStr(nextChildCategory)
+              )
+            ) {
+              nextChildCategory = "All";
+            }
+
             setSearch(nextFilters.search);
-            setCategory(nextFilters.category);
-            setTribe(nextFilters.tribe);
+            setCategory(nextCategory);
+            setSubcategory(nextSubcategory);
+            setChildCategory(nextChildCategory);
             setAttributeFilters(nextFilters.attributes || {});
             setCurrentPage(1);
           }}
@@ -507,10 +566,7 @@ export default function CatalogPage() {
                     </div>
 
                     <div className="col-span-2 border-t border-white/10 pt-4">
-                      <ProductPurchaseControls
-                        product={product}
-                        onAdded={() => setIsCartOpen(true)}
-                      />
+                      <ProductPurchaseControls product={product} />
                     </div>
 
                   </div>

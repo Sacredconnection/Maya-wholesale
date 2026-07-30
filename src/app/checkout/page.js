@@ -10,26 +10,18 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  CheckCircle2,
   ChevronDown,
-  ClipboardCheck,
+  LockKeyhole,
   Loader2,
-  MapPin,
+  MessageCircleMore,
   PackageCheck,
-  PhoneCall,
-  ShieldCheck,
   ShoppingBag,
-  UserRound,
 } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import LoginModal from "@/components/LoginModal";
-import ProductRecommendations from "@/components/ProductRecommendations";
+import CheckoutHeader from "@/components/CheckoutHeader";
 import AuthGate from "@/components/AuthGate";
 import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import { COUNTRIES } from "@/lib/countries";
-import { MIN_ORDER_GRAMS } from "@/lib/pricing";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -40,11 +32,31 @@ const EMPTY_ADDRESS = {
   country: "",
 };
 
-const STEPS = [
-  { label: "Contact", icon: UserRound },
-  { label: "Delivery", icon: MapPin },
-  { label: "Review", icon: ClipboardCheck },
+const STEPS = ["Contact", "Delivery", "Review"];
+const ORDER_SUBMISSION_STAGES = [
+  {
+    title: "Securing your order request",
+    detail: "Protecting this submission against duplicates.",
+  },
+  {
+    title: "Validating customer and delivery",
+    detail: "Confirming your wholesale account and delivery details.",
+  },
+  {
+    title: "Checking products and quantities",
+    detail: "Verifying live availability and wholesale pricing.",
+  },
+  {
+    title: "Registering your order",
+    detail: "Saving your request securely in our order system.",
+  },
+  {
+    title: "Waiting for final confirmation",
+    detail: "Our order service is taking a little longer to respond.",
+  },
 ];
+const ORDER_STAGE_DELAYS = [900, 2_400, 4_800, 8_000];
+const ORDER_STAGE_PROGRESS = [18, 38, 60, 82, 92];
 
 const addressLine = (address) =>
   [
@@ -68,6 +80,171 @@ function Field({ id, label, className = "", ...props }) {
         className="w-full rounded-sm border border-white/10 bg-[#131313] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-60"
         {...props}
       />
+    </div>
+  );
+}
+
+function OrderStageIllustration({ stage }) {
+  if (stage === 1) {
+    return (
+      <div className="order-visual-card" aria-hidden="true">
+        {[0, 1, 2].map((row) => (
+          <div
+            key={row}
+            className="order-visual-check-row"
+            style={{ animationDelay: `${row * 280}ms` }}
+          >
+            <span><Check className="h-2.5 w-2.5" /></span>
+            <i className={row === 1 ? "w-7" : "w-10"} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (stage === 2) {
+    return (
+      <div className="order-visual-package" aria-hidden="true">
+        <span className="order-visual-package-lid" />
+        <span className="order-visual-package-body">
+          <i />
+          <Check className="h-4 w-4" />
+        </span>
+      </div>
+    );
+  }
+
+  if (stage === 3) {
+    return (
+      <div className="order-visual-register" aria-hidden="true">
+        <span className="order-visual-register-sheet"><i /><i /><i /></span>
+        <span className="order-visual-register-stamp">
+          <Check className="h-4 w-4" />
+        </span>
+      </div>
+    );
+  }
+
+  if (stage === 4) {
+    return (
+      <div className="order-visual-waiting" aria-hidden="true">
+        <span /><span /><span />
+      </div>
+    );
+  }
+
+  return (
+    <div className="order-visual-secure" aria-hidden="true">
+      <span />
+      <LockKeyhole className="relative h-7 w-7 text-[#f2f2f2]" />
+    </div>
+  );
+}
+
+function OrderSubmissionOverlay({ stage }) {
+  const activeStage =
+    ORDER_SUBMISSION_STAGES[stage] || ORDER_SUBMISSION_STAGES.at(-1);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#111812]/92 px-4 py-8 backdrop-blur-md"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="order-progress-title"
+      aria-describedby="order-progress-description"
+    >
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#f2f2f2]/25 bg-[#171a18] shadow-2xl shadow-black/60">
+        <div className="relative overflow-hidden border-b border-white/10 bg-[#242f27] px-6 py-7 text-center sm:px-8">
+          <div className="pointer-events-none absolute inset-0 opacity-30 [background:radial-gradient(circle_at_top,#999933_0,transparent_62%)]" />
+          <div className="relative mx-auto mb-4 grid h-20 w-24 place-items-center">
+            <OrderStageIllustration stage={stage} />
+          </div>
+          <div className="relative">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#f2f2f2]">
+              Order confirmation in progress
+            </p>
+            <h2 id="order-progress-title" className="mt-2 text-2xl font-black text-white">
+              {activeStage.title}
+            </h2>
+            <p
+              id="order-progress-description"
+              className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/60"
+            >
+              {activeStage.detail}
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 py-6 sm:px-8">
+          <div
+            className="h-1.5 overflow-hidden rounded-full bg-white/10"
+            role="progressbar"
+            aria-label="Order confirmation progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={ORDER_STAGE_PROGRESS[stage]}
+          >
+            <div
+              className="h-full rounded-full bg-[#f2f2f2] transition-[width] duration-700 ease-out"
+              style={{ width: `${ORDER_STAGE_PROGRESS[stage]}%` }}
+            />
+          </div>
+
+          <p className="sr-only" aria-live="polite">
+            {activeStage.title}. {activeStage.detail}
+          </p>
+
+          <ol className="mt-6 space-y-1">
+            {ORDER_SUBMISSION_STAGES.map((item, index) => {
+              const complete = index < stage;
+              const active = index === stage;
+              return (
+                <li
+                  key={item.title}
+                  className={`flex gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    active ? "bg-[#999933]/12" : ""
+                  }`}
+                >
+                  <span
+                    className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
+                      complete
+                        ? "border-[#f2f2f2] bg-[#999933] text-white"
+                        : active
+                          ? "border-[#f2f2f2]/60 text-[#f2f2f2]"
+                          : "border-white/15 text-white/25"
+                    }`}
+                  >
+                    {complete ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : active ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" />
+                    ) : (
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    )}
+                  </span>
+                  <div>
+                    <p className={`text-xs font-bold ${active || complete ? "text-white" : "text-white/30"}`}>
+                      {item.title}
+                    </p>
+                    {active && (
+                      <p className="mt-1 text-[11px] leading-relaxed text-white/50">
+                        {item.detail}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/[0.025] px-4 py-3">
+            <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
+            <p className="text-[11px] leading-relaxed text-white/45">
+              Keep this page open and avoid submitting again. No payment is being collected.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -162,19 +339,19 @@ export default function CheckoutPage() {
     cart,
     clearCart,
     removeItemsByStore,
+    setIsCartOpen,
     cartSubtotal,
     cartTotalItems,
     cartTotalWeightGrams,
   } = useCart();
   const initializedForUser = useRef(null);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const orderIdempotencyKey = useRef("");
   const [step, setStep] = useState(0);
   const [contact, setContact] = useState({
     firstName: "",
     lastName: "",
     company: "",
     email: "",
-    phone: "",
   });
   const [shippingAddress, setShippingAddress] = useState(EMPTY_ADDRESS);
   const [billingAddress, setBillingAddress] = useState(EMPTY_ADDRESS);
@@ -182,6 +359,7 @@ export default function CheckoutPage() {
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStage, setSubmissionStage] = useState(0);
 
   useEffect(() => {
     if (!user || initializedForUser.current === user.email) return;
@@ -191,18 +369,24 @@ export default function CheckoutPage() {
       lastName: user.lastName || "",
       company: user.company || "",
       email: user.email || "",
-      phone: user.phone || "",
     });
     setShippingAddress({ ...EMPTY_ADDRESS, ...(user.shippingAddress || {}) });
     setBillingAddress({ ...EMPTY_ADDRESS, ...(user.billingAddress || {}) });
   }, [user]);
+
+  useEffect(() => {
+    if (!isSubmitting) return undefined;
+    const timers = ORDER_STAGE_DELAYS.map((delay, index) =>
+      window.setTimeout(() => setSubmissionStage(index + 1), delay)
+    );
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [isSubmitting]);
 
   if (loading || !isLoggedIn || !user) return <AuthGate loading={loading} />;
 
   const discountPercentage = user.discountRate || 0;
   const discountAmount = cartSubtotal * (discountPercentage / 100);
   const finalTotal = cartSubtotal - discountAmount;
-  const meetsMinimumWeight = cartTotalWeightGrams >= MIN_ORDER_GRAMS;
   const effectiveBillingAddress = billingMatchesShipping ? shippingAddress : billingAddress;
 
   const validateAddress = (address) =>
@@ -210,8 +394,8 @@ export default function CheckoutPage() {
 
   const goForward = () => {
     setError("");
-    if (step === 0 && (!contact.firstName.trim() || !contact.lastName.trim() || !contact.phone.trim())) {
-      setError("Enter the contact name and phone number to continue.");
+    if (step === 0 && (!contact.firstName.trim() || !contact.lastName.trim())) {
+      setError("Enter the contact name to continue.");
       return;
     }
     if (step === 1) {
@@ -234,14 +418,22 @@ export default function CheckoutPage() {
       setError("Confirm that the order details are correct before placing the order.");
       return;
     }
+    let navigationStarted = false;
+    setSubmissionStage(0);
     setIsSubmitting(true);
     setError("");
 
     try {
+      if (!orderIdempotencyKey.current) {
+        orderIdempotencyKey.current = crypto.randomUUID();
+      }
       const response = await fetch("/api/orders", {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": orderIdempotencyKey.current,
+        },
         body: JSON.stringify({
           items: cart.map(({ sku, quantity, wcProductId, wcVariationId, storeId }) => ({
             sku,
@@ -254,25 +446,32 @@ export default function CheckoutPage() {
             firstName: contact.firstName.trim(),
             lastName: contact.lastName.trim(),
             company: contact.company.trim(),
-            phone: contact.phone.trim(),
             shippingAddress,
             billingAddress: effectiveBillingAddress,
           },
         }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
+        if (!data.uncertain) orderIdempotencyKey.current = "";
         throw new Error(data.error || "Order submission failed. Please try again.");
       }
 
       const completedStoreIds = (data.orders || []).map((order) => order.storeId);
       if (data.failures?.length) {
         removeItemsByStore(completedStoreIds);
+        const uncertainStores = data.failures
+          .filter((failure) => failure.uncertain)
+          .map((failure) => failure.storeName);
+        if (uncertainStores.length === 0) orderIdempotencyKey.current = "";
         throw new Error(
-          `Orders were created for ${data.orders.map((order) => order.storeName).join(", ")}, but failed for ${data.failures.map((failure) => failure.storeName).join(", ")}. The remaining items are still in your cart.`
+          uncertainStores.length
+            ? `Orders were confirmed for ${data.orders.map((order) => order.storeName).join(", ")}, but confirmation is still uncertain for ${uncertainStores.join(", ")}. Check My Account before submitting again.`
+            : `Orders were created for ${data.orders.map((order) => order.storeName).join(", ")}, but failed for ${data.failures.map((failure) => failure.storeName).join(", ")}. The remaining items are still in your cart.`
         );
       }
 
+      orderIdempotencyKey.current = "";
       clearCart();
       const orderSummary = data.orders
         .map((order) => `${order.storeName} #${order.number}`)
@@ -281,10 +480,11 @@ export default function CheckoutPage() {
       router.push(
         `/order-received?orders=${encodeURIComponent(orderSummary)}&total=${encodeURIComponent(orderTotal.toFixed(2))}`
       );
+      navigationStarted = true;
     } catch (submissionError) {
       setError(submissionError.message || "Order submission failed. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      if (!navigationStarted) setIsSubmitting(false);
     }
   };
 
@@ -295,47 +495,55 @@ export default function CheckoutPage() {
 
   return (
     <div id="top" className="site-background-page min-h-screen bg-[#25362D] text-[#f2f2f2]">
-      <Header onOpenLogin={() => setIsLoginOpen(true)} />
+      {isSubmitting && <OrderSubmissionOverlay stage={submissionStage} />}
+      <CheckoutHeader />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mb-8 flex flex-col gap-3 border-b border-white/10 pb-7">
-          <Link href="/catalog" className="inline-flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#f2f2f2] transition-colors hover:text-white">
-            <ArrowLeft className="h-4 w-4" />
-            Return to catalog
-          </Link>
+      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2]">
-              Secure wholesale request
-            </span>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Checkout
+            <Link href="/catalog" className="mb-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold text-white/45 transition-colors hover:text-white">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Return to catalog
+            </Link>
+            <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+              Complete your wholesale order
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/55">
-              Confirm your details and review the order before sending it to our wholesale team.
-              No payment is collected online.
+            <p className="mt-1.5 text-sm text-white/50">
+              Three short steps. No payment is collected online.
             </p>
           </div>
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
+            Step {step + 1} of {STEPS.length}
+          </span>
         </div>
 
-        <ol aria-label="Checkout progress" className="mb-8 grid grid-cols-3 overflow-hidden rounded-lg border border-white/10 bg-[#171717]">
-          {STEPS.map(({ label, icon: Icon }, index) => {
+        <ol aria-label="Checkout progress" className="mb-6 flex items-center">
+          {STEPS.map((label, index) => {
             const complete = index < step;
             const active = index === step;
             return (
               <li
                 key={label}
                 aria-current={active ? "step" : undefined}
-                className={`relative flex min-w-0 items-center justify-center gap-2 border-r border-white/10 px-2 py-4 last:border-r-0 sm:gap-3 sm:px-5 ${
-                  active ? "bg-[#999933]/20 text-white" : complete ? "text-[#f2f2f2]" : "text-white/35"
+                className={`flex min-w-0 flex-1 items-center ${
+                  active ? "text-white" : complete ? "text-[#f2f2f2]" : "text-white/30"
                 }`}
               >
-                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border ${active || complete ? "border-[#f2f2f2]/50 bg-[#999933]/20" : "border-white/15"}`}>
-                  {complete ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[10px] font-black ${
+                  active || complete
+                    ? "border-[#f2f2f2]/60 bg-[#999933]/20"
+                    : "border-white/15"
+                }`}>
+                  {complete ? <Check className="h-3.5 w-3.5" /> : index + 1}
                 </span>
-                <span className="truncate text-[10px] font-bold uppercase tracking-wider sm:text-xs">
-                  <span className="hidden sm:inline">{index + 1}. </span>{label}
+                <span className="ml-2 truncate text-[10px] font-bold uppercase tracking-wider sm:text-xs">
+                  {label}
                 </span>
-                {active && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[#f2f2f2]" />}
+                {index < STEPS.length - 1 && (
+                  <span className={`mx-2 h-px min-w-3 flex-1 sm:mx-4 ${
+                    complete ? "bg-[#f2f2f2]/50" : "bg-white/10"
+                  }`} />
+                )}
               </li>
             );
           })}
@@ -344,15 +552,15 @@ export default function CheckoutPage() {
         {cart.length === 0 ? (
           <section className="mx-auto flex max-w-xl flex-col items-center rounded-xl border border-white/10 bg-[#1a1a1a] px-6 py-14 text-center shadow-2xl">
             <ShoppingBag className="h-12 w-12 text-white/25" />
-            <h2 className="mt-5 text-xl font-bold text-white">Your order sheet is empty</h2>
+            <h2 className="mt-5 text-xl font-bold text-white">Your cart is empty</h2>
             <p className="mt-2 text-sm text-white/50">Add products from the wholesale catalog before starting checkout.</p>
             <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#cc6633] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white">
               Browse catalog <ArrowRight className="h-4 w-4" />
             </Link>
           </section>
         ) : (
-          <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_23rem]">
-            <section className="rounded-xl border border-white/10 bg-[#1a1a1a] p-5 shadow-2xl sm:p-7 lg:p-8">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_21.5rem]">
+            <section className="rounded-xl border border-white/10 bg-[#1a1a1a] p-5 shadow-xl shadow-black/15 sm:p-7">
               {error && (
                 <div role="alert" className="mb-6 flex items-start gap-3 rounded-sm border border-[#ffb4ab]/25 bg-[#93000a]/20 px-4 py-3 text-xs leading-relaxed text-[#ffb4ab]">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -371,16 +579,13 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Field id="checkout-first-name" label="First name" autoComplete="given-name" maxLength={80} value={contact.firstName} onChange={setContactField("firstName")} required />
                     <Field id="checkout-last-name" label="Last name" autoComplete="family-name" maxLength={80} value={contact.lastName} onChange={setContactField("lastName")} required />
-                    <Field id="checkout-company" label="Company (optional)" autoComplete="organization" maxLength={160} value={contact.company} onChange={setContactField("company")} />
-                    <Field id="checkout-phone" label="Phone number" type="tel" autoComplete="tel" maxLength={40} value={contact.phone} onChange={setContactField("phone")} required />
+                    <Field id="checkout-company" label="Company (optional)" autoComplete="organization" maxLength={160} value={contact.company} onChange={setContactField("company")} className="sm:col-span-2" />
                     <Field id="checkout-email" label="Account email" type="email" autoComplete="email" value={contact.email} disabled className="sm:col-span-2" />
                   </div>
-                  <div className="flex items-start gap-3 rounded-sm border border-[#999933]/25 bg-[#999933]/10 p-4">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
-                    <p className="text-xs leading-relaxed text-white/60">
-                      Your account email identifies the approved wholesale buyer and cannot be changed during checkout.
-                    </p>
-                  </div>
+                  <p className="flex items-center gap-2 text-[11px] text-white/40">
+                    <LockKeyhole className="h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
+                    Your verified account email is used for this order.
+                  </p>
                 </div>
               )}
 
@@ -432,7 +637,6 @@ export default function CheckoutPage() {
                       <p className="text-sm font-bold text-white">{contact.firstName} {contact.lastName}</p>
                       {contact.company && <p className="mt-1 text-xs text-white/55">{contact.company}</p>}
                       <p className="mt-1 break-all text-xs text-white/55">{contact.email}</p>
-                      <p className="mt-1 text-xs text-white/55">{contact.phone}</p>
                     </div>
                     <div className="rounded-lg border border-white/10 bg-[#131313] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
@@ -444,23 +648,22 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <ProductRecommendations
-                    eyebrow="Order bump"
-                    title="Complete your order"
-                    description="Frequently purchased products you can add before confirming the order."
-                    variant="checkout"
-                    limit={2}
-                  />
-
-                  <div className="flex items-start gap-3 rounded-sm border border-[#999933]/30 bg-[#999933]/10 p-4">
-                    <PhoneCall className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
-                    <p className="text-xs leading-relaxed text-white/65">
-                      No online payment is taken. Maya Herbs will contact you to confirm stock,
-                      calculate shipping, and arrange payment.
-                    </p>
+                  <div className="flex items-start gap-3 rounded-lg border border-[#999933]/25 bg-[#999933]/10 p-4">
+                    <MessageCircleMore className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
+                    <div>
+                      <h3 className="text-xs font-bold text-white">What happens next?</h3>
+                      <p className="mt-1 text-xs leading-relaxed text-white/55">
+                        Our team reviews availability and freight, then contacts you to confirm
+                        payment and shipping. Nothing is charged now.
+                      </p>
+                    </div>
                   </div>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-white/10 p-4">
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                    confirmed
+                      ? "border-[#f2f2f2]/45 bg-[#999933]/10"
+                      : "border-white/10 bg-[#131313]"
+                  }`}>
                     <input
                       type="checkbox"
                       checked={confirmed}
@@ -471,8 +674,8 @@ export default function CheckoutPage() {
                       className="mt-0.5 h-4 w-4 accent-[#999933]"
                     />
                     <span className="text-xs leading-relaxed text-white/65">
-                      I confirm that the contact, delivery, and order details are correct and understand
-                      that the displayed total excludes shipping and remains subject to final confirmation.
+                      I have reviewed my contact, delivery, and order details. I understand that
+                      shipping is calculated separately and availability is confirmed by the team.
                     </span>
                   </label>
                 </div>
@@ -493,37 +696,53 @@ export default function CheckoutPage() {
                   </button>
                 ) : <span />}
 
-                {step < STEPS.length - 1 ? (
-                  <button
-                    type="button"
-                    onClick={goForward}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a]"
-                  >
-                    Continue <ArrowRight className="h-4 w-4" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={submitOrder}
-                    disabled={isSubmitting || !confirmed || !meetsMinimumWeight}
-                    aria-busy={isSubmitting}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-not-allowed disabled:opacity-45"
-                  >
-                    {isSubmitting ? (
-                      <>Placing order <Loader2 className="h-4 w-4 animate-spin" /></>
-                    ) : (
-                      <>Place wholesale order <PackageCheck className="h-4 w-4" /></>
-                    )}
-                  </button>
-                )}
+                <div className="flex flex-col gap-2 sm:min-w-64">
+                  {step < STEPS.length - 1 ? (
+                    <button
+                      type="button"
+                      onClick={goForward}
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#cc6633]/15 transition-colors hover:bg-[#b6532a]"
+                    >
+                      {step === 0 ? "Continue to delivery" : "Review order"}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={submitOrder}
+                        disabled={isSubmitting || !confirmed}
+                        aria-busy={isSubmitting}
+                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#cc6633]/15 transition-colors hover:bg-[#b6532a] disabled:cursor-not-allowed disabled:opacity-45"
+                      >
+                        {isSubmitting ? (
+                          <>Submitting order <Loader2 className="h-4 w-4 animate-spin" /></>
+                        ) : (
+                          <>Submit order request <PackageCheck className="h-4 w-4" /></>
+                        )}
+                      </button>
+                      <p className="flex items-center justify-center gap-1.5 text-[10px] text-white/35">
+                        <LockKeyhole className="h-3 w-3 text-[#f2f2f2]" />
+                        No payment is collected online
+                      </p>
+                    </>
+                  )}
+                </div>
               </div>
             </section>
 
-            <aside className="rounded-xl border border-white/10 bg-[#171717] shadow-2xl lg:sticky lg:top-28">
+            <aside className="rounded-xl border border-white/10 bg-[#171717] shadow-xl shadow-black/15 lg:sticky lg:top-24">
               <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
                 <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" />
                 <h2 className="text-sm font-bold text-white">Order summary</h2>
                 <span className="ml-auto text-xs text-white/45">{cartTotalItems} items</span>
+                <button
+                  type="button"
+                  onClick={() => setIsCartOpen(true)}
+                  className="border-0 bg-transparent text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2] transition-colors hover:text-white"
+                >
+                  Edit
+                </button>
               </div>
               <div className="max-h-72 divide-y divide-white/5 overflow-y-auto px-5">
                 {cart.map((item) => (
@@ -553,9 +772,9 @@ export default function CheckoutPage() {
                   <span className="font-bold uppercase tracking-wider text-white">Estimated total</span>
                   <span className="text-2xl font-black text-[#f2f2f2]">${finalTotal.toFixed(2)}</span>
                 </div>
-                <div className="mt-3 flex items-center gap-2 text-[10px] leading-relaxed text-white/35">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
-                  Final freight and availability are confirmed by our team.
+                <div className="mt-3 flex items-start gap-2 rounded-sm bg-white/[0.03] px-3 py-2.5 text-[10px] leading-relaxed text-white/40">
+                  <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
+                  No payment now. Final shipping and availability are confirmed by our team.
                 </div>
               </div>
             </aside>
@@ -563,8 +782,6 @@ export default function CheckoutPage() {
         )}
       </main>
 
-      <Footer />
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "@/lib/wc-mappers";
 import { optionPriceForUser } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
+import { securityError } from "@/lib/request-security";
 import {
   getRequiredCommerceStores,
   isCommerceStoreConfigured,
@@ -193,10 +194,15 @@ async function loadLocalCatalogSnapshot() {
 }
 
 export async function GET(request) {
+  const customer = await resolveCustomer();
+  if (!customer) return securityError("Authentication required.", 401);
+
   const { searchParams } = new URL(request.url);
   const search = queryText(searchParams, "q");
   const category = queryText(searchParams, "category");
-  const tribe = queryText(searchParams, "tribe");
+  const subcategory =
+    queryText(searchParams, "subcategory") || queryText(searchParams, "tribe");
+  const childCategory = queryText(searchParams, "childCategory");
   const selectedAttributes = attributeSelections(searchParams);
   const minPrice = positiveNumber(searchParams.get("minPrice"));
   const maxPrice = positiveNumber(searchParams.get("maxPrice"));
@@ -206,13 +212,11 @@ export async function GET(request) {
   const catalogFetchOptions = { revalidate: exportAll ? 0 : undefined };
 
   try {
-    let customer = null;
     let products = null;
     let source = "snapshot";
 
     if (isWooCommerceConfigured()) {
       source = "woocommerce-rest";
-      customer = await resolveCustomer();
       const configuredStores = getRequiredCommerceStores().filter((store) =>
         isCommerceStoreConfigured(store.id)
       );
@@ -274,12 +278,14 @@ export async function GET(request) {
 
     const normalizedSearch = normalize(search);
     const normalizedCategory = normalize(category);
-    const normalizedTribe = normalize(tribe);
+    const normalizedSubcategory = normalize(subcategory);
+    const normalizedChildCategory = normalize(childCategory);
     const matchesFilters = (
       product,
       {
         ignoreCategory = false,
-        ignoreTribe = false,
+        ignoreSubcategory = false,
+        ignoreChildCategory = false,
         ignoreAttribute = "",
       } = {}
     ) => {
@@ -288,6 +294,9 @@ export async function GET(request) {
         normalize(product.name).includes(normalizedSearch) ||
         normalize(product.sku).includes(normalizedSearch) ||
         normalize(product.tribe).includes(normalizedSearch) ||
+        (product.categoryPath || []).some((value) =>
+          normalize(value).includes(normalizedSearch)
+        ) ||
         normalize(product.storeName).includes(normalizedSearch) ||
         (product.attributes || []).some(
           (attribute) =>
@@ -303,10 +312,14 @@ export async function GET(request) {
         ignoreCategory ||
         !normalizedCategory ||
         normalize(product.category) === normalizedCategory;
-      const matchesTribe =
-        ignoreTribe ||
-        !normalizedTribe ||
-        normalize(product.tribe) === normalizedTribe;
+      const matchesSubcategory =
+        ignoreSubcategory ||
+        !normalizedSubcategory ||
+        normalize(product.subcategory || product.tribe) === normalizedSubcategory;
+      const matchesChildCategory =
+        ignoreChildCategory ||
+        !normalizedChildCategory ||
+        normalize(product.childCategory) === normalizedChildCategory;
       const matchesAttributes = Object.entries(selectedAttributes).every(
         ([key, value]) =>
           key === ignoreAttribute || productHasAttribute(product, key, value)
@@ -318,7 +331,8 @@ export async function GET(request) {
       return (
         matchesSearch &&
         matchesCategory &&
-        matchesTribe &&
+        matchesSubcategory &&
+        matchesChildCategory &&
         matchesAttributes &&
         matchesMin &&
         matchesMax &&
@@ -337,15 +351,25 @@ export async function GET(request) {
       )
     ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
 
-    const availableTribes = Array.from(
+    const availableSubcategories = Array.from(
       new Set(
         products
-          .filter((product) => matchesFilters(product, { ignoreTribe: true }))
-          .map((product) => product.tribe)
-          .filter(
-            (productTribe) =>
-              productTribe && normalize(productTribe) !== normalizedCategory
+          .filter((product) =>
+            matchesFilters(product, { ignoreSubcategory: true })
           )
+          .map((product) => product.subcategory || product.tribe)
+          .filter(Boolean)
+      )
+    ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
+
+    const availableChildCategories = Array.from(
+      new Set(
+        products
+          .filter((product) =>
+            matchesFilters(product, { ignoreChildCategory: true })
+          )
+          .map((product) => product.childCategory)
+          .filter(Boolean)
       )
     ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
 
@@ -378,7 +402,10 @@ export async function GET(request) {
       })
       .filter(
         (attribute) =>
-          attribute.options.length > 0 || selectedAttributes[attribute.key]
+          ["effects", "effect", "plant-part", "plantpart"].includes(
+            normalize(attribute.key).replace(/\s+/g, "-")
+          ) &&
+          (attribute.options.length > 0 || selectedAttributes[attribute.key])
       )
       .sort((a, b) => normalize(a.name).localeCompare(normalize(b.name)));
 
@@ -406,7 +433,9 @@ export async function GET(request) {
         },
         filters: {
           categories: availableCategories,
-          tribes: availableTribes,
+          subcategories: availableSubcategories,
+          childCategories: availableChildCategories,
+          tribes: availableSubcategories,
           attributes: availableAttributes,
           priceBounds,
         },

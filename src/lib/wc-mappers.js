@@ -172,6 +172,23 @@ const topLevelCategoryName = (categoryId, parentById, nameById) => {
   return nameById[id] || null;
 };
 
+const categoryPathNames = (categoryId, parentById, nameById) => {
+  const path = [];
+  let id = categoryId;
+  const visited = new Set();
+  for (let depth = 0; depth < 10 && id && !visited.has(id); depth += 1) {
+    visited.add(id);
+    if (nameById[id]) path.unshift(decodeHtmlEntities(nameById[id]));
+    id = parentById[id] || 0;
+  }
+  return path;
+};
+
+const deepestCategoryPath = (categories, parentById, nameById) =>
+  (categories || [])
+    .map((category) => categoryPathNames(category.id, parentById, nameById))
+    .sort((left, right) => right.length - left.length)[0] || [];
+
 // Internal address shape ↔ WooCommerce address shape
 export const toWcAddress = (address = {}) => ({
   address_1: address.street || "",
@@ -200,9 +217,18 @@ const customerMeta = (customer, key) => {
 };
 
 export function isApprovedWholesaleCustomer(customer) {
-  return Boolean(
-    customer && !["pending", "customer"].includes((customer.role || "").toLowerCase())
-  );
+  if (!customer) return false;
+
+  const approvalStatus = String(
+    customerMeta(customer, "maya_account_status") ||
+      customerMeta(customer, "sc_approval_status") ||
+      ""
+  ).toLowerCase();
+
+  if (["pending", "pending_approval"].includes(approvalStatus)) return false;
+  if (approvalStatus === "approved") return true;
+
+  return !["pending", "customer"].includes((customer.role || "").toLowerCase());
 }
 
 // Maps a WooCommerce customer to the user shape the UI stores in AuthContext.
@@ -228,9 +254,7 @@ export function mapCustomerToUser(customer) {
     // Access level (WP role) — drives role-based pricing, e.g. "New Customer",
     // "Special Customer", "Old Customer".
     role: customer.role || null,
-    status: ["pending", "customer"].includes((customer.role || "").toLowerCase())
-      ? "PENDING"
-      : "ACTIVE",
+    status: isApprovedWholesaleCustomer(customer) ? "ACTIVE" : "PENDING",
     discountRate: Number(customerMeta(customer, "sc_discount_rate")) || 0,
     avatar:
       profileAvatar === "__none__"
@@ -258,6 +282,8 @@ export function mapOrder(order, store = { id: "maya-herbs", name: "Maya Herbs" }
     items: (order.line_items || []).map((li) => ({
       name: li.name,
       sku: li.sku,
+      productId: li.product_id || null,
+      variationId: li.variation_id || null,
       quantity: li.quantity,
       total: li.total,
     })),
@@ -305,6 +331,7 @@ export function mapProduct(
   const cats = product.categories || [];
   const topCats = cats.filter((c) => !parentById[c.id]);
   const subCats = cats.filter((c) => parentById[c.id]);
+  const categoryPath = deepestCategoryPath(cats, parentById, nameById);
 
   const tribe =
     attributeOption(product.attributes, "tribe") ||
@@ -322,10 +349,14 @@ export function mapProduct(
     name: decodeHtmlEntities(product.name),
     sku: product.sku || String(product.id),
     category:
+      categoryPath[0] ||
       topCats[0]?.name ||
       (subCats[0] && topLevelCategoryName(subCats[0].id, parentById, nameById)) ||
       cats[0]?.name ||
       "Uncategorized",
+    categoryPath,
+    subcategory: categoryPath[1] || "",
+    childCategory: categoryPath[2] || "",
     tribe,
     image: product.images?.[0]?.src || null,
     images: (product.images || []).map((img) => img.src),
@@ -371,6 +402,7 @@ export function mapStoreProduct(
   const cats = product.categories || [];
   const topCats = cats.filter((category) => !parentById[category.id]);
   const subCats = cats.filter((category) => parentById[category.id]);
+  const categoryPath = deepestCategoryPath(cats, parentById, nameById);
   const tribe =
     attributeOption(product.attributes, "tribe") ||
     subCats[0]?.name ||
@@ -386,10 +418,14 @@ export function mapStoreProduct(
     name: decodeHtmlEntities(product.name),
     sku: product.sku || String(product.id),
     category:
+      categoryPath[0] ||
       topCats[0]?.name ||
       (subCats[0] && topLevelCategoryName(subCats[0].id, parentById, nameById)) ||
       cats[0]?.name ||
       "Uncategorized",
+    categoryPath,
+    subcategory: categoryPath[1] || "",
+    childCategory: categoryPath[2] || "",
     tribe,
     image: product.images?.[0]?.src || null,
     images: (product.images || []).map((image) => image.src),

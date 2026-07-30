@@ -18,6 +18,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
+import AuthGate from "@/components/AuthGate";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import ProductCard from "@/components/catalog/ProductCard";
 import { useAuth } from "@/components/AuthContext";
@@ -32,7 +33,8 @@ import { useDialogAccessibility } from "@/lib/use-dialog-accessibility";
 const EMPTY_FILTERS = {
   search: "",
   category: "",
-  tribe: "",
+  subcategory: "",
+  childCategory: "",
   attributes: {},
 };
 
@@ -66,24 +68,19 @@ function appendAttributeFilters(params, attributes) {
   });
 }
 
-function isIndigenousRapeCategory(category) {
-  return String(category || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase() === "rape indigenous";
-}
-
 export default function CatalogPage() {
-  const { isLoggedIn, user } = useAuth();
-  const { addToCart, setIsCartOpen, cartTotalItems } = useCart();
+  const { isLoggedIn, user, loading: authLoading } = useAuth();
+  const { addToCart, setIsCartOpen, cartSubtotal, cartTotalItems } = useCart();
+  const cartTotal =
+    cartSubtotal * (1 - Number(user?.discountRate || 0) / 100);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [tribes, setTribes] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [childCategories, setChildCategories] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [pagination, setPagination] = useState(EMPTY_PAGINATION);
   const [loading, setLoading] = useState(true);
@@ -114,6 +111,7 @@ export default function CatalogPage() {
   }, [filters.search]);
 
   useEffect(() => {
+    if (authLoading || !isLoggedIn) return undefined;
     const controller = new AbortController();
 
     async function loadCatalog() {
@@ -123,7 +121,8 @@ export default function CatalogPage() {
       const params = new URLSearchParams({ page: String(page) });
       if (debouncedSearch) params.set("q", debouncedSearch);
       if (filters.category) params.set("category", filters.category);
-      if (filters.tribe) params.set("tribe", filters.tribe);
+      if (filters.subcategory) params.set("subcategory", filters.subcategory);
+      if (filters.childCategory) params.set("childCategory", filters.childCategory);
       appendAttributeFilters(params, filters.attributes);
       try {
         const response = await fetch(`/api/catalog?${params.toString()}`, {
@@ -136,10 +135,38 @@ export default function CatalogPage() {
           throw new Error(data.error || "The catalog could not be loaded.");
         }
 
+        const nextCategories = data.filters?.categories || [];
+        const nextSubcategories =
+          data.filters?.subcategories || data.filters?.tribes || [];
+        const nextChildCategories = data.filters?.childCategories || [];
         setProducts(Array.isArray(data.products) ? data.products : []);
-        setCategories(data.filters?.categories || []);
-        setTribes(data.filters?.tribes || []);
+        setCategories(nextCategories);
+        setSubcategories(nextSubcategories);
+        setChildCategories(nextChildCategories);
         setAttributes(data.filters?.attributes || []);
+        setFilters((current) => {
+          if (current.category && !nextCategories.includes(current.category)) {
+            return {
+              ...current,
+              category: "",
+              subcategory: "",
+              childCategory: "",
+            };
+          }
+          if (
+            current.subcategory &&
+            !nextSubcategories.includes(current.subcategory)
+          ) {
+            return { ...current, subcategory: "", childCategory: "" };
+          }
+          if (
+            current.childCategory &&
+            !nextChildCategories.includes(current.childCategory)
+          ) {
+            return { ...current, childCategory: "" };
+          }
+          return current;
+        });
         setPagination(data.pagination || EMPTY_PAGINATION);
         if (data.pagination?.page && data.pagination.page !== page) {
           setPage(data.pagination.page);
@@ -165,8 +192,10 @@ export default function CatalogPage() {
     page,
     debouncedSearch,
     filters.category,
-    filters.tribe,
+    filters.subcategory,
+    filters.childCategory,
     filters.attributes,
+    authLoading,
     isLoggedIn,
     reloadKey,
   ]);
@@ -175,7 +204,8 @@ export default function CatalogPage() {
     const params = new URLSearchParams();
     if (debouncedSearch) params.set("q", debouncedSearch);
     if (filters.category) params.set("category", filters.category);
-    if (filters.tribe) params.set("tribe", filters.tribe);
+    if (filters.subcategory) params.set("subcategory", filters.subcategory);
+    if (filters.childCategory) params.set("childCategory", filters.childCategory);
     appendAttributeFilters(params, filters.attributes);
     if (page > 1) params.set("page", String(page));
     const query = params.toString();
@@ -196,7 +226,8 @@ export default function CatalogPage() {
   const hasActiveExportFilters = Boolean(
     debouncedSearch ||
     filters.category ||
-    filters.tribe ||
+    filters.subcategory ||
+    filters.childCategory ||
     Object.values(filters.attributes).some(Boolean)
   );
 
@@ -213,14 +244,14 @@ export default function CatalogPage() {
 
   const handleAddToCart = (product, optionIndex) => {
     addToCart(product, optionIndex, 1);
-    setIsCartOpen(true);
   };
 
   const loadExportProducts = async () => {
     const params = new URLSearchParams({ export: "true" });
     if (debouncedSearch) params.set("q", debouncedSearch);
     if (filters.category) params.set("category", filters.category);
-    if (filters.tribe) params.set("tribe", filters.tribe);
+    if (filters.subcategory) params.set("subcategory", filters.subcategory);
+    if (filters.childCategory) params.set("childCategory", filters.childCategory);
     appendAttributeFilters(params, filters.attributes);
     const response = await fetch(`/api/catalog?${params.toString()}`, {
       credentials: "same-origin",
@@ -240,14 +271,9 @@ export default function CatalogPage() {
     const labels = [];
     if (debouncedSearch) labels.push(`Search: ${debouncedSearch}`);
     if (filters.category) labels.push(`Category: ${filters.category}`);
-    if (filters.tribe) {
-      labels.push(
-        `${
-          isIndigenousRapeCategory(filters.category)
-            ? "Indigenous Tribe"
-            : "Product Type"
-        }: ${filters.tribe}`
-      );
+    if (filters.subcategory) labels.push(`Subcategory: ${filters.subcategory}`);
+    if (filters.childCategory) {
+      labels.push(`Subcategory level 2: ${filters.childCategory}`);
     }
     attributes.forEach((attribute) => {
       const value = filters.attributes[attribute.key];
@@ -259,7 +285,7 @@ export default function CatalogPage() {
   const currentPdfOptions = () => ({
     search: debouncedSearch,
     category: filters.category,
-    tribe: filters.tribe,
+    tribe: filters.subcategory,
     attributes: filters.attributes,
     filterLabel: filterLabel(),
   });
@@ -305,6 +331,8 @@ export default function CatalogPage() {
       setExporting("");
     }
   };
+
+  if (authLoading || !isLoggedIn) return <AuthGate loading={authLoading} />;
 
   return (
     <div id="top" className="site-background-page flex min-h-screen flex-col bg-[#25362D] text-[#f2f2f2] antialiased">
@@ -431,7 +459,7 @@ export default function CatalogPage() {
               Wholesale Digital Catalog
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/55 sm:text-lg">
-              Explore Maya Herbs products, then refine the catalog by category, product type or indigenous tribe, and product attributes.
+              Explore Maya Herbs products, then combine category levels with Effects and Plant Part filters.
             </p>
           </div>
 
@@ -511,7 +539,7 @@ export default function CatalogPage() {
                   className="relative inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-[#1a1a1a] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-[#999933]/60"
                 >
                   <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
-                  Order sheet
+                  Cart · ${cartTotal.toFixed(2)}
                   {cartTotalItems > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#cc6633] px-1 text-[10px] text-white">
                       {cartTotalItems}
@@ -540,7 +568,8 @@ export default function CatalogPage() {
           <FilterSidebar
             filters={filters}
             categories={categories}
-            tribes={tribes}
+            subcategories={subcategories}
+            childCategories={childCategories}
             attributes={attributes}
             onChange={handleFiltersChange}
             onClear={clearFilters}

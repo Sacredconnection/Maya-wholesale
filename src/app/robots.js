@@ -3,7 +3,16 @@ export default function robots() {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/private/", "/portal/"],
+      disallow: [
+        "/api/",
+        "/catalog",
+        "/checkout",
+        "/digital-catalog",
+        "/my-account",
+        "/order-received",
+        "/product/",
+        "/suggested-orders",
+      ],
     },
     sitemap: "https://wholesale.mayaherbs.com/sitemap.xml",
   };

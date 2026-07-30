@@ -13,17 +13,6 @@ const roboto = Roboto({
   display: "swap",
 });
 
-const themeBootScript = `
-  (function () {
-    try {
-      var savedTheme = localStorage.getItem('maya-wholesale-theme');
-      document.documentElement.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
-    } catch (error) {
-      document.documentElement.dataset.theme = 'dark';
-    }
-  })();
-`;
-
 export const metadata = {
   metadataBase: new URL("https://wholesale.mayaherbs.com"),
   title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
@@ -40,9 +29,6 @@ export default function RootLayout({ children }) {
       className={`${roboto.variable} ${roboto.className} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-      </head>
       <body
         className="min-h-full flex flex-col bg-[#25362D] text-[#f2f2f2]"
         suppressHydrationWarning

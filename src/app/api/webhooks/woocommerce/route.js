@@ -53,9 +53,7 @@ async function handleCustomerWebhook(topic, payload) {
 
   if (topic === "customer.created") {
     const alreadySent = customerMeta(customer, "sc_pending_email_sent_at");
-    const isPending = ["pending", "customer"].includes(
-      String(customer.role || "").toLowerCase()
-    );
+    const isPending = !isApprovedWholesaleCustomer(customer);
     if (alreadySent || !isPending) {
       return { accepted: true, emailSent: false, reason: alreadySent ? "already-sent" : "not-pending" };
     }

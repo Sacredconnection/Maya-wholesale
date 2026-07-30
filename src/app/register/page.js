@@ -19,15 +19,14 @@ export default function RegisterPage() {
   const { register } = useAuth();
 
   const [form, setForm] = useState({
-    username: "",
+    name: "",
     email: "",
-    password: "",
+    vatNumber: "",
     address: "",
     city: "",
     zip: "",
     country: "",
-    state: "",
-    phone: ""
+    state: ""
   });
 
   const [error, setError] = useState("");
@@ -41,21 +40,25 @@ export default function RegisterPage() {
 
   const handleCountryChange = (e) => {
     const country = e.target.value;
-    setForm((prev) => ({ ...prev, country, state: "" }));
+    setForm((prev) => ({ ...prev, country }));
     setError("");
   };
 
   const validate = () => {
-    if (!form.username.trim()) return "Username / Contact Name is required.";
-    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "A valid email address is required.";
-    if (!form.password || form.password.length < 12 || form.password.length > 128) {
-      return "Password must contain between 12 and 128 characters.";
+    if (!form.name.trim()) return "Name is required.";
+    if (
+      !form.email.trim() ||
+      form.email.trim().length > 60 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+    ) {
+      return "A valid email address with no more than 60 characters is required.";
     }
-    if (!form.address.trim()) return "Address Line 1 is required.";
+    if (!form.vatNumber.trim()) return "VAT Number is required.";
+    if (!form.address.trim()) return "Address is required.";
     if (!form.city.trim()) return "City is required.";
+    if (!form.state.trim()) return "State / Province is required.";
     if (!form.zip.trim()) return "Postcode / ZIP is required.";
-    if (!form.country) return "Please select your Country/Region.";
-    if (!form.phone.trim()) return "Phone number is required.";
+    if (!form.country) return "Please select your Country.";
     return null;
   };
 
@@ -73,38 +76,14 @@ export default function RegisterPage() {
 
     try {
       await register({
-        firstName: form.username.trim().split(/\s+/)[0] || form.username.trim(),
-        lastName: form.username.trim().split(/\s+/).slice(1).join(" "),
-        displayName: form.username.trim(),
+        name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
-        phone: form.phone.trim(),
-        country: form.country,
-        company: `${form.username} Wholesale`,
-        businessType: "Wholesale Partner",
-        taxId: "PENDING-B2B",
-        monthlyVolume: "Under $1,000",
-        website: "",
-        avatar: null,
-        password: form.password,
-        accountId: `MAYA-${Date.now().toString(36).toUpperCase()}`,
-        status: "PENDING",
-        discountRate: 0,
-        shippingAddress: {
-          street: form.address.trim(),
-          neighborhood: "",
-          city: form.city.trim(),
-          state: form.state.trim(),
-          zip: form.zip.trim(),
-          country: form.country
-        },
-        billingAddress: {
-          street: form.address.trim(),
-          neighborhood: "",
-          city: form.city.trim(),
-          state: form.state.trim(),
-          zip: form.zip.trim(),
-          country: form.country
-        }
+        vatNumber: form.vatNumber.trim(),
+        address: form.address.trim(),
+        city: form.city.trim(),
+        state: form.state.trim(),
+        zip: form.zip.trim(),
+        country: form.country
       });
       setSubmitted(true);
     } catch (err) {
@@ -166,10 +145,10 @@ export default function RegisterPage() {
 
               <div className="flex flex-col gap-4">
 
-                {/* Username */}
+                {/* Name */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="register-name" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    Username
+                    Name
                   </label>
                   <input
                     id="register-name"
@@ -177,9 +156,9 @@ export default function RegisterPage() {
                     type="text"
                     autoComplete="name"
                     maxLength={160}
-                    value={form.username}
-                    onChange={set("username")}
-                    placeholder="e.g. johndoe"
+                    value={form.name}
+                    onChange={set("name")}
+                    placeholder="e.g. John Doe"
                     className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
@@ -195,7 +174,7 @@ export default function RegisterPage() {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    maxLength={254}
+                    maxLength={60}
                     value={form.email}
                     onChange={set("email")}
                     placeholder="name@company.com"
@@ -204,30 +183,29 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                {/* Password */}
+                {/* VAT Number */}
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="register-password" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    Password
+                  <label htmlFor="register-vat-number" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
+                    VAT Number
                   </label>
                   <input
-                    id="register-password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    minLength={12}
-                    maxLength={128}
-                    value={form.password}
-                    onChange={set("password")}
-                    placeholder="12–128 characters"
+                    id="register-vat-number"
+                    name="vat-number"
+                    type="text"
+                    autoComplete="off"
+                    maxLength={64}
+                    value={form.vatNumber}
+                    onChange={set("vatNumber")}
+                    placeholder="e.g. NL123456789B01"
                     className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
 
-                {/* Address Line 1 */}
+                {/* Address */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="register-address" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    Address Line 1
+                    Address
                   </label>
                   <input
                     id="register-address"
@@ -262,6 +240,25 @@ export default function RegisterPage() {
                   />
                 </div>
 
+                {/* State / Province */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="register-state" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
+                    State / Province
+                  </label>
+                  <input
+                    id="register-state"
+                    name="state"
+                    type="text"
+                    autoComplete="address-level1"
+                    maxLength={100}
+                    value={form.state}
+                    onChange={set("state")}
+                    placeholder="North Holland"
+                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
+                    required
+                  />
+                </div>
+
                 {/* Postcode / ZIP */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="register-postal-code" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
@@ -275,16 +272,16 @@ export default function RegisterPage() {
                     maxLength={24}
                     value={form.zip}
                     onChange={set("zip")}
-                    placeholder="10001"
+                    placeholder="2031 BZ"
                     className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
                     required
                   />
                 </div>
 
-                {/* Country/Region */}
+                {/* Country */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="registration-country" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    Country/Region
+                    Country
                   </label>
                   <div className="relative">
                     <select
@@ -296,7 +293,7 @@ export default function RegisterPage() {
                       className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-11 text-sm text-white outline-none transition-colors focus:border-[#999933] cursor-pointer"
                       required
                     >
-                      <option value="" disabled>Select a country / region...</option>
+                      <option value="" disabled>Select a country</option>
                       {COUNTRIES.map(({ code, name }) => (
                         <option key={code} value={code}>{name}</option>
                       ))}
@@ -305,47 +302,10 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* State / Region (Optional) */}
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="register-state" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    State / Region (Optional)
-                  </label>
-                  <input
-                    id="register-state"
-                    name="state"
-                    type="text"
-                    autoComplete="address-level1"
-                    maxLength={100}
-                    value={form.state}
-                    onChange={set("state")}
-                    placeholder="Select a state / region..."
-                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
-                  />
-                </div>
-
-                {/* Phone Number */}
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="register-phone" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    Phone Number
-                  </label>
-                  <input
-                    id="register-phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    maxLength={40}
-                    value={form.phone}
-                    onChange={set("phone")}
-                    placeholder="(123) 456-7890"
-                    className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
-                    required
-                  />
-                </div>
-
               </div>
 
               <div className="text-center text-[11px] text-white/40 mt-1 font-body-md">
-                Registration confirmation will be emailed to you.
+                Registration confirmation and account access instructions will be emailed to you.
               </div>
 
               <button
@@ -386,8 +346,8 @@ export default function RegisterPage() {
 
               <div className="bg-[#131313] border border-white/5 rounded-lg p-4 w-full flex flex-col gap-2 font-mono text-left max-w-sm">
                 <div className="flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
-                  <span className="text-white/40">USERNAME:</span>
-                  <span className="break-all text-[#f2f2f2] font-bold sm:text-right">{form.username}</span>
+                  <span className="text-white/40">NAME:</span>
+                  <span className="break-all text-[#f2f2f2] font-bold sm:text-right">{form.name}</span>
                 </div>
                 <div className="flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
                   <span className="text-white/40">EMAIL:</span>

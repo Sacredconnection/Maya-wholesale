@@ -337,18 +337,28 @@ export async function getProductVariations(
 
 // SKU lookup matches both products and variations (variations come back with
 // type "variation" and a parent_id). Uncached — used while creating orders.
+const ORDER_PRODUCT_FIELDS =
+  "id,parent_id,name,sku,price,weight,purchasable,stock_status,stock_quantity,attributes,meta_data,categories";
+
 export async function findProductBySku(sku, storeId = PRIMARY_STORE_ID) {
-  const { data } = await wcFetch(storeId, "products", { params: { sku }, revalidate: 0 });
+  const { data } = await wcFetch(storeId, "products", {
+    params: { sku, per_page: 1, _fields: ORDER_PRODUCT_FIELDS },
+    revalidate: 0,
+  });
   return data[0] || null;
 }
 
 export async function getProductById(productId, storeId = PRIMARY_STORE_ID) {
-  const { data } = await wcFetch(storeId, `products/${productId}`, { revalidate: 0 });
+  const { data } = await wcFetch(storeId, `products/${productId}`, {
+    params: { _fields: ORDER_PRODUCT_FIELDS },
+    revalidate: 0,
+  });
   return data;
 }
 
 export async function getVariationById(productId, variationId, storeId = PRIMARY_STORE_ID) {
   const { data } = await wcFetch(storeId, `products/${productId}/variations/${variationId}`, {
+    params: { _fields: ORDER_PRODUCT_FIELDS },
     revalidate: 0,
   });
   return data;
@@ -392,6 +402,9 @@ export async function getCategories(storeId = PRIMARY_STORE_ID, { revalidate } =
 
 // ── Customers ───────────────────────────────────────────────────────
 
+const PORTAL_CUSTOMER_FIELDS =
+  "id,email,role,username,first_name,last_name,billing,shipping,meta_data,avatar_url";
+
 export async function createCustomer(customer, storeId = PRIMARY_STORE_ID) {
   const { data } = await wcFetch(storeId, "customers", { method: "POST", body: customer });
   return data;
@@ -399,7 +412,12 @@ export async function createCustomer(customer, storeId = PRIMARY_STORE_ID) {
 
 export async function getCustomerByEmail(email, storeId = PRIMARY_STORE_ID) {
   const { data } = await wcFetch(storeId, "customers", {
-    params: { email, role: "all", per_page: 10 },
+    params: {
+      email,
+      role: "all",
+      per_page: 1,
+      _fields: PORTAL_CUSTOMER_FIELDS,
+    },
     revalidate: 0,
   });
   return (
@@ -431,8 +449,15 @@ export async function updateCustomerMeta(customer, values, storeId = PRIMARY_STO
 
 // ── Orders ──────────────────────────────────────────────────────────
 
+const ORDER_RESPONSE_FIELDS =
+  "id,number,status,date_created,total,currency,payment_method_title,customer_note,line_items,meta_data,billing";
+
 export async function createOrder(order, storeId = PRIMARY_STORE_ID) {
-  const { data } = await wcFetch(storeId, "orders", { method: "POST", body: order });
+  const { data } = await wcFetch(storeId, "orders", {
+    method: "POST",
+    body: order,
+    params: { _fields: ORDER_RESPONSE_FIELDS },
+  });
   return data;
 }
 
@@ -440,7 +465,13 @@ export async function createOrder(order, storeId = PRIMARY_STORE_ID) {
 // only exact billing matches. Uncached so new orders show up immediately.
 export async function getOrdersByEmail(email, storeId = PRIMARY_STORE_ID) {
   const { data } = await wcFetch(storeId, "orders", {
-    params: { search: email, per_page: 50, orderby: "date", order: "desc" },
+    params: {
+      search: email,
+      per_page: 50,
+      orderby: "date",
+      order: "desc",
+      _fields: ORDER_RESPONSE_FIELDS,
+    },
     revalidate: 0,
   });
   return data.filter(

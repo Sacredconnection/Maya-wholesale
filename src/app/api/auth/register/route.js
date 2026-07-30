@@ -4,7 +4,6 @@ import {
   updateCustomerMeta,
   WooCommerceApiError,
 } from "@/lib/woocommerce";
-import { setWpUserRole } from "@/lib/wp-auth";
 import { mapCustomerToUser, toWcAddress } from "@/lib/wc-mappers";
 import { sendApplicationReceivedEmail } from "@/lib/transactional-email";
 import { isSupportedCountryCode } from "@/lib/countries";
@@ -16,6 +15,16 @@ import {
   RequestBodyError,
   securityError,
 } from "@/lib/request-security";
+
+const VAT_META_KEYS = ["billing_vat", "vat_number", "maya_vat_number"];
+
+const splitFullName = (name) => {
+  const parts = name.trim().split(/\s+/);
+  return {
+    firstName: parts.shift() || "",
+    lastName: parts.join(" "),
+  };
+};
 
 function cleanAddress(value) {
   const address = value && typeof value === "object" ? value : {};
@@ -41,47 +50,66 @@ export async function POST(request) {
     return securityError("Invalid JSON body.", 400);
   }
 
+  const name = cleanText(body.name, 160);
   const email = cleanText(body.email, 254).toLowerCase();
-  const password = typeof body.password === "string" ? body.password : "";
-  const firstName = cleanText(body.firstName, 80);
-  const lastName = cleanText(body.lastName, 80);
-  const company = cleanText(body.company, 120);
-  const phone = cleanText(body.phone, 40);
-  const businessType = cleanText(body.businessType, 80);
-  const shippingAddress = cleanAddress(body.shippingAddress);
-  const billingAddress = cleanAddress(body.billingAddress);
+  const { firstName, lastName } = splitFullName(name);
+  const vatNumber = cleanText(body.vatNumber, 64);
+  const address = cleanAddress({
+    street: body.address,
+    city: body.city,
+    state: body.state,
+    zip: body.zip,
+    country: body.country,
+  });
 
-  if (!isValidEmail(email)) return securityError("A valid email address is required.", 400);
-  if (password.length < 12 || password.length > 128) {
-    return securityError("Password must contain between 12 and 128 characters.", 400);
-  }
-  if (!firstName || !shippingAddress.street || !shippingAddress.city || !shippingAddress.country || !phone) {
-    return securityError("Required account and address fields are missing.", 400);
+  if (!name) return securityError("Name is required.", 400);
+  if (!isValidEmail(email) || email.length > 60) {
+    return securityError("A valid email address with no more than 60 characters is required.", 400);
   }
   if (
-    !isSupportedCountryCode(shippingAddress.country) ||
-    !isSupportedCountryCode(billingAddress.country)
+    !vatNumber ||
+    !address.street ||
+    !address.city ||
+    !address.state ||
+    !address.zip ||
+    !address.country
   ) {
-    return securityError("Please select a valid Country/Region.", 400);
+    return securityError("Complete all registration and address fields.", 400);
+  }
+  if (!isSupportedCountryCode(address.country)) {
+    return securityError("Please select a valid Country.", 400);
   }
 
   try {
     const customer = await createCustomer({
       email,
       username: email,
-      password,
       first_name: firstName,
       last_name: lastName,
-      billing: { first_name: firstName, last_name: lastName, company, email, phone, ...toWcAddress(billingAddress) },
-      shipping: { first_name: firstName, last_name: lastName, company, ...toWcAddress(shippingAddress) },
+      billing: { first_name: firstName, last_name: lastName, email, ...toWcAddress(address) },
+      shipping: { first_name: firstName, last_name: lastName, ...toWcAddress(address) },
+      // Preserve the field names used by Maya's legacy WordPress registration
+      // validation. WooCommerce ignores unknown properties when persisting the
+      // customer, but WordPress hooks can still read them from the REST request.
+      vat_number: vatNumber,
+      billing_vat: vatNumber,
+      maya_vat_number: vatNumber,
+      address: address.street,
+      city: address.city,
+      state: address.state,
+      postcode: address.zip,
+      zip: address.zip,
+      country: address.country,
       meta_data: [
         { key: "sc_channel", value: "wholesale-portal" },
         { key: "sc_approval_status", value: "pending" },
-        ...(businessType ? [{ key: "sc_business_type", value: businessType }] : []),
+        { key: "sc_display_name", value: name },
+        { key: "maya_account_status", value: "pending_approval" },
+        { key: "maya_account_status_label", value: "Pending approval" },
+        ...VAT_META_KEYS.map((key) => ({ key, value: vatNumber })),
       ],
     });
 
-    await setWpUserRole(customer.id, "pending");
     let confirmationEmailSent = false;
     try {
       await sendApplicationReceivedEmail(customer);
@@ -100,10 +128,17 @@ export async function POST(request) {
     if (err instanceof WooCommerceApiError) {
       const code = err.details?.code || "";
       if (code.includes("email-exists") || code.includes("username-exists")) {
-        return securityError("An account with this email already exists. Please log in.", 409);
+        return securityError(
+          "An account with this email already exists. Please sign in or use another email address.",
+          409
+        );
       }
       console.error("POST /api/auth/register rejected:", err.details);
-      return securityError("Registration was rejected. Please review the supplied details.", 422);
+      const upstreamMessage = cleanText(err.details?.message, 240);
+      return securityError(
+        upstreamMessage || "WordPress rejected the registration details.",
+        422
+      );
     }
     console.error("POST /api/auth/register failed:", err);
     return securityError("Registration failed. Please try again.", 502);

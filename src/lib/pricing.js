@@ -1,10 +1,6 @@
 // Client-safe pricing helpers (no secrets here). Also imported server-side by
 // /api/orders so the order totals use exactly the same rules as the UI.
 
-// Minimum wholesale order weight, enforced in the cart UI and re-validated
-// server-side when the order is registered.
-export const MIN_ORDER_GRAMS = 250;
-
 // ── Progressive weight-based pricing (New Customer level) ───────────────────
 // For the "New Customer" access level the price is per gram and the rate
 // improves with the TOTAL ORDER WEIGHT. Each product line has its own table:

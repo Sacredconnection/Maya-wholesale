@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  Check,
   ShoppingBag,
   Minus,
   Plus,
@@ -24,15 +25,13 @@ import {
   Globe
 } from "lucide-react";
 
-const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
-
 export default function ProductDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const fromPage = searchParams.get("fromPage") || "1";
   const { id } = params;
 
-  const { addToCart, setIsCartOpen } = useCart();
+  const { addToCart } = useCart();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
   const { products, loading: productsLoading } = useProducts();
 
@@ -45,10 +44,23 @@ export default function ProductDetailPage() {
   const [resolvedProduct, setResolvedProduct] = useState(null);
   const [productLoadError, setProductLoadError] = useState("");
   const product = resolvedProduct?.id === catalogProduct?.id ? resolvedProduct : catalogProduct;
+  const [selectedOptIdx, setSelectedOptIdx] = useState(() => {
+    const firstAvailable = product?.options?.findIndex(
+      (option) => option.inStock !== false
+    );
+    return firstAvailable >= 0 ? firstAvailable : 0;
+  });
+  const [quantity, setQuantity] = useState(1);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const relatedCarouselRef = useRef(null);
+  const [relatedControls, setRelatedControls] = useState({ previous: false, next: false });
+  const [addedAt, setAddedAt] = useState(0);
 
   useEffect(() => {
     if (!catalogProduct || catalogProduct.optionsLoaded) return undefined;
-    if (LOCAL_CATALOG_PREVIEW && !isLoggedIn) return undefined;
 
     let cancelled = false;
 
@@ -63,7 +75,15 @@ export default function ProductDetailPage() {
         if (!response.ok) {
           throw new Error(data.error || "Could not load this product's options.");
         }
-        if (!cancelled) setResolvedProduct(data.product);
+        if (!cancelled) {
+          setResolvedProduct(data.product);
+          const firstAvailable = data.product.options.findIndex(
+            (option) => option.inStock !== false
+          );
+          setSelectedOptIdx(firstAvailable >= 0 ? firstAvailable : 0);
+          setQuantity(1);
+          setAddedAt(0);
+        }
       } catch (error) {
         if (!cancelled) {
           setProductLoadError(
@@ -79,7 +99,7 @@ export default function ProductDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [catalogProduct, isLoggedIn]);
+  }, [catalogProduct]);
 
   const relatedProductPool = useMemo(() => {
     if (!product) return [];
@@ -87,15 +107,11 @@ export default function ProductDetailPage() {
     return products.filter((item) => item.id !== product.id);
   }, [product, products]);
 
-  // States
-  const [selectedOptIdx, setSelectedOptIdx] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [imgError, setImgError] = useState(false);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const relatedCarouselRef = useRef(null);
-  const [relatedControls, setRelatedControls] = useState({ previous: false, next: false });
+  useEffect(() => {
+    if (!addedAt) return undefined;
+    const timer = window.setTimeout(() => setAddedAt(0), 1800);
+    return () => window.clearTimeout(timer);
+  }, [addedAt]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -137,8 +153,8 @@ export default function ProductDetailPage() {
     };
   }, [isLoggedIn, relatedProducts.length, product?.id]);
 
-  // Production remains partner-only; local development can preview public catalog data.
-  if (!LOCAL_CATALOG_PREVIEW && (authLoading || !isLoggedIn)) {
+  // Product pages are partner-only: block until authenticated
+  if (authLoading || !isLoggedIn) {
     return <AuthGate loading={authLoading} />;
   }
 
@@ -191,9 +207,9 @@ export default function ProductDetailPage() {
   const finalPrice = basePrice - discountAmount;
 
   const handleAddToCartClick = () => {
-    if (!product.optionsLoaded) return;
+    if (!product.optionsLoaded || selectedOption?.inStock === false) return;
     addToCart(product, selectedOptIdx, quantity);
-    setIsCartOpen(true);
+    setAddedAt(Date.now());
   };
 
   const scrollRelatedProducts = (direction) => {
@@ -360,19 +376,24 @@ export default function ProductDetailPage() {
                 <div className="rounded border border-[#f2f2f2]/20 bg-[#f2f2f2]/5 px-4 py-3 text-xs text-[#f2f2f2]">
                   {productLoadError || "Loading product options..."}
                 </div>
-              ) : product.options.length > 1 && (
+              ) : product.productType === "variable" && product.options.length > 1 && (
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-mono text-white/45 uppercase tracking-wider font-label-sm">
                     Weight / Packaging Size
                   </label>
                   <select
                     value={selectedOptIdx}
-                    onChange={(e) => setSelectedOptIdx(parseInt(e.target.value))}
+                    onChange={(event) => {
+                      setSelectedOptIdx(Number.parseInt(event.target.value, 10));
+                      setAddedAt(0);
+                      setQuantity(1);
+                    }}
                     className="bg-[#1a1a1a] border border-white/10 text-sm text-white rounded px-4 py-3.5 focus:border-[#999933] outline-none w-full"
                   >
                     {product.options.map((opt, idx) => (
-                      <option key={opt.sku} value={idx}>
+                      <option key={opt.sku} value={idx} disabled={opt.inStock === false}>
                         {opt.name} (${optionPriceForUser(opt, user, product.category).toFixed(2)})
+                        {opt.inStock === false ? " · Out of stock" : ""}
                       </option>
                     ))}
                   </select>
@@ -398,8 +419,18 @@ export default function ProductDetailPage() {
                       {quantity}
                     </span>
                     <button
-                      onClick={() => setQuantity(prev => prev + 1)}
-                      className="p-3 text-white/50 hover:text-white cursor-pointer bg-transparent border-0"
+                      onClick={() =>
+                        setQuantity((previous) =>
+                          selectedOption?.stockQuantity == null
+                            ? previous + 1
+                            : Math.min(previous + 1, Number(selectedOption.stockQuantity))
+                        )
+                      }
+                      disabled={
+                        selectedOption?.stockQuantity != null &&
+                        quantity >= Number(selectedOption.stockQuantity)
+                      }
+                      className="p-3 text-white/50 hover:text-white cursor-pointer bg-transparent border-0 disabled:cursor-not-allowed disabled:opacity-25"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -410,11 +441,17 @@ export default function ProductDetailPage() {
                 <div className="flex-grow w-full">
                   <button
                     onClick={handleAddToCartClick}
-                    disabled={!product.optionsLoaded}
-                    className="w-full bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/45 transition-all flex items-center justify-center gap-2 cursor-pointer border-0"
+                    disabled={!product.optionsLoaded || selectedOption?.inStock === false}
+                    className="w-full bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded shadow-lg shadow-[#cc6633]/20 hover:shadow-[#cc6633]/45 transition-all flex items-center justify-center gap-2 cursor-pointer border-0 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-[#cc6633]"
                   >
-                    <ShoppingBag className="w-4 h-4" />
-                    {product.optionsLoaded ? "Add to Basket" : "Loading options..."}
+                    {addedAt ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                    {!product.optionsLoaded
+                      ? "Loading options..."
+                      : selectedOption?.inStock === false
+                        ? "Out of stock"
+                        : addedAt
+                          ? "Added to cart"
+                          : "Add to Basket"}
                   </button>
                 </div>
 
@@ -457,7 +494,7 @@ export default function ProductDetailPage() {
                 onClick={() => scrollRelatedProducts(-1)}
                 disabled={!relatedControls.previous}
                 aria-label="Show previous related product"
-                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#ffffff] disabled:cursor-not-allowed disabled:opacity-30"
+                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#eadcae] disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -466,7 +503,7 @@ export default function ProductDetailPage() {
                 onClick={() => scrollRelatedProducts(1)}
                 disabled={!relatedControls.next}
                 aria-label="Show next related product"
-                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#ffffff] disabled:cursor-not-allowed disabled:opacity-30"
+                className="related-carousel-button grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-[#131313] text-[#f2f2f2] shadow-lg transition-colors hover:border-[#f2f2f2] hover:text-[#eadcae] disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>

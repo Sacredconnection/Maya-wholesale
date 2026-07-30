@@ -195,7 +195,7 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
   instructions.getRow(2).height = 36;
 
   const guidance = [
-    ["1", "Open the Order sheet and locate products by SKU, name, category, or option."],
+    ["1", "Open the cart and locate products by SKU, name, category, or option."],
     ["2", "Enter the desired amount only in the Quantidade column. Keep SKU values unchanged."],
     ["3", "Use Descricao for an optional note about that line."],
     ["4", "Rows with quantity zero are ignored when the order file is imported."],

@@ -5,13 +5,17 @@ AF AX AL DZ AS AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY PW BE BZ BJ BM BT
 // WooCommerce uses a few familiar labels that differ from Intl.DisplayNames.
 const COUNTRY_NAME_OVERRIDES = {
   AG: "Antigua and Barbuda",
+  AX: "Åland Islands",
   BA: "Bosnia and Herzegovina",
   BL: "Saint Barthélemy",
   BQ: "Bonaire, Saint Eustatius and Saba",
   CD: "Congo (Kinshasa)",
   CG: "Congo (Brazzaville)",
   CI: "Ivory Coast",
+  CV: "Cape Verde",
+  CW: "Curaçao",
   CZ: "Czech Republic",
+  FK: "Falkland Islands",
   GB: "United Kingdom (UK)",
   GS: "South Georgia/Sandwich Islands",
   HK: "Hong Kong",
@@ -35,6 +39,7 @@ const COUNTRY_NAME_OVERRIDES = {
   ST: "São Tomé and Príncipe",
   SX: "Saint Martin (Dutch part)",
   TC: "Turks and Caicos Islands",
+  TR: "Türkiye",
   TT: "Trinidad and Tobago",
   UM: "United States (US) Minor Outlying Islands",
   US: "United States (US)",
@@ -43,6 +48,7 @@ const COUNTRY_NAME_OVERRIDES = {
   VG: "Virgin Islands (British)",
   VI: "Virgin Islands (US)",
   WF: "Wallis and Futuna",
+  EH: "Western Sahara",
 };
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
