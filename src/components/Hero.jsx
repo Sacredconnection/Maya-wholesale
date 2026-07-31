@@ -29,7 +29,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="theme-dark-zone relative flex min-h-[calc(100svh-66px)] w-full flex-col justify-center overflow-hidden bg-[#25362D] sm:min-h-[calc(100svh-82px)] lg:min-h-[calc(100svh-90px)]">
+    <div className="theme-dark-zone maya-hero-pattern relative flex min-h-[calc(100svh-66px)] w-full flex-col justify-center overflow-hidden bg-[#171714] sm:min-h-[calc(100svh-82px)] lg:min-h-[calc(100svh-90px)]">
       {/* Full Bleed Background Image Carousel */}
       <div className="absolute inset-0 z-0">
         {BANNERS.map((banner, idx) => (
@@ -52,7 +52,7 @@ export default function Hero() {
         ))}
         {/* Radial & Linear Overlays for Premium Contrast and Typography Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#131313]/88 via-[#131313]/48 to-[#131313]/8 md:bg-gradient-to-r md:from-[#131313]/90 md:via-[#131313]/65 md:to-[#131313]/15"></div>
-        <div className="absolute inset-0 hidden bg-gradient-to-t from-[#131313] via-transparent to-transparent opacity-65 md:block"></div>
+        <div className="absolute inset-0 hidden bg-gradient-to-t from-[#171714] via-transparent to-transparent opacity-65 md:block"></div>
 
         {/* Glow decoration */}
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#999933] opacity-[0.06] blur-[150px] pointer-events-none rounded-full animate-drift-slow"></div>
@@ -60,9 +60,9 @@ export default function Hero() {
 
       {/* Hero Section Content */}
       <section className="relative z-10 w-full -translate-y-48 py-10 sm:-translate-y-12 sm:py-14 md:translate-y-0 md:py-16 lg:py-24">
-        <div className="mx-auto flex w-full max-w-7xl animate-fade-in-up flex-col items-center gap-4 px-4 text-center sm:gap-5 sm:px-6 md:items-start md:gap-6 md:text-left lg:px-8">
+        <div className="mx-auto flex min-w-0 w-full max-w-7xl animate-fade-in-up flex-col items-center gap-4 px-4 text-center sm:gap-5 sm:px-6 md:items-start md:gap-6 md:text-left lg:px-8">
 
-          <div className="hero-tribe-badge inline-flex items-center gap-3 rounded-full border border-white/15 bg-black/25 p-1.5 pr-4 shadow-[0_12px_35px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+          <div className="hero-tribe-badge inline-flex max-w-full items-center gap-2.5 overflow-hidden rounded-full border border-white/15 bg-black/25 p-1.5 pr-3 shadow-[0_12px_35px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl sm:gap-3 sm:pr-4">
             <Image
               src="/icons/hero-authentic-tribes-01.svg"
               alt=""
@@ -71,16 +71,16 @@ export default function Hero() {
               unoptimized
               className="h-7 w-7 shrink-0 object-contain"
             />
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/90 sm:text-[11px] font-label-sm">
+            <span className="min-w-0 text-[9px] font-bold uppercase leading-tight tracking-[0.1em] text-white/90 sm:text-[11px] sm:tracking-[0.18em] font-label-sm">
               Ethnobotanical specialists since 2000
             </span>
           </div>
 
-          <h1 className="max-w-xl text-[2rem] font-black leading-[1.02] tracking-tighter text-white sm:text-4xl md:max-w-3xl md:text-6xl md:leading-[0.98] lg:text-7xl font-headline-lg">
+          <h1 className="max-w-xl text-[2rem] font-bold leading-[1.02] tracking-tight text-white sm:text-4xl md:max-w-3xl md:text-6xl md:leading-[0.98] lg:text-7xl font-headline-lg">
             <span className="text-[#f2f2f2]">Botanical integrity</span> at wholesale scale.
           </h1>
 
-          <p className="max-w-md text-base font-normal leading-relaxed text-white/75 sm:text-lg md:max-w-2xl md:text-xl md:text-white/70 font-body-lg">
+          <p className="w-full max-w-[22rem] text-base font-normal leading-relaxed text-white/75 sm:max-w-md sm:text-lg md:max-w-2xl md:text-xl md:text-white/70 font-body-lg">
             Authentic herbs, plant extracts, superfoods, incense and
             traditional preparations selected for retailers, practitioners
             and professional buyers.

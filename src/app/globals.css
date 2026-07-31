@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  /* Maya Herbs core brand palette */
+  /* Maya Herbs 2023 brand manual */
   --color-brand-orange: #cc6633;
   --color-brand-olive: #999933;
+  --color-brand-teal: #068077;
+  --color-brand-gold: #d9952b;
+  --color-brand-bark: #665842;
+  --color-brand-pollen: #e5e591;
+  --color-brand-red: #992523;
+  --color-brand-violet: #653299;
   --color-brand-white: #ffffff;
   --color-brand-gray: #f2f2f2;
 
@@ -33,7 +39,7 @@
   --color-error-container: #93000a;
   --color-secondary-fixed: #e2e2e2;
   --color-secondary-container: #454747;
-  --color-surface: #25362d;
+  --color-surface: #171714;
   --color-secondary: #c6c6c7;
   --color-surface-bright: #393939;
   --color-surface-variant: #353535;
@@ -43,14 +49,14 @@
   --color-on-primary-container: #e7fff8;
   --color-tertiary-fixed: #e2e2e2;
   --color-outline-variant: #3e4946;
-  --color-background: #25362d;
+  --color-background: #171714;
   --color-surface-container-high: #2a2a2a;
   --color-inverse-primary: #6f7025;
   --color-surface-container-lowest: #0e0e0e;
   --color-primary-container: #999933;
   --color-inverse-on-surface: #303030;
   --color-primary: #f2f2f2;
-  --color-surface-dim: #25362d;
+  --color-surface-dim: #171714;
   --color-on-tertiary-container: #fafafa;
   --color-tertiary-fixed-dim: #c6c6c7;
   --color-on-error: #690005;
@@ -66,16 +72,16 @@
   --spacing-container-max: 1440px;
   --spacing-margin-desktop: 64px;
 
-  /* One font family across every Tailwind font utility. */
-  --font-sans: var(--font-roboto), Arial, sans-serif;
-  --font-mono: var(--font-roboto), Arial, sans-serif;
-  --font-headline-lg: var(--font-roboto), sans-serif;
-  --font-label-sm: var(--font-roboto), sans-serif;
-  --font-headline-md: var(--font-roboto), sans-serif;
-  --font-body-md: var(--font-roboto), sans-serif;
-  --font-body-lg: var(--font-roboto), sans-serif;
-  --font-headline-lg-mobile: var(--font-roboto), sans-serif;
-  --font-display-lg: var(--font-roboto), sans-serif;
+  /* Manual: Futura PT for display/labels and Avenir Next LT Pro for body. */
+  --font-sans: "Avenir Next LT Pro", "Avenir Next", var(--font-maya-body), sans-serif;
+  --font-mono: "Futura PT", var(--font-maya-display), sans-serif;
+  --font-headline-lg: "Futura PT", var(--font-maya-display), sans-serif;
+  --font-label-sm: "Futura PT", var(--font-maya-display), sans-serif;
+  --font-headline-md: "Futura PT", var(--font-maya-display), sans-serif;
+  --font-body-md: "Avenir Next LT Pro", "Avenir Next", var(--font-maya-body), sans-serif;
+  --font-body-lg: "Avenir Next LT Pro", "Avenir Next", var(--font-maya-body), sans-serif;
+  --font-headline-lg-mobile: "Futura PT", var(--font-maya-display), sans-serif;
+  --font-display-lg: "Futura PT", var(--font-maya-display), sans-serif;
 }
 
 @keyframes drift {
@@ -128,7 +134,7 @@
 
 @layer base {
 html {
-  font-family: var(--font-roboto), Arial, sans-serif;
+  font-family: "Avenir Next LT Pro", "Avenir Next", var(--font-maya-body), sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-size: 100%;
@@ -136,37 +142,89 @@ html {
 }
 
 body {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: "Avenir Next LT Pro", "Avenir Next", var(--font-maya-body), sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  background-color: #25362d;
+  background-color: #171714;
   background-image:
-    linear-gradient(rgb(35 64 59 / 0.58), rgb(35 64 59 / 0.72)),
-    url("/backgrounds/maya-wholesale-background.webp");
+    linear-gradient(rgb(23 23 20 / 0.88), rgb(23 23 20 / 0.95)),
+    url("/patterns/maya-brand-pattern.svg");
   background-position: center top;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: auto, 276px 203px;
   background-attachment: fixed;
   color: #f2f2f2;
   overflow-x: clip;
+}
+
+/* The manual's isometric line pattern is the site's recurring signature. */
+.maya-hero-pattern::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("/patterns/maya-brand-pattern.svg");
+  background-position: right center;
+  background-repeat: repeat;
+  background-size: 276px 203px;
+  opacity: 0.16;
+  -webkit-mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / 0.2) 48%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / 0.2) 48%, #000 100%);
+}
+
+.maya-footer-pattern {
+  background-color: #191914 !important;
+  background-image:
+    linear-gradient(rgb(25 25 20 / 0.9), rgb(25 25 20 / 0.96)),
+    url("/patterns/maya-brand-pattern.svg");
+  background-size: auto, 276px 203px;
+}
+
+html[data-theme="dark"] [class~="bg-[#25362D]"] {
+  background-color: #171714 !important;
+}
+
+html[data-theme="dark"] [class~="bg-[#242f27]"],
+html[data-theme="dark"] [class~="bg-[#303f32]"] {
+  background-color: #24221c !important;
+}
+
+html[data-theme="dark"] [class~="bg-[#1a1a1a]"] {
+  background-color: #1d1c17 !important;
+}
+
+html[data-theme="dark"] [class~="bg-[#212121]"] {
+  background-color: #191914 !important;
+}
+
+html[data-theme="dark"] [class~="bg-[#131313]"],
+html[data-theme="dark"] [class~="bg-[#131313]/60"] {
+  background-color: #12120f !important;
 }
 
 .site-header {
   position: sticky !important;
   top: 0;
   z-index: 50;
-  background-color: #ffffff !important;
-  color: #1e1e1e !important;
+  background-color: #f5f2e9 !important;
+  color: #342f25 !important;
+  border-bottom-color: rgb(153 153 51 / 0.24) !important;
+}
+
+/* Keep the manual's preferred light logo ground above dark surface mappings. */
+html[data-theme] body .site-header {
+  background-color: #f5f2e9 !important;
 }
 
 .site-header #mobile-navigation {
-  background-color: #ffffff !important;
-  border-color: #f2f2f2 !important;
+  background-color: #f5f2e9 !important;
+  border-color: rgb(153 153 51 / 0.24) !important;
 }
 
 .site-header :is(a, button):not([href="/digital-catalog"], [href="/register"]) {
-  color: #1e1e1e !important;
+  color: #342f25 !important;
 }
 
 .site-header :is(a, button):not([href="/digital-catalog"], [href="/register"]):hover {
@@ -192,15 +250,15 @@ body {
 }
 
 .site-header a[href="/register"] {
-  border-color: rgb(30 30 30 / 0.12) !important;
-  background-color: #f2f2f2 !important;
-  color: #1e1e1e !important;
+  border-color: #cc6633 !important;
+  background-color: #cc6633 !important;
+  color: #ffffff !important;
 }
 
 .site-header a[href="/register"]:hover {
-  border-color: rgb(30 30 30 / 0.2) !important;
-  background-color: #e6e6e6 !important;
-  color: #1e1e1e !important;
+  border-color: #b6532a !important;
+  background-color: #b6532a !important;
+  color: #ffffff !important;
 }
 
 .site-header #mobile-navigation a[href="/register"] {
@@ -234,7 +292,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: "Futura PT", var(--font-maya-display), sans-serif;
   margin: 0;
   text-wrap: balance;
 }
@@ -243,7 +301,7 @@ h1 {
   font-size: clamp(2.25rem, 5vw, 4.5rem);
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 
 h2 {
@@ -282,7 +340,7 @@ button, input, select, textarea {
 }
 
 code, pre, .font-mono {
-  font-family: var(--font-roboto), Arial, sans-serif;
+  font-family: "Futura PT", var(--font-maya-display), sans-serif;
 }
 }
 
@@ -321,19 +379,19 @@ textarea {
 }
 
 html[data-theme="light"] body {
-  background-color: #ffffff;
+  background-color: #f5f2e9;
   background-image:
-    linear-gradient(rgb(255 255 255 / 0.68), rgb(255 255 255 / 0.82)),
-    url("/backgrounds/maya-wholesale-background-light.webp");
-  color: #17201e;
+    linear-gradient(rgb(245 242 233 / 0.91), rgb(245 242 233 / 0.96)),
+    url("/patterns/maya-brand-pattern.svg");
+  color: #342f25;
 }
 
 html[data-theme="light"] [class~="bg-[#25362D]"] {
-  background-color: #ffffff !important;
+  background-color: #f5f2e9 !important;
 }
 
 html[data-theme="light"] .trust-bar-grid > .group:hover {
-  background-color: #f5f7f6 !important;
+  background-color: #f0ecdf !important;
 }
 
 .home-green-outline.home-green-outline {
@@ -397,7 +455,7 @@ html[data-theme="dark"] :is(
 
 html[data-theme="light"] [class~="bg-[#131313]"],
 html[data-theme="light"] [class~="bg-[#131313]/60"] {
-  background-color: #f5f7f6 !important;
+  background-color: #f0ecdf !important;
 }
 
 html[data-theme="light"] [class~="bg-[#1a1a1a]"],
@@ -422,19 +480,19 @@ html[data-theme="light"] [class~="before:bg-[#131313]"]::before {
 
 html[data-theme="light"] [class~="text-[#f2f2f2]"],
 html[data-theme="light"] [class~="text-white"] {
-  color: #17201e !important;
+  color: #342f25 !important;
 }
 
 html[data-theme="light"] [class~="text-white/80"] {
-  color: rgb(23 32 30 / 0.8) !important;
+  color: rgb(52 47 37 / 0.8) !important;
 }
 
 html[data-theme="light"] [class~="text-white/75"] {
-  color: rgb(23 32 30 / 0.75) !important;
+  color: rgb(52 47 37 / 0.75) !important;
 }
 
 html[data-theme="light"] [class~="text-white/70"] {
-  color: rgb(23 32 30 / 0.7) !important;
+  color: rgb(52 47 37 / 0.7) !important;
 }
 
 html[data-theme="light"] :is(
@@ -443,7 +501,7 @@ html[data-theme="light"] :is(
   [class~="text-white/60"],
   [class~="text-white/65"]
 ) {
-  color: #46524e !important;
+  color: #615b50 !important;
 }
 
 html[data-theme="light"] :is(
@@ -454,7 +512,7 @@ html[data-theme="light"] :is(
   [class~="text-white/40"],
   [class~="text-white/45"]
 ) {
-  color: #5b6864 !important;
+  color: #6e675b !important;
 }
 
 html[data-theme="light"] [class~="text-[#f2f2f2]"] {

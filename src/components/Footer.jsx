@@ -16,7 +16,7 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer" className="theme-dark-zone bg-[#212121] border-t border-white/10 w-full scroll-mt-24">
+    <footer id="footer" className="theme-dark-zone maya-footer-pattern bg-[#191914] border-t border-[#999933]/25 w-full scroll-mt-24">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:grid-cols-2 sm:gap-10 sm:px-6 sm:py-12 lg:grid-cols-4 lg:gap-12 lg:px-8 lg:py-16">
 
         {/* Brand Info */}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276.378 203.252" width="276.378" height="203.252">
+  <defs>
+    <path id="maya-a" d="M0 0l-13.69 23.143h-20.645L-20.644 0H0Zm20.101-11.073C19.775-11.409-27.272-11.073-27.272-11.073l-26.946 45.299h47.373S20.427-10.737 20.101-11.073Z"/>
+    <path id="maya-b" d="M0 0h-20.644l-13.691-23.143h20.645L0 0Zm19.884 11.083-26.946-45.299s-47.047-.336-47.373 0c-.326.336 26.946 45.299 26.946 45.299h47.373Z"/>
+    <path id="maya-c" d="M0 0l13.636 22.934L0 45.867s-13.31-23.252-13.636-23.301C-13.962 22.517 0 0 0 0Zm27 22.724L-.163-22.575-27 22.724-.163 67.707 27 22.724Z"/>
+  </defs>
+  <g transform="translate(0 203.252) scale(1 -1)" fill="none" stroke="#999933" stroke-width="1.6" stroke-linejoin="round" opacity="0.58">
+    <use href="#maya-a" transform="translate(247.867 16.817)"/>
+    <use href="#maya-c" transform="translate(276.378 28.25)"/>
+    <use href="#maya-a" transform="translate(109.679 -33.996)"/>
+    <use href="#maya-b" transform="translate(201.034 -10.922)"/>
+    <use href="#maya-c" transform="translate(138.189 -22.563)"/>
+    <use href="#maya-b" transform="translate(62.845 39.891)"/>
+    <use href="#maya-c" transform="translate(0 28.25)"/>
+    <use href="#maya-a" transform="translate(247.867 118.443)"/>
+    <use href="#maya-c" transform="translate(276.378 129.875)"/>
+    <use href="#maya-a" transform="translate(109.679 67.63)"/>
+    <use href="#maya-b" transform="translate(201.034 90.704)"/>
+    <use href="#maya-c" transform="translate(138.189 79.063)"/>
+    <use href="#maya-b" transform="translate(62.845 141.517)"/>
+    <use href="#maya-c" transform="translate(0 129.875)"/>
+    <use href="#maya-a" transform="translate(109.679 169.256)"/>
+    <use href="#maya-b" transform="translate(201.034 192.33)"/>
+    <use href="#maya-c" transform="translate(138.189 180.688)"/>
+  </g>
+</svg>

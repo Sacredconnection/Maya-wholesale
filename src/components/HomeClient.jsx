@@ -20,7 +20,7 @@ export default function HomeClient() {
   const { isLoggedIn, loading: authLoading } = useAuth();
 
   return (
-    <div id="top" className="site-background-page home-no-glass bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
+    <div id="top" className="site-background-page home-no-glass bg-[#171714] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
       {/* Navigation Header */}
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
