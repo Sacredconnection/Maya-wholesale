@@ -34,6 +34,7 @@ import {
   isStockedOption,
   mapWithClientConcurrency,
 } from "@/lib/order-suggestions";
+import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
 
 // WooCommerce order status → UI label/color
 const ORDER_STATUS_STYLES = {
@@ -702,7 +703,9 @@ export default function MyAccountPage() {
                         <div className="flex flex-col gap-2">
                           <div className={`h-1.5 rounded-full ${activeOrder.status === "processing" ? "bg-[#999933]" : "bg-white/10"}`}></div>
                           <span className={`text-[9px] font-mono uppercase ${activeOrder.status === "processing" ? "text-[#f2f2f2] font-bold" : "text-white/40"}`}>
-                            2. Payment Arranged
+                            2. {activeOrder.paymentMethodTitle === MANUAL_BANK_TRANSFER.title
+                              ? "Funds Cleared"
+                              : "Payment Arranged"}
                           </span>
                         </div>
                         <div className="flex flex-col gap-2">
@@ -713,8 +716,9 @@ export default function MyAccountPage() {
 
                       {OPEN_ORDER_STATUSES.slice(0, 2).includes(activeOrder.status) && (
                         <p className="text-[11px] text-white/50 leading-relaxed border-t border-white/5 pt-4">
-                          No online payment is required; our team will contact you to
-                          arrange payment and confirm shipping for this order.
+                          {activeOrder.paymentMethodTitle === MANUAL_BANK_TRANSFER.title
+                            ? `Pay by manual bank transfer and use Order #${activeOrder.number} as the reference. The order ships after the funds clear and freight is confirmed.`
+                            : "No online payment is required; our team will contact you to arrange payment and confirm shipping for this order."}
                         </p>
                       )}
                     </div>

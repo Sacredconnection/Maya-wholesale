@@ -34,11 +34,17 @@ import {
 } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
 import { isSupportedCountryCode } from "@/lib/countries";
+import {
+  bankTransferOrderNote,
+  MANUAL_BANK_TRANSFER,
+} from "@/lib/payment-methods";
 import { createHash } from "node:crypto";
 
 const ORDER_CUSTOMER_NOTE =
   process.env.WHOLESALE_ORDER_NOTE?.replace(/\\n/g, "\n").trim() ||
   "Thank you for your wholesale order request. The Maya Herbs team will confirm availability, shipping and payment instructions before fulfillment.";
+const ORDER_CUSTOMER_NOTE_WITH_PAYMENT =
+  `${ORDER_CUSTOMER_NOTE}\n\n${bankTransferOrderNote()}`;
 
 const missingBackendsResponse = () => {
   const missingStores = getMissingCommerceStores();
@@ -177,6 +183,11 @@ export async function POST(request) {
   }
 
   const { items = [] } = body;
+  const paymentMethod =
+    cleanText(body.paymentMethod, 40) || MANUAL_BANK_TRANSFER.id;
+  if (paymentMethod !== MANUAL_BANK_TRANSFER.id) {
+    return securityError("Unsupported payment method.", 400);
+  }
   const checkout =
     body.checkout && typeof body.checkout === "object" && !Array.isArray(body.checkout)
       ? {
@@ -440,16 +451,18 @@ export async function POST(request) {
             status: "on-hold",
             set_paid: false,
             customer_id: wcCustomer.id,
-            payment_method: "sc_offline",
-            payment_method_title: "Offline: Maya Herbs team will contact you to arrange payment",
+            payment_method: MANUAL_BANK_TRANSFER.id,
+            payment_method_title: MANUAL_BANK_TRANSFER.title,
             billing,
             shipping,
             line_items: lineItems,
-            customer_note: ORDER_CUSTOMER_NOTE,
+            customer_note: ORDER_CUSTOMER_NOTE_WITH_PAYMENT,
             meta_data: [
               { key: "sc_channel", value: "wholesale-portal" },
               { key: "sc_source_store", value: store.id },
               { key: "sc_request_reference", value: requestReference },
+              { key: "sc_payment_method", value: MANUAL_BANK_TRANSFER.id },
+              { key: "sc_payment_account", value: MANUAL_BANK_TRANSFER.accountDetails },
               { key: "sc_access_level", value: role || "none (base prices)" },
               { key: "sc_total_weight_grams", value: String(Math.round(totalWeightGrams)) },
               ...(Object.keys(appliedRates).length > 0

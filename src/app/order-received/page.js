@@ -6,7 +6,8 @@ import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
-import { Check, PhoneCall, ClipboardList, ArrowRight } from "lucide-react";
+import BankTransferDetails from "@/components/BankTransferDetails";
+import { Check, ClipboardList, ArrowRight } from "lucide-react";
 
 function OrderReceivedContent() {
   const searchParams = useSearchParams();
@@ -40,18 +41,16 @@ function OrderReceivedContent() {
         )}
       </div>
 
-      <div className="bg-[#1a1a1a] border border-[#999933]/25 rounded-xl p-8 flex flex-col gap-4 max-w-xl">
-        <div className="flex items-center justify-center gap-3 text-[#f2f2f2]">
-          <PhoneCall className="w-5 h-5" />
-          <span className="text-xs font-bold uppercase tracking-widest font-label-sm">
-            Payment arranged personally
-          </span>
-        </div>
-        <p className="font-body-md text-sm text-white/70 leading-relaxed">
-          Your wholesale order has been registered in the corresponding store backend. <strong className="text-white">No payment
-          has been taken yet.</strong> A member of the Maya Herbs team will contact
-          you within 24 hours to confirm availability, calculate shipping, and arrange payment.
-        </p>
+      <div className="flex w-full max-w-2xl flex-col gap-5 rounded-xl border border-[#999933]/35 bg-[#1a1a1a] p-5 text-left sm:p-8">
+        <BankTransferDetails />
+        {(orderSummary || orderNumber) && (
+          <div className="rounded-lg border border-[#999933]/35 bg-[#999933]/10 px-4 py-3 text-xs leading-relaxed text-white/70">
+            Payment reference:{" "}
+            <strong className="font-mono text-white">
+              {orderSummary || `#${orderNumber}`}
+            </strong>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">

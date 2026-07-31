@@ -19,9 +19,11 @@ import {
 } from "lucide-react";
 import CheckoutHeader from "@/components/CheckoutHeader";
 import AuthGate from "@/components/AuthGate";
+import BankTransferDetails from "@/components/BankTransferDetails";
 import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import { COUNTRIES } from "@/lib/countries";
+import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -449,6 +451,7 @@ export default function CheckoutPage() {
             shippingAddress,
             billingAddress: effectiveBillingAddress,
           },
+          paymentMethod: MANUAL_BANK_TRANSFER.id,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -478,7 +481,7 @@ export default function CheckoutPage() {
         .join(" · ");
       const orderTotal = data.orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
       router.push(
-        `/order-received?orders=${encodeURIComponent(orderSummary)}&total=${encodeURIComponent(orderTotal.toFixed(2))}`
+        `/order-received?orders=${encodeURIComponent(orderSummary)}&total=${encodeURIComponent(orderTotal.toFixed(2))}&payment=${MANUAL_BANK_TRANSFER.id}`
       );
       navigationStarted = true;
     } catch (submissionError) {
@@ -509,7 +512,7 @@ export default function CheckoutPage() {
               Complete your wholesale order
             </h1>
             <p className="mt-1.5 text-sm text-white/50">
-              Three short steps. No payment is collected online.
+              Three short steps. Payment is completed by manual bank transfer.
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
@@ -648,13 +651,32 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  <fieldset className="rounded-xl border border-[#999933]/35 bg-[#242f27] p-4 sm:p-5">
+                    <legend className="px-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f2f2f2]">
+                      Payment method
+                    </legend>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value={MANUAL_BANK_TRANSFER.id}
+                        checked
+                        readOnly
+                        className="mt-3 h-4 w-4 shrink-0 accent-[#999933]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <BankTransferDetails />
+                      </div>
+                    </label>
+                  </fieldset>
+
                   <div className="flex items-start gap-3 rounded-lg border border-[#999933]/25 bg-[#999933]/10 p-4">
                     <MessageCircleMore className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
                     <div>
                       <h3 className="text-xs font-bold text-white">What happens next?</h3>
                       <p className="mt-1 text-xs leading-relaxed text-white/55">
-                        Our team reviews availability and freight, then contacts you to confirm
-                        payment and shipping. Nothing is charged now.
+                        After submitting, use your Order Number as the bank transfer reference.
+                        Your order ships after the funds clear and freight is confirmed.
                       </p>
                     </div>
                   </div>
@@ -675,7 +697,8 @@ export default function CheckoutPage() {
                     />
                     <span className="text-xs leading-relaxed text-white/65">
                       I have reviewed my contact, delivery, and order details. I understand that
-                      shipping is calculated separately and availability is confirmed by the team.
+                      payment is made by manual bank transfer, shipping is calculated separately,
+                      and the order ships after the funds have cleared.
                     </span>
                   </label>
                 </div>
@@ -723,7 +746,7 @@ export default function CheckoutPage() {
                       </button>
                       <p className="flex items-center justify-center gap-1.5 text-[10px] text-white/35">
                         <LockKeyhole className="h-3 w-3 text-[#f2f2f2]" />
-                        No payment is collected online
+                        Bank transfer is completed outside this website
                       </p>
                     </>
                   )}
@@ -774,7 +797,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="mt-3 flex items-start gap-2 rounded-sm bg-white/[0.03] px-3 py-2.5 text-[10px] leading-relaxed text-white/40">
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
-                  No payment now. Final shipping and availability are confirmed by our team.
+                  Manual bank transfer. Use the Order Number as the payment reference.
                 </div>
               </div>
             </aside>
