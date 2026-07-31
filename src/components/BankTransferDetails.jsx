@@ -1,4 +1,4 @@
-import { Building2, Landmark } from "lucide-react";
+import { Building2, Hash, Landmark } from "lucide-react";
 import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
 
 function AddressBlock({ title, lines, icon: Icon }) {
@@ -35,6 +35,20 @@ export default function BankTransferDetails({ showTitle = true }) {
           </div>
         </div>
       )}
+
+      <div className="flex items-start gap-3 rounded-lg border border-[#f2b84b]/55 bg-[#f2b84b]/12 px-4 py-3 shadow-[0_0_24px_rgba(242,184,75,0.08)]">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f2b84b]/15 text-[#ffd36b]">
+          <Hash className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#ffd36b]">
+            Payment reference required
+          </p>
+          <p className="mt-1 text-sm font-black leading-snug text-white">
+            {method.referenceInstruction}
+          </p>
+        </div>
+      </div>
 
       <dl className="grid gap-3 rounded-lg border border-white/10 bg-[#131313] p-4 text-xs sm:grid-cols-3">
         <div>

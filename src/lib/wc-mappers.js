@@ -277,6 +277,7 @@ export function mapOrder(order, store = { id: "maya-herbs", name: "Maya Herbs" }
     dateCreated: order.date_created,
     total: order.total,
     currency: order.currency,
+    paymentMethod: order.payment_method,
     paymentMethodTitle: order.payment_method_title,
     customerNote: order.customer_note,
     items: (order.line_items || []).map((li) => ({

@@ -2,7 +2,9 @@ import {
   createOrder,
   findProductBySku,
   getCustomerByEmail,
+  getOrderPaymentUrl,
   getOrdersByEmail,
+  getPaymentGateway,
   getProductById,
   getVariationById,
   WooCommerceApiError,
@@ -36,6 +38,7 @@ import { getSession } from "@/lib/session";
 import { isSupportedCountryCode } from "@/lib/countries";
 import {
   bankTransferOrderNote,
+  BUNQ_CARD_PAYMENT,
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 import { createHash } from "node:crypto";
@@ -45,6 +48,12 @@ const ORDER_CUSTOMER_NOTE =
   "Thank you for your wholesale order request. The Maya Herbs team will confirm availability, shipping and payment instructions before fulfillment.";
 const ORDER_CUSTOMER_NOTE_WITH_PAYMENT =
   `${ORDER_CUSTOMER_NOTE}\n\n${bankTransferOrderNote()}`;
+const CARD_CUSTOMER_NOTE =
+  `${ORDER_CUSTOMER_NOTE}\n\nPayment method: ${BUNQ_CARD_PAYMENT.title} via ${BUNQ_CARD_PAYMENT.provider}. Complete payment on the secure WooCommerce payment page.`;
+const SUPPORTED_PAYMENT_METHODS = new Set([
+  MANUAL_BANK_TRANSFER.id,
+  BUNQ_CARD_PAYMENT.id,
+]);
 
 const missingBackendsResponse = () => {
   const missingStores = getMissingCommerceStores();
@@ -68,6 +77,16 @@ const orderMetaValue = (order, key) => {
   }
   return "";
 };
+
+const PAYMENT_RETRY_STATUSES = new Set(["pending", "failed", "on-hold"]);
+
+const mapOrderForClient = (order, store) => ({
+  ...mapOrder(order, store),
+  ...(order.payment_method === BUNQ_CARD_PAYMENT.id &&
+  PAYMENT_RETRY_STATUSES.has(order.status)
+    ? { paymentUrl: getOrderPaymentUrl(order, store.id) }
+    : {}),
+});
 
 const productCanFulfill = (product, quantity) =>
   Boolean(
@@ -131,7 +150,7 @@ export async function GET() {
   const results = await Promise.allSettled(
     stores.map(async (store) => {
       const orders = await getOrdersByEmail(session.email, store.id);
-      return orders.map((order) => mapOrder(order, store));
+      return orders.map((order) => mapOrderForClient(order, store));
     })
   );
 
@@ -185,7 +204,7 @@ export async function POST(request) {
   const { items = [] } = body;
   const paymentMethod =
     cleanText(body.paymentMethod, 40) || MANUAL_BANK_TRANSFER.id;
-  if (paymentMethod !== MANUAL_BANK_TRANSFER.id) {
+  if (!SUPPORTED_PAYMENT_METHODS.has(paymentMethod)) {
     return securityError("Unsupported payment method.", 400);
   }
   const checkout =
@@ -417,6 +436,33 @@ export async function POST(request) {
     };
 
     const storesInOrder = stores.filter((store) => entriesByStore.has(store.id));
+    const selectedPaymentMethod =
+      paymentMethod === BUNQ_CARD_PAYMENT.id
+        ? BUNQ_CARD_PAYMENT
+        : MANUAL_BANK_TRANSFER;
+    const isCardPayment = selectedPaymentMethod.id === BUNQ_CARD_PAYMENT.id;
+    if (isCardPayment && storesInOrder.length !== 1) {
+      return securityError(
+        "Card payment is currently available only for orders from one store.",
+        409
+      );
+    }
+    const gatewayChecks = await Promise.allSettled(
+      storesInOrder.map((store) =>
+        getPaymentGateway(selectedPaymentMethod.id, store.id)
+      )
+    );
+    const unavailableGatewayIndex = gatewayChecks.findIndex(
+      (result) =>
+        result.status !== "fulfilled" || result.value?.enabled !== true
+    );
+    if (unavailableGatewayIndex >= 0) {
+      return securityError(
+        `${selectedPaymentMethod.title} is not currently available for this order.`,
+        409
+      );
+    }
+
     const requestReference = createHash("sha256")
       .update(`${session.customerId}:${idempotencyKey}`)
       .digest("hex")
@@ -448,21 +494,28 @@ export async function POST(request) {
         try {
           const order = await createOrder(
           {
-            status: "on-hold",
+            status: isCardPayment ? "pending" : "on-hold",
             set_paid: false,
             customer_id: wcCustomer.id,
-            payment_method: MANUAL_BANK_TRANSFER.id,
-            payment_method_title: MANUAL_BANK_TRANSFER.title,
+            payment_method: selectedPaymentMethod.id,
+            payment_method_title: selectedPaymentMethod.title,
             billing,
             shipping,
             line_items: lineItems,
-            customer_note: ORDER_CUSTOMER_NOTE_WITH_PAYMENT,
+            customer_note: isCardPayment
+              ? CARD_CUSTOMER_NOTE
+              : ORDER_CUSTOMER_NOTE_WITH_PAYMENT,
             meta_data: [
               { key: "sc_channel", value: "wholesale-portal" },
               { key: "sc_source_store", value: store.id },
               { key: "sc_request_reference", value: requestReference },
-              { key: "sc_payment_method", value: MANUAL_BANK_TRANSFER.id },
-              { key: "sc_payment_account", value: MANUAL_BANK_TRANSFER.accountDetails },
+              { key: "sc_payment_method", value: selectedPaymentMethod.id },
+              ...(isCardPayment
+                ? [{ key: "sc_payment_provider", value: BUNQ_CARD_PAYMENT.provider }]
+                : [{
+                    key: "sc_payment_account",
+                    value: MANUAL_BANK_TRANSFER.accountDetails,
+                  }]),
               { key: "sc_access_level", value: role || "none (base prices)" },
               { key: "sc_total_weight_grams", value: String(Math.round(totalWeightGrams)) },
               ...(Object.keys(appliedRates).length > 0
@@ -481,7 +534,7 @@ export async function POST(request) {
           },
           store.id
         );
-          return mapOrder(order, store);
+          return mapOrderForClient(order, store);
         } catch (creationError) {
           try {
             const recentOrders = await getOrdersByEmail(customer.email, store.id);
@@ -489,7 +542,9 @@ export async function POST(request) {
               (order) =>
                 orderMetaValue(order, "sc_request_reference") === requestReference
             );
-            if (recoveredOrder) return mapOrder(recoveredOrder, store);
+            if (recoveredOrder) {
+              return mapOrderForClient(recoveredOrder, store);
+            }
           } catch (reconciliationError) {
             console.error(
               `Order reconciliation failed for ${store.id}:`,

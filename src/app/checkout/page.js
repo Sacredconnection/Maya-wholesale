@@ -11,10 +11,13 @@ import {
   ArrowRight,
   Check,
   ChevronDown,
+  CreditCard,
+  Landmark,
   LockKeyhole,
   Loader2,
   MessageCircleMore,
   PackageCheck,
+  ShieldCheck,
   ShoppingBag,
 } from "lucide-react";
 import CheckoutHeader from "@/components/CheckoutHeader";
@@ -23,7 +26,10 @@ import BankTransferDetails from "@/components/BankTransferDetails";
 import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import { COUNTRIES } from "@/lib/countries";
-import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
+import {
+  BUNQ_CARD_PAYMENT,
+  MANUAL_BANK_TRANSFER,
+} from "@/lib/payment-methods";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -53,8 +59,8 @@ const ORDER_SUBMISSION_STAGES = [
     detail: "Saving your request securely in our order system.",
   },
   {
-    title: "Waiting for final confirmation",
-    detail: "Our order service is taking a little longer to respond.",
+    title: "Preparing the next step",
+    detail: "Finalizing confirmation and secure payment details.",
   },
 ];
 const ORDER_STAGE_DELAYS = [900, 2_400, 4_800, 8_000];
@@ -358,6 +364,12 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState(EMPTY_ADDRESS);
   const [billingAddress, setBillingAddress] = useState(EMPTY_ADDRESS);
   const [billingMatchesShipping, setBillingMatchesShipping] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState(MANUAL_BANK_TRANSFER.id);
+  const [cardPaymentStatus, setCardPaymentStatus] = useState({
+    loading: true,
+    available: false,
+    reason: "",
+  });
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -383,6 +395,56 @@ export default function CheckoutPage() {
     );
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [isSubmitting]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return undefined;
+    let active = true;
+
+    fetch("/api/payment-methods", {
+      credentials: "same-origin",
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Payment methods unavailable.");
+        return data;
+      })
+      .then((data) => {
+        if (!active) return;
+        const cardMethod = (data.methods || []).find(
+          (method) => method.id === BUNQ_CARD_PAYMENT.id
+        );
+        setCardPaymentStatus({
+          loading: false,
+          available: cardMethod?.available === true,
+          reason: cardMethod?.unavailableReason || "",
+        });
+        if (cardMethod?.available !== true) {
+          setPaymentMethod((current) =>
+            current === BUNQ_CARD_PAYMENT.id
+              ? MANUAL_BANK_TRANSFER.id
+              : current
+          );
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setCardPaymentStatus({
+          loading: false,
+          available: false,
+          reason: "Card payment is temporarily unavailable.",
+        });
+        setPaymentMethod((current) =>
+          current === BUNQ_CARD_PAYMENT.id
+            ? MANUAL_BANK_TRANSFER.id
+            : current
+        );
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isLoggedIn]);
 
   if (loading || !isLoggedIn || !user) return <AuthGate loading={loading} />;
 
@@ -451,7 +513,7 @@ export default function CheckoutPage() {
             shippingAddress,
             billingAddress: effectiveBillingAddress,
           },
-          paymentMethod: MANUAL_BANK_TRANSFER.id,
+          paymentMethod,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -472,6 +534,26 @@ export default function CheckoutPage() {
             ? `Orders were confirmed for ${data.orders.map((order) => order.storeName).join(", ")}, but confirmation is still uncertain for ${uncertainStores.join(", ")}. Check My Account before submitting again.`
             : `Orders were created for ${data.orders.map((order) => order.storeName).join(", ")}, but failed for ${data.failures.map((failure) => failure.storeName).join(", ")}. The remaining items are still in your cart.`
         );
+      }
+
+      if (paymentMethod === BUNQ_CARD_PAYMENT.id) {
+        const paymentUrl = data.orders?.[0]?.paymentUrl || "";
+        let securePaymentUrl;
+        try {
+          securePaymentUrl = new URL(paymentUrl);
+          if (securePaymentUrl.protocol !== "https:") throw new Error("Invalid protocol.");
+        } catch {
+          removeItemsByStore(completedStoreIds);
+          throw new Error(
+            "Your order was created, but the secure card payment page could not be opened. Check My Account before submitting again."
+          );
+        }
+
+        orderIdempotencyKey.current = "";
+        clearCart();
+        navigationStarted = true;
+        window.location.assign(securePaymentUrl.toString());
+        return;
       }
 
       orderIdempotencyKey.current = "";
@@ -512,7 +594,7 @@ export default function CheckoutPage() {
               Complete your wholesale order
             </h1>
             <p className="mt-1.5 text-sm text-white/50">
-              Three short steps. Payment is completed by manual bank transfer.
+              Three short steps. Choose bank transfer or secure card payment.
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
@@ -655,19 +737,99 @@ export default function CheckoutPage() {
                     <legend className="px-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f2f2f2]">
                       Payment method
                     </legend>
-                    <label className="flex cursor-pointer items-start gap-3">
-                      <input
-                        type="radio"
-                        name="payment-method"
-                        value={MANUAL_BANK_TRANSFER.id}
-                        checked
-                        readOnly
-                        className="mt-3 h-4 w-4 shrink-0 accent-[#999933]"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <BankTransferDetails />
-                      </div>
-                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                        paymentMethod === MANUAL_BANK_TRANSFER.id
+                          ? "border-[#f2f2f2]/45 bg-[#999933]/12"
+                          : "border-white/10 bg-[#131313] hover:border-white/20"
+                      }`}>
+                        <input
+                          type="radio"
+                          name="payment-method"
+                          value={MANUAL_BANK_TRANSFER.id}
+                          checked={paymentMethod === MANUAL_BANK_TRANSFER.id}
+                          onChange={() => {
+                            setPaymentMethod(MANUAL_BANK_TRANSFER.id);
+                            setConfirmed(false);
+                            setError("");
+                          }}
+                          className="mt-1 h-4 w-4 shrink-0 accent-[#999933]"
+                        />
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-[#f2f2f2]">
+                          <Landmark className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-black text-white">
+                            {MANUAL_BANK_TRANSFER.title}
+                          </span>
+                          <span className="mt-1 block text-[11px] leading-relaxed text-white/50">
+                            Pay directly from your bank account.
+                          </span>
+                        </span>
+                      </label>
+
+                      <label className={`flex items-start gap-3 rounded-lg border p-4 transition-colors ${
+                        cardPaymentStatus.available
+                          ? "cursor-pointer"
+                          : "cursor-not-allowed opacity-55"
+                      } ${
+                        paymentMethod === BUNQ_CARD_PAYMENT.id
+                          ? "border-[#f2f2f2]/45 bg-[#999933]/12"
+                          : "border-white/10 bg-[#131313]"
+                      }`}>
+                        <input
+                          type="radio"
+                          name="payment-method"
+                          value={BUNQ_CARD_PAYMENT.id}
+                          checked={paymentMethod === BUNQ_CARD_PAYMENT.id}
+                          disabled={!cardPaymentStatus.available}
+                          onChange={() => {
+                            setPaymentMethod(BUNQ_CARD_PAYMENT.id);
+                            setConfirmed(false);
+                            setError("");
+                          }}
+                          className="mt-1 h-4 w-4 shrink-0 accent-[#999933]"
+                        />
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-[#f2f2f2]">
+                          <CreditCard className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-black text-white">
+                            {BUNQ_CARD_PAYMENT.title}
+                          </span>
+                          <span className="mt-1 block text-[11px] font-bold text-white/55">
+                            Securely via {BUNQ_CARD_PAYMENT.provider}
+                          </span>
+                          {!cardPaymentStatus.available && (
+                            <span className="mt-2 block text-[10px] leading-relaxed text-[#ffd36b]">
+                              {cardPaymentStatus.loading
+                                ? "Checking availability..."
+                                : cardPaymentStatus.reason}
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="mt-5 border-t border-white/10 pt-5">
+                      {paymentMethod === MANUAL_BANK_TRANSFER.id ? (
+                        <BankTransferDetails showTitle={false} />
+                      ) : (
+                        <div className="flex items-start gap-3 rounded-lg border border-[#f2f2f2]/20 bg-white/[0.035] p-4">
+                          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#f2f2f2]" />
+                          <div>
+                            <h3 className="text-xs font-black text-white">
+                              Secure hosted card payment
+                            </h3>
+                            <p className="mt-1 text-xs leading-relaxed text-white/55">
+                              After the order is registered, you will continue to the secure
+                              WooCommerce payment page powered by {BUNQ_CARD_PAYMENT.provider}.
+                              This portal never receives or stores your card details.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </fieldset>
 
                   <div className="flex items-start gap-3 rounded-lg border border-[#999933]/25 bg-[#999933]/10 p-4">
@@ -675,8 +837,9 @@ export default function CheckoutPage() {
                     <div>
                       <h3 className="text-xs font-bold text-white">What happens next?</h3>
                       <p className="mt-1 text-xs leading-relaxed text-white/55">
-                        After submitting, use your Order Number as the bank transfer reference.
-                        Your order ships after the funds clear and freight is confirmed.
+                        {paymentMethod === MANUAL_BANK_TRANSFER.id
+                          ? "After submitting, use your Order Number as the bank transfer reference. Your order ships after the funds clear and freight is confirmed."
+                          : "After submitting, you will be redirected to the secure card payment page. The order is prepared after payment is confirmed."}
                       </p>
                     </div>
                   </div>
@@ -696,9 +859,9 @@ export default function CheckoutPage() {
                       className="mt-0.5 h-4 w-4 accent-[#999933]"
                     />
                     <span className="text-xs leading-relaxed text-white/65">
-                      I have reviewed my contact, delivery, and order details. I understand that
-                      payment is made by manual bank transfer, shipping is calculated separately,
-                      and the order ships after the funds have cleared.
+                      I have reviewed my contact, delivery, payment, and order details. I understand
+                      that shipping is calculated separately and fulfillment begins after payment
+                      is confirmed.
                     </span>
                   </label>
                 </div>
@@ -740,13 +903,17 @@ export default function CheckoutPage() {
                       >
                         {isSubmitting ? (
                           <>Submitting order <Loader2 className="h-4 w-4 animate-spin" /></>
+                        ) : paymentMethod === BUNQ_CARD_PAYMENT.id ? (
+                          <>Continue to secure payment <CreditCard className="h-4 w-4" /></>
                         ) : (
                           <>Submit order request <PackageCheck className="h-4 w-4" /></>
                         )}
                       </button>
                       <p className="flex items-center justify-center gap-1.5 text-[10px] text-white/35">
                         <LockKeyhole className="h-3 w-3 text-[#f2f2f2]" />
-                        Bank transfer is completed outside this website
+                        {paymentMethod === BUNQ_CARD_PAYMENT.id
+                          ? "Card details are handled only by the secure payment provider"
+                          : "Bank transfer is completed outside this website"}
                       </p>
                     </>
                   )}
@@ -797,7 +964,9 @@ export default function CheckoutPage() {
                 </div>
                 <div className="mt-3 flex items-start gap-2 rounded-sm bg-white/[0.03] px-3 py-2.5 text-[10px] leading-relaxed text-white/40">
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
-                  Manual bank transfer. Use the Order Number as the payment reference.
+                  {paymentMethod === BUNQ_CARD_PAYMENT.id
+                    ? `Secure card payment via ${BUNQ_CARD_PAYMENT.provider}.`
+                    : "Manual bank transfer. Use the Order Number as the payment reference."}
                 </div>
               </div>
             </aside>

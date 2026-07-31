@@ -450,7 +450,34 @@ export async function updateCustomerMeta(customer, values, storeId = PRIMARY_STO
 // ── Orders ──────────────────────────────────────────────────────────
 
 const ORDER_RESPONSE_FIELDS =
-  "id,number,status,date_created,total,currency,payment_method_title,customer_note,line_items,meta_data,billing";
+  "id,number,order_key,status,date_created,total,currency,payment_method,payment_method_title,customer_note,line_items,meta_data,billing";
+
+export async function getPaymentGateway(gatewayId, storeId = PRIMARY_STORE_ID) {
+  const { data } = await wcFetch(
+    storeId,
+    `payment_gateways/${encodeURIComponent(gatewayId)}`,
+    {
+      revalidate: 0,
+      params: {
+        _fields: "id,title,description,enabled",
+      },
+    }
+  );
+  return data;
+}
+
+export function getOrderPaymentUrl(order, storeId = PRIMARY_STORE_ID) {
+  if (!order?.id || !order?.order_key) return "";
+  const checkoutPath =
+    (process.env.WOOCOMMERCE_CHECKOUT_PATH || "/checkout").trim() || "/checkout";
+  const checkoutUrl = new URL(
+    `${checkoutPath.replace(/\/+$/, "")}/order-pay/${order.id}/`,
+    `${getWooCommerceBaseUrl(storeId)}/`
+  );
+  checkoutUrl.searchParams.set("pay_for_order", "true");
+  checkoutUrl.searchParams.set("key", order.order_key);
+  return checkoutUrl.toString();
+}
 
 export async function createOrder(order, storeId = PRIMARY_STORE_ID) {
   const { data } = await wcFetch(storeId, "orders", {

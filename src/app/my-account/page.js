@@ -25,6 +25,7 @@ import {
   Save,
   Lock,
   Camera,
+  CreditCard,
   LoaderCircle,
   RotateCcw,
 } from "lucide-react";
@@ -34,7 +35,10 @@ import {
   isStockedOption,
   mapWithClientConcurrency,
 } from "@/lib/order-suggestions";
-import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
+import {
+  BUNQ_CARD_PAYMENT,
+  MANUAL_BANK_TRANSFER,
+} from "@/lib/payment-methods";
 
 // WooCommerce order status → UI label/color
 const ORDER_STATUS_STYLES = {
@@ -705,6 +709,8 @@ export default function MyAccountPage() {
                           <span className={`text-[9px] font-mono uppercase ${activeOrder.status === "processing" ? "text-[#f2f2f2] font-bold" : "text-white/40"}`}>
                             2. {activeOrder.paymentMethodTitle === MANUAL_BANK_TRANSFER.title
                               ? "Funds Cleared"
+                              : activeOrder.paymentMethod === BUNQ_CARD_PAYMENT.id
+                                ? "Payment Confirmed"
                               : "Payment Arranged"}
                           </span>
                         </div>
@@ -715,11 +721,24 @@ export default function MyAccountPage() {
                       </div>
 
                       {OPEN_ORDER_STATUSES.slice(0, 2).includes(activeOrder.status) && (
-                        <p className="text-[11px] text-white/50 leading-relaxed border-t border-white/5 pt-4">
-                          {activeOrder.paymentMethodTitle === MANUAL_BANK_TRANSFER.title
-                            ? `Pay by manual bank transfer and use Order #${activeOrder.number} as the reference. The order ships after the funds clear and freight is confirmed.`
-                            : "No online payment is required; our team will contact you to arrange payment and confirm shipping for this order."}
-                        </p>
+                        <div className="flex flex-col gap-3 border-t border-white/5 pt-4">
+                          <p className="text-[11px] leading-relaxed text-white/50">
+                            {activeOrder.paymentMethodTitle === MANUAL_BANK_TRANSFER.title
+                              ? `Pay by manual bank transfer and use Order #${activeOrder.number} as the reference. The order ships after the funds clear and freight is confirmed.`
+                              : activeOrder.paymentMethod === BUNQ_CARD_PAYMENT.id
+                                ? "Complete the secure card payment to begin fulfillment. Card details are handled only by the WooCommerce payment page."
+                                : "No online payment is required; our team will contact you to arrange payment and confirm shipping for this order."}
+                          </p>
+                          {activeOrder.paymentUrl && (
+                            <a
+                              href={activeOrder.paymentUrl}
+                              className="inline-flex w-fit items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-5 py-3 text-[10px] font-black uppercase tracking-wider text-white no-underline transition-colors hover:bg-[#b6532a]"
+                            >
+                              Complete card payment
+                              <CreditCard className="h-3.5 w-3.5" aria-hidden="true" />
+                            </a>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
