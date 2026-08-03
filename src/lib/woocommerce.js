@@ -364,14 +364,18 @@ export async function getVariationById(productId, variationId, storeId = PRIMARY
   return data;
 }
 
-export async function getCategories(storeId = PRIMARY_STORE_ID, { revalidate } = {}) {
+export async function getCategories(
+  storeId = PRIMARY_STORE_ID,
+  { revalidate, parent } = {}
+) {
   const { catalogLanguage } = getCommerceStore(storeId);
   const tags = [getWooCommerceCatalogCacheTag(storeId)];
   const categoryParams = {
     per_page: 100,
     hide_empty: true,
+    ...(parent !== undefined ? { parent } : {}),
     ...(catalogLanguage ? { lang: catalogLanguage } : {}),
-    _fields: "id,name,parent",
+    _fields: "id,name,slug,description,parent,count",
   };
   const { data: firstPage, headers } = await wcFetch(
     storeId,

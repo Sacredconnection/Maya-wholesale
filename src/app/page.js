@@ -1,4 +1,5 @@
 import HomeClient from "@/components/HomeClient";
+import { getCategories } from "@/lib/woocommerce";
 
 export const metadata = {
   title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
@@ -41,7 +42,44 @@ export const metadata = {
   }
 };
 
-export default function Page() {
+const categoryDescriptionText = (description = "") =>
+  description
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0*39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+
+async function getHomeCategories() {
+  try {
+    const categories = await getCategories(undefined, { parent: 0 });
+
+    return categories
+      .filter(
+        (category) =>
+          ![category.name, category.slug].some(
+            (value) => String(value || "").trim().toLowerCase() === "cbd"
+          )
+      )
+      .map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: categoryDescriptionText(category.description),
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  } catch (error) {
+    console.error("Could not load parent categories for the home page:", error);
+    return [];
+  }
+}
+
+export default async function Page() {
+  const categories = await getHomeCategories();
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -74,7 +112,7 @@ export default function Page() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <HomeClient />
+      <HomeClient categories={categories} />
     </>
   );
 }

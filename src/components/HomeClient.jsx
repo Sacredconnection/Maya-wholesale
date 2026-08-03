@@ -15,7 +15,7 @@ import LoginModal from '@/components/LoginModal';
 import SuggestedOrdersPreview from '@/components/SuggestedOrdersPreview';
 import { useAuth } from '@/components/AuthContext';
 
-export default function HomeClient() {
+export default function HomeClient({ categories = [] }) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { isLoggedIn, loading: authLoading } = useAuth();
 
@@ -39,7 +39,7 @@ export default function HomeClient() {
           <Onboarding />
 
           {/* Maya's core wholesale ranges */}
-          <BotanicalCategories />
+          <BotanicalCategories categories={categories} />
 
           {/* Rapéh producer lineage details */}
           <LineageShowcase />

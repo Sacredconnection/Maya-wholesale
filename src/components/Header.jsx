@@ -68,9 +68,6 @@ export default function Header({ onOpenLogin }) {
           >
             Home
           </Link>
-          <Link className="relative inline-flex items-center justify-center py-2 leading-none hover:text-white transition-all duration-300 ease-out after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:origin-center after:scale-x-0 after:bg-[#f2f2f2] after:shadow-[0_0_10px_rgba(130,214,197,0.65)] after:transition-transform after:duration-300 hover:after:scale-x-100 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(130,214,197,0.45)] motion-reduce:transform-none" href="/#tribes">
-            Origins &amp; Partners
-          </Link>
           <Link
             className={`${pathname === '/catalog' ? 'text-white after:scale-x-100' : 'hover:text-white after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-2 leading-none transition-all duration-300 ease-out after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:origin-center after:bg-[#f2f2f2] after:shadow-[0_0_10px_rgba(130,214,197,0.65)] after:transition-transform after:duration-300 hover:after:scale-x-100 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(130,214,197,0.45)] motion-reduce:transform-none`}
             href="/catalog"
@@ -205,13 +202,6 @@ export default function Header({ onOpenLogin }) {
             }}
           >
             Home
-          </Link>
-          <Link
-            className="text-white/70 text-base font-medium transition-all duration-300 hover:text-[#f2f2f2] hover:translate-x-1.5 motion-reduce:transform-none"
-            href="/#tribes"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Origins &amp; Partners
           </Link>
           <Link
             className={`${pathname === '/catalog' ? 'text-white' : 'text-white/70'} text-base font-medium transition-all duration-300 hover:text-[#f2f2f2] hover:translate-x-1.5 motion-reduce:transform-none`}
