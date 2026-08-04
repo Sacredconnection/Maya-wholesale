@@ -20,11 +20,15 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  FileSpreadsheet,
   PackageOpen,
+  Upload,
 } from "lucide-react";
 
 import { useProducts } from "@/components/ProductsContext";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
+import { exportCatalogExcel } from "@/lib/catalog-export";
+import { readCatalogOrderWorkbook } from "@/lib/catalog-order-workbook";
 
 // Normalize string for accent-insensitive comparison
 // Strips diacritics, lowercases and trims — used ONLY for comparison, never for display
@@ -69,10 +73,12 @@ const getPaginationItems = (currentPage, totalPages) => {
 export default function CatalogPage() {
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
-  const { setIsCartOpen, cartSubtotal, cartTotalItems } = useCart();
+  const { setIsCartOpen, addSelectionsToCart, cartSubtotal, cartTotalItems } = useCart();
   const cartTotal =
     cartSubtotal * (1 - Number(user?.discountRate || 0) / 100);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [excelBusy, setExcelBusy] = useState(false);
+  const importInputRef = useRef(null);
 
   // Filter States
   const [search, setSearch] = useState("");
@@ -364,6 +370,29 @@ export default function CatalogPage() {
     setCurrentPage(1);
   };
 
+  const exportExcel = async () => {
+    setExcelBusy(true);
+    try { await exportCatalogExcel({ products: compoundFilteredProducts, user, includeLinks: true }); }
+    finally { setExcelBusy(false); }
+  };
+
+  const importExcel = async (event) => {
+    const file = event.target.files?.[0]; event.target.value = "";
+    if (!file) return;
+    setExcelBusy(true);
+    try {
+      const rows = await readCatalogOrderWorkbook(file);
+      const selections = rows.flatMap(({ storeId, sku, quantity }) => {
+        const product = products.find((item) => String(item.storeId || "maya-herbs") === storeId && item.options?.some((option) => option.sku === sku));
+        const optionIndex = product?.options?.findIndex((option) => option.sku === sku) ?? -1;
+        return product && optionIndex >= 0 ? [{ product, optionIndex, quantity }] : [];
+      });
+      if (!selections.length) throw new Error("No current products were found in this workbook.");
+      if (window.confirm(`Add ${selections.length} product lines from Excel to the cart?`)) { addSelectionsToCart(selections); setIsCartOpen(true); }
+    } catch (error) { window.alert(error.message || "The Excel file could not be imported."); }
+    finally { setExcelBusy(false); }
+  };
+
   // Catalog is partner-only: block until authenticated
   if (authLoading || !isLoggedIn) {
     return <AuthGate loading={authLoading} />;
@@ -395,6 +424,25 @@ export default function CatalogPage() {
 
           {/* Header Action Buttons */}
           <div className="flex w-full shrink-0 flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <input ref={importInputRef} type="file" accept=".xlsx" className="sr-only" onChange={importExcel} />
+            <button
+              type="button"
+              disabled={excelBusy}
+              onClick={() => importInputRef.current?.click()}
+              className="flex w-full items-center justify-center gap-2 rounded-sm border border-[#999933]/35 bg-[#999933]/10 px-5 py-3.5 text-xs font-black uppercase tracking-[0.1em] text-white no-underline transition-colors hover:border-[#999933]/70 hover:bg-[#999933]/20 sm:w-auto"
+            >
+              <Upload className={`h-4 w-4 ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+              Import Excel
+            </button>
+            <button
+              type="button"
+              disabled={excelBusy || productsLoading || compoundFilteredProducts.length === 0}
+              onClick={exportExcel}
+              className="flex w-full items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-5 py-3.5 text-xs font-black uppercase tracking-[0.1em] text-white no-underline transition-colors hover:border-[#999933]/60 hover:bg-white/10 sm:w-auto"
+            >
+              <FileSpreadsheet className={`h-4 w-4 ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+              Export Excel
+            </button>
             {/* Quick Cart Summary Button */}
             <button
               onClick={() => setIsCartOpen(true)}

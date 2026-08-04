@@ -13,6 +13,7 @@ import {
   PackageOpen,
   RefreshCw,
   ShoppingBag,
+  Upload,
   X,
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -29,6 +30,7 @@ import {
   exportCatalogExcel,
 } from "@/lib/catalog-export";
 import { useDialogAccessibility } from "@/lib/use-dialog-accessibility";
+import { readCatalogOrderWorkbook } from "@/lib/catalog-order-workbook";
 
 const EMPTY_FILTERS = {
   search: "",
@@ -70,7 +72,7 @@ function appendAttributeFilters(params, attributes) {
 
 export default function CatalogPage() {
   const { isLoggedIn, user, loading: authLoading } = useAuth();
-  const { addToCart, setIsCartOpen, cartSubtotal, cartTotalItems } = useCart();
+  const { addToCart, addSelectionsToCart, setIsCartOpen, cartSubtotal, cartTotalItems } = useCart();
   const cartTotal =
     cartSubtotal * (1 - Number(user?.discountRate || 0) / 100);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -91,6 +93,11 @@ export default function CatalogPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewMeta, setPreviewMeta] = useState(null);
+  const [importItems, setImportItems] = useState([]);
+  const [importError, setImportError] = useState("");
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const importInputRef = useRef(null);
   const resultsRef = useRef(null);
   const hasLoaded = useRef(false);
   const previewDialogRef = useRef(null);
@@ -332,6 +339,39 @@ export default function CatalogPage() {
     }
   };
 
+  const handleWorkbookImport = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setIsImporting(true);
+    setImportError("");
+    try {
+      const requestedItems = await readCatalogOrderWorkbook(file);
+      const catalog = await loadExportProducts();
+      const selections = requestedItems.flatMap(({ storeId, sku, quantity }) => {
+        const product = catalog.find((item) => String(item.storeId || "maya-herbs") === storeId && item.options?.some((option) => option.sku === sku));
+        const optionIndex = product?.options?.findIndex((option) => option.sku === sku) ?? -1;
+        return product && optionIndex >= 0 && product.options[optionIndex].inStock !== false
+          ? [{ product, optionIndex, quantity }]
+          : [];
+      });
+      if (!selections.length) throw new Error("None of the spreadsheet products are currently available.");
+      setImportItems(selections);
+      setIsImportOpen(true);
+    } catch (importFailure) {
+      setImportError(importFailure.message || "The spreadsheet could not be imported.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const confirmWorkbookImport = () => {
+    addSelectionsToCart(importItems);
+    setIsImportOpen(false);
+    setImportItems([]);
+    setIsCartOpen(true);
+  };
+
   if (authLoading || !isLoggedIn) return <AuthGate loading={authLoading} />;
 
   return (
@@ -532,6 +572,16 @@ export default function CatalogPage() {
                 )}
                 {exporting === "excel" ? "Preparing Excel" : "Export Excel"}
               </button>
+              <input ref={importInputRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={handleWorkbookImport} className="sr-only" />
+              <button
+                type="button"
+                disabled={isImporting || Boolean(exporting)}
+                onClick={() => importInputRef.current?.click()}
+                className="inline-flex items-center justify-center gap-2 rounded-sm border border-[#999933]/35 bg-[#999933]/10 px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-white transition-colors hover:border-[#999933]/70 hover:bg-[#999933]/20 disabled:cursor-wait disabled:opacity-50"
+              >
+                {isImporting ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Upload className="h-4 w-4" aria-hidden="true" />}
+                {isImporting ? "Checking Excel" : "Import Excel"}
+              </button>
               {isLoggedIn ? (
                 <button
                   type="button"
@@ -556,9 +606,9 @@ export default function CatalogPage() {
                 </button>
               )}
             </div>
-            {exportError && (
+            {(exportError || importError) && (
               <p className="max-w-lg text-right text-xs leading-5 text-[#ff9b88]" role="alert">
-                {exportError}
+                {exportError || importError}
               </p>
             )}
           </div>
@@ -697,6 +747,23 @@ export default function CatalogPage() {
       </main>
 
       <Footer />
+      {isImportOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="excel-import-title">
+          <div className="w-full max-w-2xl overflow-hidden rounded-xl border border-[#999933]/35 bg-[#1a1a1a] shadow-2xl">
+            <div className="border-b border-white/10 p-6 sm:p-8">
+              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#d8c58f]">Excel order · review</span>
+              <h2 id="excel-import-title" className="mt-2 font-headline-lg text-2xl font-black text-white sm:text-3xl">Confirm products before adding them</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/60">The spreadsheet was matched against the live Maya catalog. Check these current products and quantities before they enter your cart.</p>
+            </div>
+            <div className="max-h-[48vh] overflow-y-auto p-5 sm:p-6">
+              <div className="divide-y divide-white/10 rounded-lg border border-white/10">
+                {importItems.map(({ product, optionIndex, quantity }) => <div key={`${product.id}:${product.options[optionIndex].sku}`} className="flex items-center justify-between gap-4 p-4"><div className="min-w-0"><p className="truncate text-sm font-bold text-white">{product.name}</p><p className="mt-1 text-xs text-white/50">{product.options[optionIndex].name} · SKU {product.options[optionIndex].sku}</p></div><span className="shrink-0 rounded-full border border-[#999933]/35 bg-[#999933]/10 px-3 py-1 text-xs font-black text-[#f2f2f2]">× {quantity}</span></div>)}
+              </div>
+            </div>
+            <div className="flex flex-col-reverse gap-3 border-t border-white/10 p-5 sm:flex-row sm:justify-end sm:p-6"><button type="button" onClick={() => setIsImportOpen(false)} className="rounded-sm border border-white/15 px-5 py-3 text-xs font-black uppercase tracking-wider text-white/75 hover:bg-white/5">Cancel</button><button type="button" onClick={confirmWorkbookImport} className="rounded-sm bg-[#cc6633] px-5 py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-[#b6532a]">Add {importItems.length} {importItems.length === 1 ? "item" : "items"} to cart</button></div>
+          </div>
+        </div>
+      )}
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );

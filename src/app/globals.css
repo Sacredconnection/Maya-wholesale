@@ -182,6 +182,17 @@ body {
   background-size: auto, 276px 203px;
 }
 
+/* The homepage carries the Maya pattern continuously between its featured surfaces. */
+.maya-home-pattern {
+  background-color: #171714;
+  background-image:
+    linear-gradient(rgb(23 23 20 / 0.9), rgb(23 23 20 / 0.94)),
+    url("/patterns/maya-brand-pattern.svg");
+  background-position: center top;
+  background-repeat: repeat;
+  background-size: auto, 276px 203px;
+}
+
 html[data-theme="dark"] [class~="bg-[#25362D]"] {
   background-color: #171714 !important;
 }
@@ -384,6 +395,13 @@ html[data-theme="light"] body {
     linear-gradient(rgb(245 242 233 / 0.91), rgb(245 242 233 / 0.96)),
     url("/patterns/maya-brand-pattern.svg");
   color: #342f25;
+}
+
+html[data-theme="light"] .maya-home-pattern {
+  background-color: #f5f2e9;
+  background-image:
+    linear-gradient(rgb(245 242 233 / 0.91), rgb(245 242 233 / 0.96)),
+    url("/patterns/maya-brand-pattern.svg");
 }
 
 html[data-theme="light"] [class~="bg-[#25362D]"] {

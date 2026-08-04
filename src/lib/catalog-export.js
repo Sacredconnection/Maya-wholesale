@@ -1,6 +1,13 @@
 "use client";
 
 import { optionPriceForUser } from "@/lib/pricing";
+import {
+  catalogOrderItemToken,
+  ORDER_ITEM_HEADER,
+  ORDER_WORKBOOK_MARKER,
+  ORDER_WORKBOOK_META_SHEET,
+  ORDER_WORKBOOK_VERSION,
+} from "@/lib/catalog-order-workbook";
 
 const BRAND_DARK = "FF1A1A1A";
 const BRAND_GREEN = "FF999933";
@@ -165,6 +172,7 @@ function catalogRows(products, user) {
       option: option.name || "Single format",
       weight: Number(option.weightGrams) || null,
       price: optionPriceForUser(option, user, product.category),
+      importToken: catalogOrderItemToken(product, option),
       description: "",
       productUrl: product.productUrl || "",
     }));
@@ -178,6 +186,9 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
   workbook.creator = "Maya Herbs Wholesale";
   workbook.created = new Date();
   workbook.modified = new Date();
+  const metadata = workbook.addWorksheet(ORDER_WORKBOOK_META_SHEET, { state: "veryHidden" });
+  metadata.getCell("B1").value = ORDER_WORKBOOK_MARKER;
+  metadata.getCell("B2").value = ORDER_WORKBOOK_VERSION;
 
   const instructions = workbook.addWorksheet("Instructions", {
     views: [{ showGridLines: false }],
@@ -264,6 +275,7 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
     "Preco unitario (USD)",
     "Subtotal (USD)",
     "Produto no site",
+    ORDER_ITEM_HEADER,
   ];
   sheet.getRow(5).values = headers;
   sheet.getRow(5).height = 30;
@@ -289,6 +301,7 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
       item.price,
       { formula: `IF(B${rowNumber}>0,B${rowNumber}*H${rowNumber},"")` },
       "",
+      item.importToken,
     ];
     row.height = 24;
     row.alignment = { vertical: "middle" };
@@ -336,6 +349,7 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
   sheet.getCell(totalRow, 9).font = { bold: true, color: { argb: BRAND_RED } };
   sheet.getCell(totalRow, 9).numFmt = '"$"#,##0.00';
   sheet.autoFilter = { from: "A5", to: `J${lastDataRow}` };
+  sheet.getColumn(11).hidden = true;
 
   const buffer = await workbook.xlsx.writeBuffer();
   downloadBlob(
