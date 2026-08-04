@@ -128,7 +128,7 @@ export default function RegisterPage() {
                 <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase block mb-1">
                   B2B Partner Portal
                 </span>
-                <h1 className="text-2xl font-bold text-white font-headline-md">
+                <h1 className="type-promo-title text-white font-headline-lg">
                   Wholesale Registration
                 </h1>
                 <p className="text-xs text-white/50 mt-1 leading-relaxed">

@@ -6,7 +6,7 @@ export default function MayaWholesaleBanner() {
   return (
     <section
       aria-labelledby="maya-wholesale-banner-title"
-      className="maya-wholesale-banner theme-dark-zone relative mb-10 flex items-center overflow-hidden border-t border-white/10 bg-[#171813] bg-cover bg-center px-4 py-10 sm:mb-12 sm:px-6 sm:py-12 lg:px-8"
+      className="maya-wholesale-banner theme-dark-zone relative mb-12 flex items-center overflow-hidden border-t border-white/10 bg-[#171813] bg-cover bg-center px-4 py-12 sm:px-6 lg:mb-16 lg:px-8 lg:py-16"
     >
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#131313]/88 via-[#131313]/48 to-[#131313]/8 md:bg-gradient-to-r md:from-[#131313]/90 md:via-[#131313]/65 md:to-[#131313]/15"
@@ -29,7 +29,7 @@ export default function MayaWholesaleBanner() {
           <div>
             <h2
               id="maya-wholesale-banner-title"
-              className="mt-7 max-w-2xl text-2xl font-black leading-tight text-white sm:text-3xl"
+              className="type-promo-title mt-7 max-w-2xl text-white font-headline-lg"
             >
               Ready to build your Maya wholesale assortment?
             </h2>

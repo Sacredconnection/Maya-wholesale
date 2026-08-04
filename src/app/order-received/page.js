@@ -22,7 +22,7 @@ function OrderReceivedContent() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h1 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white">
+        <h1 className="type-page-title font-headline-lg text-white">
           Order Received
         </h1>
         {(orderSummary || orderNumber) && (

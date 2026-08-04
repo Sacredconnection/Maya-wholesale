@@ -452,10 +452,10 @@ export default function CatalogPage() {
       <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-12 lg:px-8">
         <header className="flex flex-col gap-6 border-b border-white/10 pb-8">
           <div className="max-w-3xl">
-            <span className="mb-3 inline-flex rounded-full border border-[#999933]/40 bg-[#999933]/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#f2f2f2]">
+            <span className="type-eyebrow mb-3 inline-flex rounded-full border border-[#999933]/40 bg-[#999933]/15 px-3 py-1 text-[#f2f2f2] font-label-sm">
               Interactive digital catalog
             </span>
-            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="type-page-title font-headline-lg text-white">
               Wholesale Digital Catalog
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/55 sm:text-lg">

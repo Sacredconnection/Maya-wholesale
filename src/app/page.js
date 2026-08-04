@@ -25,7 +25,7 @@ export const metadata = {
     url: "https://wholesale.mayaherbs.com",
     images: [
       {
-        url: "/banner/hero-banner.webp",
+        url: "/banner/maya-wholesale/maya-wholesale-banner-desktop.webp",
         alt: "Maya Herbs Wholesale ethnobotanical sourcing",
       }
     ],
@@ -34,7 +34,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
     description: "Ethnobotanical herbs, plant extracts, superfoods and incense for approved wholesale partners.",
-    images: ["/banner/hero-banner.webp"],
+    images: ["/banner/maya-wholesale/maya-wholesale-banner-desktop.webp"],
   },
   robots: {
     index: true,

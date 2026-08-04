@@ -32,7 +32,7 @@ export default function AuthGate({ loading = false }) {
             <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase block mb-2">
               B2B Partner Portal
             </span>
-            <h1 className="font-headline-md text-2xl md:text-3xl font-bold text-white mb-3">
+            <h1 className="type-promo-title font-headline-lg text-white mb-3">
               Wholesale Access Only
             </h1>
             <p className="font-body-md text-sm text-white/60 leading-relaxed mb-8 max-w-sm mx-auto">

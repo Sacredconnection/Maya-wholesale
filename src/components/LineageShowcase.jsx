@@ -214,10 +214,10 @@ export default function LineageShowcase() {
       {/* Header and Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 w-full">
         <div>
-          <h2 id="lineage-title" className="lineage-heading font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white mb-3 sm:mb-4">
+          <h2 id="lineage-title" className="lineage-heading type-section-title font-headline-lg text-white mb-3 sm:mb-4">
             Rapéh partnerships across 10 Indigenous nations
           </h2>
-          <p className="lineage-description font-body-md text-lg text-white/70 max-w-2xl font-normal leading-relaxed">
+          <p className="lineage-description type-body-lead font-body-md text-white/70 max-w-2xl">
             Maya&apos;s Rapéh collection is connected to established artisan
             and community relationships in Brazil. Explore the people, places
             and lineages represented in this specialist range.
@@ -303,7 +303,7 @@ export default function LineageShowcase() {
                   <span className="lineage-location font-label-sm text-xs text-[#f2f2f2] uppercase tracking-widest transition-colors group-hover:[color:var(--ethnicity-readable)]">
                     {tribe.region}
                   </span>
-                  <span className="font-headline-md text-2xl font-bold text-white">
+                  <span className="type-card-title font-headline-md text-white">
                     {tribe.name}
                   </span>
                 </div>

@@ -529,7 +529,7 @@ export default function MyAccountPage() {
             <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase">
               B2B Partner Portal
             </span>
-            <h1 className="break-words font-headline-md text-3xl md:text-4xl font-bold text-white mt-1">
+            <h1 className="type-page-title break-words font-headline-lg text-white mt-1">
               My Account
             </h1>
             <p className="break-words text-sm text-white/50 mt-1.5 font-mono">

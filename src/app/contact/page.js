@@ -85,7 +85,7 @@ export default function ContactPage() {
           <span className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
             Get In Touch
           </span>
-          <h1 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white">
+          <h1 className="type-page-title font-headline-lg text-white">
             B2B Support &amp; Contact
           </h1>
           <p className="font-body-md text-base text-white/60 max-w-2xl mt-2 leading-relaxed">

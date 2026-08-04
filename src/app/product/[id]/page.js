@@ -308,7 +308,7 @@ export default function ProductDetailPage() {
 
             {/* Product Title */}
             <div>
-              <h1 className="font-headline-lg text-3xl md:text-4xl font-black text-white leading-tight">
+              <h1 className="type-page-title font-headline-lg text-white">
                 {product.name}
               </h1>
               <p className="text-[11px] font-mono text-white/40 mt-1">
