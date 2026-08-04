@@ -590,8 +590,11 @@ export default function CheckoutPage() {
               <ArrowLeft className="h-3.5 w-3.5" />
               Return to catalog
             </Link>
-            <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-              Complete your wholesale order
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2]">
+              Secure wholesale request
+            </span>
+            <h1 className="type-page-title mt-2 font-headline-lg text-white">
+              Checkout
             </h1>
             <p className="mt-1.5 text-sm text-white/50">
               Three short steps. Choose bank transfer or secure card payment.

@@ -9,7 +9,7 @@ export function EditorialSection({ id, number, title, children }) {
         <span className="editorial-section-number mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#f2f2f2]/30 bg-[#999933]/10 font-label-sm text-[11px] font-bold text-[#f2f2f2]">
           {number}
         </span>
-        <h2 className="font-headline text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">
+        <h2 className="type-content-title font-headline-md text-white">
           {title}
         </h2>
       </div>
@@ -80,12 +80,12 @@ export default function EditorialPage({
                 <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f2f2f2]/30 bg-[#999933]/10">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <span className="font-label-sm text-xs font-bold uppercase tracking-[0.2em]">{eyebrow}</span>
+                <span className="type-eyebrow font-label-sm">{eyebrow}</span>
               </div>
-              <h1 className="max-w-3xl font-headline text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-7xl">
+              <h1 className="type-page-title max-w-3xl font-headline text-white">
                 {title}
               </h1>
-              <p className="mt-7 max-w-3xl font-body-md text-lg leading-8 text-white/60 sm:text-xl sm:leading-9">
+              <p className="type-body-lead mt-7 max-w-3xl font-body-md text-white/60">
                 {description}
               </p>
               {updated && (

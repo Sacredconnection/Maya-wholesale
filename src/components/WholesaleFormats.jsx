@@ -32,16 +32,16 @@ export default function WholesaleFormats() {
       className="flex w-full flex-col gap-8 sm:gap-10"
     >
       <div className="max-w-3xl">
-        <span className="mb-3 block font-label-sm text-[10px] font-bold uppercase tracking-[0.2em] text-[#f2f2f2] sm:text-xs">
+        <span className="type-eyebrow mb-3 block font-label-sm text-[#f2f2f2]">
           Product Line &amp; Categories
         </span>
         <h2
           id="wholesale-formats-title"
-          className="mb-3 font-headline-lg text-3xl font-black tracking-tighter text-white sm:mb-4 sm:text-4xl md:text-5xl"
+          className="type-section-title mb-3 font-headline-lg text-white sm:mb-4"
         >
           Product Formats &amp; Wholesale Volumes
         </h2>
-        <p className="max-w-2xl font-body-md text-base font-normal leading-relaxed text-white/70 sm:text-lg">
+        <p className="type-body-lead max-w-2xl font-body-md text-white/70">
           Protective packaging options for retail display and bulk supply, from compact tins to 1kg wholesale bags.
         </p>
         <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white/45 font-label-sm">
@@ -68,10 +68,10 @@ export default function WholesaleFormats() {
             </div>
 
             <div className="relative z-10 border-t border-white/10 pt-6">
-              <span className="wholesale-format-category mb-2 block font-label-sm text-[10px] font-bold uppercase tracking-[0.16em] text-[#ffffff]">
+              <span className="wholesale-format-category type-eyebrow mb-2 block font-label-sm text-[#ffffff]">
                 {category}
               </span>
-              <h3 className="wholesale-format-title font-headline-md text-2xl font-bold text-white transition-colors duration-300 group-hover:text-[#ffffff]">
+              <h3 className="wholesale-format-title type-card-title font-headline-md text-white transition-colors duration-300 group-hover:text-[#ffffff]">
                 {title}
               </h3>
               <p className="wholesale-format-description mt-3 max-w-xl font-body-md text-sm leading-relaxed text-white/80">

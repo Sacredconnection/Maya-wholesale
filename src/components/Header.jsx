@@ -44,8 +44,8 @@ export default function Header({ onOpenLogin }) {
   };
 
   return (
-    <header className="site-header theme-dark-zone sticky top-0 z-50 w-full border-b-2 border-[#999933] bg-[#212121] shadow-lg shadow-black/15">
-      <div className="mx-auto flex min-h-[4.5rem] w-full max-w-[96rem] items-center justify-between gap-5 px-4 sm:min-h-[5.5rem] sm:px-6 2xl:min-h-24 2xl:px-8">
+    <header className="site-header sticky top-0 z-50 w-full bg-white text-[#1e1e1e] shadow-lg shadow-black/10">
+      <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center justify-between px-4 sm:min-h-24 sm:px-6 lg:min-h-28 lg:px-8">
         {/* Logotipo (Left) */}
         <Link className="group flex self-stretch shrink-0 items-center" href="/" onClick={handleHomeClick}>
           <Image
@@ -54,7 +54,7 @@ export default function Header({ onOpenLogin }) {
             width={494}
             height={201}
             unoptimized
-            className="h-11 w-auto max-w-[10rem] transition-all duration-300 group-hover:opacity-90 sm:h-14 sm:max-w-[11rem] 2xl:h-[3.75rem] 2xl:max-w-[12rem]"
+            className="h-12 w-auto transition-all duration-300 group-hover:opacity-90 sm:h-16 lg:h-[4.75rem]"
           />
         </Link>
 
@@ -94,13 +94,13 @@ export default function Header({ onOpenLogin }) {
         </nav>
 
         {/* CTA Actions (Right - Desktop Only) */}
-        <div className="hidden shrink-0 self-stretch items-center gap-3 whitespace-nowrap 2xl:flex">
+        <div className="hidden self-stretch shrink-0 items-center gap-3 xl:gap-5 lg:flex">
           {/* Cart Icon Trigger */}
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
-            aria-label={`Open cart${cartTotalItems > 0 ? `, ${cartTotalItems} items, $${cartTotal.toFixed(2)}` : ''}`}
-            className="relative flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-3 py-2.5 text-white transition-all hover:border-white/20 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
+            aria-label={`Open order sheet${cartTotalItems > 0 ? `, ${cartTotalItems} items` : ''}`}
+            className="relative order-3 h-10 p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-sm transition-all cursor-pointer flex items-center justify-center shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
           >
             <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -114,7 +114,7 @@ export default function Header({ onOpenLogin }) {
           </button>
 
           <Link
-            className={`${pathname === '/digital-catalog' ? 'border-[#f2f2f2] bg-[#999933]/25 text-white' : 'border-[#999933]/50 bg-[#999933]/10 text-[#f2f2f2] hover:border-[#f2f2f2] hover:bg-[#999933]/20 hover:text-white'} inline-flex items-center justify-center rounded-sm border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300`}
+            className={`${pathname === '/digital-catalog' ? 'border-[#f2f2f2] bg-[#999933]/25 text-white' : 'border-[#999933]/50 bg-[#999933]/10 text-[#f2f2f2] hover:border-[#f2f2f2] hover:bg-[#999933]/20 hover:text-white'} order-4 inline-flex h-10 items-center justify-center rounded-sm border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300`}
             href="/digital-catalog"
             aria-current={pathname === '/digital-catalog' ? 'page' : undefined}
           >
@@ -133,7 +133,7 @@ export default function Header({ onOpenLogin }) {
               <button
                 type="button"
                 onClick={handleHeaderLogout}
-                className="bg-[#93000a]/15 hover:bg-[#93000a]/30 text-[#ffb4ab] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-[#93000a]/30 hover:border-[#ffb4ab]/40 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                className="h-10 bg-[#93000a]/15 hover:bg-[#93000a]/30 text-[#ffb4ab] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-[#93000a]/30 hover:border-[#ffb4ab]/40 transition-all duration-300 flex items-center gap-2 cursor-pointer"
               >
                 Exit Portal
                 <LogOut className="w-3.5 h-3.5" />
@@ -144,13 +144,13 @@ export default function Header({ onOpenLogin }) {
               <button
                 type="button"
                 onClick={onOpenLogin}
-                className="text-sm font-medium text-white/80 hover:text-white transition-colors font-body-md bg-transparent border-0 cursor-pointer text-left"
+                className="order-1 text-sm font-medium text-white/80 hover:text-white transition-colors font-body-md bg-transparent border-0 cursor-pointer text-left"
               >
                 Client Login
               </button>
               <Link
                 href="/register"
-                className="bg-white/10 hover:bg-white text-white hover:text-[#212121] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-white/10 hover:border-white transition-all duration-300 flex items-center gap-2 font-label-sm cursor-pointer no-underline"
+                className="order-2 h-10 bg-white/10 hover:bg-white text-white hover:text-[#212121] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-white/10 hover:border-white transition-all duration-300 flex items-center gap-2 font-label-sm cursor-pointer no-underline"
               >
                 Register Account
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -160,12 +160,12 @@ export default function Header({ onOpenLogin }) {
         </div>
 
         {/* Mobile Cart and Hamburger Container (Mobile Only) */}
-        <div className="flex items-center gap-2.5 sm:gap-3 2xl:hidden">
+        <div className="flex items-center gap-2.5 sm:gap-3 lg:hidden">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
-            aria-label={`Open cart${cartTotalItems > 0 ? `, ${cartTotalItems} items, $${cartTotal.toFixed(2)}` : ''}`}
-            className="relative flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-white/10 bg-white/5 px-2.5 py-2.5 text-white transition-all hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
+            aria-label={`Open order sheet${cartTotalItems > 0 ? `, ${cartTotalItems} items` : ''}`}
+            className="relative p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm transition-all cursor-pointer flex items-center justify-center shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
           >
             <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             <span className="hidden text-[9px] font-bold sm:inline">${cartTotal.toFixed(2)}</span>
@@ -189,9 +189,11 @@ export default function Header({ onOpenLogin }) {
         </div>
       </div>
 
+      <div aria-hidden="true" className="h-2 w-full bg-[#999933]" />
+
       {/* Mobile Drawer Navigation overlay */}
       {mobileMenuOpen && (
-        <nav id="mobile-navigation" aria-label="Mobile navigation" className="absolute top-[100%] left-0 z-40 flex max-h-[calc(100dvh-4.5rem)] w-full flex-col gap-5 overflow-y-auto border-b border-white/10 bg-[#212121] px-4 py-6 shadow-xl backdrop-blur-md animate-fade-in sm:max-h-[calc(100dvh-5.5rem)] sm:px-6 2xl:hidden">
+        <nav id="mobile-navigation" aria-label="Mobile navigation" className="absolute top-[100%] left-0 z-40 flex max-h-[calc(100dvh-6rem)] w-full flex-col gap-5 overflow-y-auto border-b border-white/10 bg-[#212121] px-4 py-6 shadow-xl backdrop-blur-md animate-fade-in sm:max-h-[calc(100dvh-7rem)] sm:px-6 lg:hidden">
           <Link
             className={`${pathname === '/' ? 'text-white' : 'text-white/70'} text-base font-medium transition-all duration-300 hover:text-[#f2f2f2] hover:translate-x-1.5 motion-reduce:transform-none`}
             href="/"

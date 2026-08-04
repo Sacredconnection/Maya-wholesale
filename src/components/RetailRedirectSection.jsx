@@ -15,11 +15,11 @@ export default function RetailRedirectSection() {
 
       <div className="relative z-10 mx-auto flex min-h-[430px] w-full max-w-7xl items-start px-4 pb-14 pt-8 sm:min-h-[380px] sm:px-6 sm:pb-16 sm:pt-10 md:items-center md:py-16 lg:min-h-[420px] lg:px-8 lg:py-20">
           <div className="mx-auto max-w-xl text-center md:mx-0 md:text-left">
-            <p className="mb-3 font-label-sm text-xs font-bold uppercase tracking-[0.18em] text-[#f2f2f2]">
+            <p className="type-eyebrow mb-3 font-label-sm text-[#f2f2f2]">
               Individual Orders &amp; Retail
             </p>
 
-            <h2 className="font-headline-lg text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
+            <h2 className="type-promo-title font-headline-lg text-white">
               Shopping for yourself? Visit Maya Herbs retail.
             </h2>
 

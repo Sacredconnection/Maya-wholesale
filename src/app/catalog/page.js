@@ -91,11 +91,12 @@ export default function CatalogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Read URL query parameters to set initial tribe filter and page
-  // Resolve accent-insensitively against actual data so URL params always match
+  // Read URL query parameters to set initial category, tribe and page filters.
+  // Resolve accent-insensitively against actual data so URL params always match.
   useEffect(() => {
     const syncTimer = window.setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
+      const categoryParam = params.get("category");
       const subcategoryParam = params.get("subcategory") || params.get("tribe");
       if (subcategoryParam) {
         const match = products.find(
@@ -105,6 +106,13 @@ export default function CatalogPage() {
         );
         setCategory(match?.category || "All");
         setSubcategory(match?.subcategory || match?.tribe || "All");
+      } else if (categoryParam) {
+        const match = products.find(
+          (product) =>
+            normalizeStr(product.category) === normalizeStr(categoryParam)
+        );
+        setCategory(match?.category || "All");
+        setSubcategory("All");
       }
       const pageParam = params.get("page");
       if (pageParam) {
@@ -136,8 +144,14 @@ export default function CatalogPage() {
       } else {
         params.delete("page");
       }
+      if (category !== "All") {
+        params.set("category", category);
+      } else {
+        params.delete("category");
+      }
       if (subcategory !== "All") {
         params.set("subcategory", subcategory.toLowerCase());
+        params.delete("tribe");
       } else {
         params.delete("subcategory");
         params.delete("tribe");
@@ -152,7 +166,7 @@ export default function CatalogPage() {
     } else {
       isMounted.current = true;
     }
-  }, [childCategory, currentPage, subcategory]);
+  }, [category, childCategory, currentPage, subcategory]);
 
   // Extract Categories and Tribes dynamically for dropdowns (A–Z, accent-insensitive dedup)
   const categories = useMemo(() => {
@@ -414,7 +428,7 @@ export default function CatalogPage() {
             <div className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
               B2B Portal
             </div>
-            <h1 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-white">
+            <h1 className="type-page-title font-headline-lg text-white">
               Wholesale Product Catalog
             </h1>
             <p className="font-body-md text-base text-white/60 max-w-2xl mt-2 leading-relaxed">

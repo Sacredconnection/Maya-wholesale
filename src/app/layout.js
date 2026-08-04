@@ -1,4 +1,4 @@
-import { Jost, Manrope } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { AuthProvider } from "@/components/AuthContext";
 import { CartProvider } from "@/components/CartContext";
 import { ProductsProvider } from "@/components/ProductsContext";
@@ -6,15 +6,8 @@ import CartDrawer from "@/components/CartDrawer";
 import BackToTop from "@/components/BackToTop";
 import "./globals.css";
 
-const futuraFallback = Jost({
-  variable: "--font-maya-display",
-  subsets: ["latin"],
-  weight: "variable",
-  display: "swap",
-});
-
-const avenirFallback = Manrope({
-  variable: "--font-maya-body",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
   weight: "variable",
   display: "swap",
@@ -32,12 +25,12 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      data-theme="dark"
-      className={`${futuraFallback.variable} ${avenirFallback.variable} ${avenirFallback.className} h-full antialiased`}
+      data-theme="light"
+      className={`${roboto.variable} ${roboto.className} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
-        className="min-h-full flex flex-col bg-[#171714] text-[#f2f2f2]"
+        className="min-h-full flex flex-col bg-white text-[#2D2D2D]"
         suppressHydrationWarning
       >
         <AuthProvider>

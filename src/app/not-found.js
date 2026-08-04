@@ -14,10 +14,10 @@ export default function NotFound() {
     <main className="flex min-h-screen items-center justify-center bg-[#25362D] px-6 py-16 text-white">
       <section className="w-full max-w-2xl rounded-xl border border-white/10 bg-[#121615] px-6 py-14 text-center shadow-2xl sm:px-12">
         <Compass aria-hidden="true" className="mx-auto mb-6 h-10 w-10 text-[#f2f2f2]" />
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-[#f2f2f2]">
+        <p className="type-eyebrow mb-3 font-label-sm text-[#f2f2f2]">
           Error 404
         </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+        <h1 className="type-page-title font-headline-lg">
           Page not found
         </h1>
         <p className="mx-auto mt-5 max-w-lg text-base leading-7 text-[#D1D9D5]">
