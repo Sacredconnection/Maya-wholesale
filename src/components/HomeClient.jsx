@@ -31,7 +31,7 @@ export default function HomeClient({ categories = [] }) {
 
       {/* Main Page Area */}
       <main className="flex w-full flex-grow flex-col gap-12 bg-white pb-12 lg:gap-16 lg:pb-16">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 sm:px-6 lg:gap-16 lg:px-8">
+        <div className="home-content-shell flex flex-col gap-12 lg:gap-16">
           {!authLoading && isLoggedIn && <SuggestedOrdersPreview />}
           {/* B2B Onboarding Steps */}
           <Onboarding />
@@ -44,7 +44,7 @@ export default function HomeClient({ categories = [] }) {
         {/* Secondary path for individual retail customers */}
         <RetailRedirectSection />
 
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="home-content-shell">
           {/* NGO Partnership Details */}
           <NGOSection />
         </div>

@@ -8,13 +8,13 @@
   position: relative;
   display: grid;
   width: 100%;
-  max-width: 72rem;
+  max-width: none;
   min-height: 35rem;
-  margin-inline: auto;
+  margin-inline: 0;
   overflow: hidden;
   grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
   scroll-margin-top: 6rem;
-  border: 1px solid rgb(220 224 210 / 0.28);
+  border: 1px solid #999933;
   border-radius: 0.75rem;
   background: var(--paper);
   color: var(--forest-dark);

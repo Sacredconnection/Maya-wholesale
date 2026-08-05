@@ -10,10 +10,14 @@ import {
   securityError,
 } from "@/lib/request-security";
 import { createSession } from "@/lib/session";
+import {
+  getLocalDevUser,
+  isLocalDevRequest,
+  matchesLocalDevCredentials,
+} from "@/lib/local-dev-auth";
 
 export async function POST(request) {
   if (!isSameOrigin(request)) return securityError("Cross-origin request rejected.", 403);
-  if (!isWooCommerceConfigured()) return securityError("Authentication backend unavailable.", 503);
 
   let body;
   try {
@@ -28,6 +32,14 @@ export async function POST(request) {
   if (!isValidEmail(email) || !password || password.length > 256) {
     return securityError("A valid email and password are required.", 400);
   }
+
+  if (isLocalDevRequest(request) && matchesLocalDevCredentials(email, password)) {
+    const user = getLocalDevUser();
+    await createSession({ email: user.email, customerId: null, localDev: true });
+    return Response.json({ user }, { headers: { "Cache-Control": "no-store" } });
+  }
+
+  if (!isWooCommerceConfigured()) return securityError("Authentication backend unavailable.", 503);
 
   let authenticationStage = "WordPress credential verification";
   try {

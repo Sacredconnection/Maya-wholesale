@@ -6,7 +6,7 @@ export default function MayaWholesaleBanner() {
   return (
     <section
       aria-labelledby="maya-wholesale-banner-title"
-      className="maya-wholesale-banner theme-dark-zone relative mb-12 flex items-center overflow-hidden border-t border-white/10 bg-[#171813] bg-cover bg-center px-4 py-12 sm:px-6 lg:mb-16 lg:px-8 lg:py-16"
+      className="maya-wholesale-banner theme-dark-zone relative mb-12 flex items-center overflow-hidden border-t border-white/10 bg-[#171813] bg-cover bg-center py-12 lg:mb-16 lg:py-16"
     >
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#131313]/88 via-[#131313]/48 to-[#131313]/8 md:bg-gradient-to-r md:from-[#131313]/90 md:via-[#131313]/65 md:to-[#131313]/15"
@@ -16,7 +16,7 @@ export default function MayaWholesaleBanner() {
         className="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-[#131313] via-transparent to-transparent opacity-65 md:block"
         aria-hidden="true"
       />
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center">
+      <div className="home-content-shell relative z-10 flex items-center">
         <div className="relative w-full max-w-3xl text-left lg:w-[58%]">
           <Image
             src="/banner/maya-wholesale/logo-maya-wholesale.svg"

@@ -13,7 +13,7 @@ export default function RetailRedirectSection() {
         className="pointer-events-none absolute inset-0 z-0 hidden bg-gradient-to-t from-[#131313] via-transparent to-transparent opacity-65 md:block"
       />
 
-      <div className="relative z-10 mx-auto flex min-h-[430px] w-full max-w-7xl items-start px-4 pb-14 pt-8 sm:min-h-[380px] sm:px-6 sm:pb-16 sm:pt-10 md:items-center md:py-16 lg:min-h-[420px] lg:px-8 lg:py-20">
+      <div className="home-content-shell relative z-10 flex min-h-[430px] items-start pb-14 pt-8 sm:min-h-[380px] sm:pb-16 sm:pt-10 md:items-center md:py-16 lg:min-h-[420px] lg:py-20">
           <div className="mx-auto max-w-xl text-center md:mx-0 md:text-left">
             <p className="type-eyebrow mb-3 font-label-sm text-[#f2f2f2]">
               Individual Orders &amp; Retail

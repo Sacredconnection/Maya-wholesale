@@ -134,6 +134,7 @@
 
 @layer base {
 html {
+  --site-header-height: 5.4375rem;
   font-family: var(--font-roboto), Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -147,7 +148,11 @@ body {
   font-weight: 400;
   line-height: 1.6;
   background-color: #ffffff;
-  background-image: none;
+  background-image: url("/background/site-background.webp");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
   color: #2d2d2d;
   overflow-x: clip;
 }
@@ -166,14 +171,6 @@ body {
   opacity: 0.16;
   -webkit-mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / 0.2) 48%, #000 100%);
   mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / 0.2) 48%, #000 100%);
-}
-
-.maya-footer-pattern {
-  background-color: #191914 !important;
-  background-image:
-    linear-gradient(rgb(25 25 20 / 0.9), rgb(25 25 20 / 0.96)),
-    url("/patterns/maya-brand-pattern.svg");
-  background-size: auto, 276px 203px;
 }
 
 /* The homepage carries the Maya pattern continuously between its featured surfaces. */
@@ -222,6 +219,46 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
   border-color: #999933 !important;
 }
 
+@media (min-width: 640px) {
+  html {
+    --site-header-height: 6.4375rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    --site-header-height: 7.4375rem;
+  }
+}
+
+.site-hero {
+  min-height: calc(100svh - var(--site-header-height));
+}
+
+/* Shared horizontal rhythm for every contained section on the homepage. */
+.home-content-shell {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .home-content-shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-content-shell {
+    padding-inline: 2rem;
+  }
+}
+
+.site-header #mobile-navigation :is(a, button):not([href="/digital-catalog"], [href="/register"]) {
+  color: #f2f2f2 !important;
+}
+
 .site-header :is(a, button):not([href="/digital-catalog"], [href="/register"]) {
   color: #2d2d2d !important;
 }
@@ -249,15 +286,15 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
 }
 
 .site-header a[href="/register"] {
-  border-color: rgb(204 102 51 / 0.28) !important;
-  background-color: rgb(204 102 51 / 0.14) !important;
-  color: #2d2d2d !important;
+  border-color: #cc6633 !important;
+  background-color: #cc6633 !important;
+  color: #ffffff !important;
 }
 
 .site-header a[href="/register"]:hover {
-  border-color: rgb(204 102 51 / 0.48) !important;
-  background-color: rgb(204 102 51 / 0.22) !important;
-  color: #2d2d2d !important;
+  border-color: #b6532a !important;
+  background-color: #b6532a !important;
+  color: #ffffff !important;
 }
 
 .site-header #mobile-navigation a[href="/register"] {
@@ -272,21 +309,27 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
   color: #ffffff !important;
 }
 
-.site-header button[aria-label^="Open order sheet"] {
-  border-color: rgb(30 30 30 / 0.15) !important;
-  background-color: #f2f2f2 !important;
+.site-header .header-cart-button {
+  border-color: rgb(45 45 45 / 0.18) !important;
+  background-color: #f7f7f3 !important;
   color: #1e1e1e !important;
 }
 
-.site-header button[aria-label^="Open order sheet"]:hover {
-  border-color: rgb(204 102 51 / 0.5) !important;
+.site-header .header-cart-button:hover {
+  border-color: rgb(153 153 51 / 0.72) !important;
   background-color: #ffffff !important;
-  color: #cc6633 !important;
+  color: #6f701f !important;
 }
 
-.site-header button[aria-label^="Open order sheet"] span {
-  border-color: #ffffff !important;
-  background-color: #cc6633 !important;
+.site-header .header-cart-button .header-cart-label {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.site-header .header-cart-button .header-cart-count {
+  border: 2px solid #ffffff !important;
+  background-color: #999933 !important;
   color: #ffffff !important;
 }
 
@@ -374,7 +417,7 @@ code, pre, .font-mono {
 
 .type-display-title {
   max-width: 15ch;
-  font-size: clamp(2.5rem, 10.5vw, 3.25rem);
+  font-size: clamp(2.75rem, 10.75vw, 3.5rem);
   font-weight: 900;
   line-height: 0.96;
   letter-spacing: -0.025em;
@@ -439,9 +482,9 @@ code, pre, .font-mono {
 
 @media (min-width: 640px) {
   .type-display-title {
-    max-width: 48rem;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 0.98;
+    max-width: 60rem;
+    font-size: clamp(3.75rem, 5.5vw, 5.25rem);
+    line-height: 0.96;
   }
 }
 
@@ -481,7 +524,11 @@ textarea {
 
 html[data-theme="light"] body {
   background-color: #ffffff;
-  background-image: none;
+  background-image: url("/background/site-background.webp");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
   color: #17201e;
 }
 
@@ -518,7 +565,7 @@ html[data-theme="light"] .home-green-outline.home-green-outline {
   }
 }
 
-/* Page shells stay transparent so the white global background remains visible. */
+/* Page shells stay transparent so the global site background remains visible. */
 html[data-theme="light"] body .site-background-page,
 html[data-theme="light"] body .site-background-page > main {
   background-color: transparent !important;

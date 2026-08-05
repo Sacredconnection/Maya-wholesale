@@ -71,7 +71,7 @@ export default function NGOSection() {
       <section
         ref={sectionRef}
         id="ngo-partnership"
-        className="ngo-section-card bg-[#1a1a1a] border border-white/35 rounded-xl p-6 sm:p-8 lg:p-12 xl:p-16 relative overflow-hidden scroll-mt-24 w-full shadow-2xl hover:border-white/60 transition-colors duration-500"
+        className="ngo-section-card bg-[#1a1a1a] border border-[#999933] rounded-xl p-6 sm:p-8 lg:p-12 xl:p-16 relative overflow-hidden scroll-mt-24 w-full shadow-2xl transition-colors duration-500"
       >
         {/* NGO Symbol Watermark in Bottom-Right */}
         <Image

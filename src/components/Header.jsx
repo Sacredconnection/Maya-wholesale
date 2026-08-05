@@ -44,8 +44,8 @@ export default function Header({ onOpenLogin }) {
   };
 
   return (
-    <header className="site-header sticky top-0 z-50 w-full bg-white text-[#1e1e1e] shadow-lg shadow-black/10">
-      <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center justify-between px-4 sm:min-h-24 sm:px-6 lg:min-h-28 lg:px-8">
+    <header className="site-header sticky top-0 z-50 w-full border-t border-[#2d2d2d] bg-white text-[#1e1e1e] shadow-[0_8px_24px_rgba(45,45,45,0.08)]">
+      <div className="mx-auto flex h-20 w-full max-w-[90rem] items-center justify-between gap-5 px-4 sm:h-24 sm:px-6 xl:h-28 xl:gap-7 xl:px-8">
         {/* Logotipo (Left) */}
         <Link className="group flex self-stretch shrink-0 items-center" href="/" onClick={handleHomeClick}>
           <Image
@@ -54,14 +54,14 @@ export default function Header({ onOpenLogin }) {
             width={494}
             height={201}
             unoptimized
-            className="h-12 w-auto transition-all duration-300 group-hover:opacity-90 sm:h-16 lg:h-[4.75rem]"
+            className="h-12 w-auto transition-opacity duration-300 group-hover:opacity-85 sm:h-16 xl:h-[4.5rem]"
           />
         </Link>
 
         {/* Navigation Links (Center - Desktop Only) */}
-        <nav aria-label="Primary navigation" className="hidden min-w-0 flex-1 self-stretch items-center justify-center gap-5 whitespace-nowrap text-xs font-medium tracking-wide text-white/70 font-body-md 2xl:flex">
+        <nav aria-label="Primary navigation" className="hidden min-w-0 flex-1 self-stretch items-center justify-center gap-5 whitespace-nowrap text-[0.9375rem] font-semibold tracking-[0.01em] text-[#2d2d2d]/75 font-body-md xl:flex 2xl:gap-7">
           <Link
-            className={`${pathname === '/' ? 'text-white after:scale-x-100' : 'hover:text-white after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-2 leading-none transition-all duration-300 ease-out after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:origin-center after:bg-[#f2f2f2] after:shadow-[0_0_10px_rgba(130,214,197,0.65)] after:transition-transform after:duration-300 hover:after:scale-x-100 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(130,214,197,0.45)] motion-reduce:transform-none`}
+            className={`${pathname === '/' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
             href="/"
             onClick={handleHomeClick}
             aria-current={pathname === '/' ? 'page' : undefined}
@@ -69,7 +69,7 @@ export default function Header({ onOpenLogin }) {
             Home
           </Link>
           <Link
-            className={`${pathname === '/catalog' ? 'text-white after:scale-x-100' : 'hover:text-white after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-2 leading-none transition-all duration-300 ease-out after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:origin-center after:bg-[#f2f2f2] after:shadow-[0_0_10px_rgba(130,214,197,0.65)] after:transition-transform after:duration-300 hover:after:scale-x-100 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(130,214,197,0.45)] motion-reduce:transform-none`}
+            className={`${pathname === '/catalog' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
             href="/catalog"
             aria-current={pathname === '/catalog' ? 'page' : undefined}
           >
@@ -77,7 +77,7 @@ export default function Header({ onOpenLogin }) {
           </Link>
           {isLoggedIn && (
             <Link
-              className={`${pathname === '/suggested-orders' ? 'text-white after:scale-x-100' : 'text-[#f2f2f2] after:scale-x-0 hover:text-white hover:after:scale-x-100'} relative inline-flex items-center justify-center py-2 leading-none transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-center after:bg-[#f2f2f2] after:transition-transform after:duration-300 after:content-['']`}
+              className={`${pathname === '/suggested-orders' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
               href="/suggested-orders"
               aria-current={pathname === '/suggested-orders' ? 'page' : undefined}
             >
@@ -85,7 +85,7 @@ export default function Header({ onOpenLogin }) {
             </Link>
           )}
           <Link
-            className={`${pathname === '/contact' ? 'text-white after:scale-x-100' : 'hover:text-white after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-2 leading-none transition-all duration-300 ease-out after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:origin-center after:bg-[#f2f2f2] after:shadow-[0_0_10px_rgba(130,214,197,0.65)] after:transition-transform after:duration-300 hover:after:scale-x-100 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_rgba(130,214,197,0.45)] motion-reduce:transform-none`}
+            className={`${pathname === '/contact' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
             href="/contact"
             aria-current={pathname === '/contact' ? 'page' : undefined}
           >
@@ -94,27 +94,27 @@ export default function Header({ onOpenLogin }) {
         </nav>
 
         {/* CTA Actions (Right - Desktop Only) */}
-        <div className="hidden self-stretch shrink-0 items-center gap-3 xl:gap-5 lg:flex">
+        <div className="hidden shrink-0 items-center justify-center gap-2 self-stretch xl:flex 2xl:gap-2.5">
           {/* Cart Icon Trigger */}
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
             aria-label={`Open order sheet${cartTotalItems > 0 ? `, ${cartTotalItems} items` : ''}`}
-            className="relative order-3 h-10 p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-sm transition-all cursor-pointer flex items-center justify-center shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
+            className="header-cart-button relative order-4 ml-2 flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border px-2.5 text-[#2d2d2d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
           >
-            <ShoppingBag className="w-4 h-4" aria-hidden="true" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            <span className="header-cart-label whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.07em]">
               Cart · ${cartTotal.toFixed(2)}
             </span>
             {cartTotalItems > 0 && (
-              <span aria-hidden="true" className="absolute -top-1.5 -right-1.5 bg-[#999933] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border border-[#131313]">
+              <span aria-hidden="true" className="header-cart-count absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold">
                 {cartTotalItems}
               </span>
             )}
           </button>
 
           <Link
-            className={`${pathname === '/digital-catalog' ? 'border-[#f2f2f2] bg-[#999933]/25 text-white' : 'border-[#999933]/50 bg-[#999933]/10 text-[#f2f2f2] hover:border-[#f2f2f2] hover:bg-[#999933]/20 hover:text-white'} order-4 inline-flex h-10 items-center justify-center rounded-sm border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300`}
+            className={`${pathname === '/digital-catalog' ? 'border-[#999933] bg-[#999933]/20' : 'border-[#999933]/45 bg-[#999933]/10 hover:border-[#999933] hover:bg-[#999933]/15'} order-1 inline-flex h-9 items-center justify-center rounded border px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300`}
             href="/digital-catalog"
             aria-current={pathname === '/digital-catalog' ? 'page' : undefined}
           >
@@ -126,17 +126,17 @@ export default function Header({ onOpenLogin }) {
               <Link
                 href="/my-account"
                 aria-current={pathname === '/my-account' ? 'page' : undefined}
-                className={`text-sm font-medium ${pathname === '/my-account' ? 'text-white border-b-2 border-[#999933]' : 'text-[#f2f2f2] hover:text-white'} pb-1 transition-colors`}
+                className={`order-2 ml-2 px-2 py-3 text-[0.9375rem] font-semibold ${pathname === '/my-account' ? 'border-b-2 border-[#999933]' : ''} transition-colors`}
               >
                 My Account
               </Link>
               <button
                 type="button"
                 onClick={handleHeaderLogout}
-                className="h-10 bg-[#93000a]/15 hover:bg-[#93000a]/30 text-[#ffb4ab] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-[#93000a]/30 hover:border-[#ffb4ab]/40 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                className="order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#93000a]/25 bg-[#93000a]/10 px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#93000a] transition-colors duration-300 hover:border-[#93000a]/45 hover:bg-[#93000a]/15"
               >
                 Exit Portal
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="h-3 w-3" />
               </button>
             </>
           ) : (
@@ -144,33 +144,33 @@ export default function Header({ onOpenLogin }) {
               <button
                 type="button"
                 onClick={onOpenLogin}
-                className="order-1 text-sm font-medium text-white/80 hover:text-white transition-colors font-body-md bg-transparent border-0 cursor-pointer text-left"
+                className="order-2 ml-2 flex h-9 cursor-pointer items-center rounded border border-[#2d2d2d]/20 bg-white px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300 hover:border-[#999933]/70 hover:bg-[#f7f7f3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933] font-label-sm"
               >
                 Client Login
               </button>
               <Link
                 href="/register"
-                className="order-2 h-10 bg-white/10 hover:bg-white text-white hover:text-[#212121] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-white/10 hover:border-white transition-all duration-300 flex items-center gap-2 font-label-sm cursor-pointer no-underline"
+                className="order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#cc6633] bg-[#cc6633] px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-white no-underline transition-colors duration-300 hover:border-[#b6532a] hover:bg-[#b6532a] font-label-sm"
               >
                 Register Account
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="h-3 w-3" />
               </Link>
             </>
           )}
         </div>
 
         {/* Mobile Cart and Hamburger Container (Mobile Only) */}
-        <div className="flex items-center gap-2.5 sm:gap-3 lg:hidden">
+        <div className="flex items-center gap-2.5 sm:gap-3 xl:hidden">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
             aria-label={`Open order sheet${cartTotalItems > 0 ? `, ${cartTotalItems} items` : ''}`}
-            className="relative p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm transition-all cursor-pointer flex items-center justify-center shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2]"
+            className="header-cart-button relative flex h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded border px-3 text-[#2d2d2d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
           >
-            <ShoppingBag className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden text-[9px] font-bold sm:inline">${cartTotal.toFixed(2)}</span>
+            <ShoppingBag className="h-[1.125rem] w-[1.125rem]" aria-hidden="true" />
+            <span className="header-cart-label hidden text-xs font-bold sm:inline">${cartTotal.toFixed(2)}</span>
             {cartTotalItems > 0 && (
-              <span aria-hidden="true" className="absolute -top-1 -right-1 bg-[#999933] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#131313]">
+              <span aria-hidden="true" className="header-cart-count absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold">
                 {cartTotalItems}
               </span>
             )}
@@ -182,18 +182,18 @@ export default function Header({ onOpenLogin }) {
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation"
-            className="rounded-sm text-white/80 hover:text-white cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2f2f2]"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded border border-[#2d2d2d]/15 text-[#2d2d2d] transition-colors hover:border-[#999933] hover:text-[#999933] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
           </button>
         </div>
       </div>
 
-      <div aria-hidden="true" className="h-2 w-full bg-[#999933]" />
+      <div aria-hidden="true" className="h-1.5 w-full bg-[#999933]" />
 
       {/* Mobile Drawer Navigation overlay */}
       {mobileMenuOpen && (
-        <nav id="mobile-navigation" aria-label="Mobile navigation" className="absolute top-[100%] left-0 z-40 flex max-h-[calc(100dvh-6rem)] w-full flex-col gap-5 overflow-y-auto border-b border-white/10 bg-[#212121] px-4 py-6 shadow-xl backdrop-blur-md animate-fade-in sm:max-h-[calc(100dvh-7rem)] sm:px-6 lg:hidden">
+        <nav id="mobile-navigation" aria-label="Mobile navigation" className="absolute left-0 top-[100%] z-40 flex max-h-[calc(100dvh-6rem)] w-full flex-col gap-5 overflow-y-auto border-b border-[#999933] bg-[#2d2d2d] px-4 py-6 shadow-xl animate-fade-in sm:max-h-[calc(100dvh-7rem)] sm:px-6 xl:hidden">
           <Link
             className={`${pathname === '/' ? 'text-white' : 'text-white/70'} text-base font-medium transition-all duration-300 hover:text-[#f2f2f2] hover:translate-x-1.5 motion-reduce:transform-none`}
             href="/"
