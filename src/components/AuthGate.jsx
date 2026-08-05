@@ -18,7 +18,7 @@ export default function AuthGate({ loading = false }) {
     <div className="site-background-page bg-[#131313] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex items-center justify-center">
+      <main className="site-content-shell flex flex-grow items-center justify-center py-16 sm:py-20 lg:py-24">
         {loading ? (
           <div className="w-10 h-10 border-4 border-[#999933] border-t-transparent rounded-full animate-spin"></div>
         ) : (

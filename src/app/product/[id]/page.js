@@ -164,7 +164,7 @@ export default function ProductDetailPage() {
     return (
       <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
-        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex flex-col items-center justify-center text-center gap-4">
+        <main className="site-content-shell flex flex-grow flex-col items-center justify-center gap-4 py-16 text-center sm:py-20 lg:py-24">
           <div className="w-10 h-10 border-2 border-[#999933] border-t-transparent rounded-full animate-spin" />
           <p className="text-white/50 text-xs font-mono uppercase tracking-widest">Loading product…</p>
         </main>
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
     return (
       <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
-        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex flex-col items-center justify-center text-center gap-6">
+        <main className="site-content-shell flex flex-grow flex-col items-center justify-center gap-6 py-16 text-center sm:py-20 lg:py-24">
           <div className="text-6xl">⚠️</div>
           <h2 className="font-headline-md text-3xl font-bold text-white">Product Not Found</h2>
           <p className="text-white/60 text-sm max-w-md">
@@ -227,7 +227,7 @@ export default function ProductDetailPage() {
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       {/* Main Container */}
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col gap-10 sm:gap-12">
+      <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
 
         {/* Breadcrumbs / Back button */}
         <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-white/50 font-mono">

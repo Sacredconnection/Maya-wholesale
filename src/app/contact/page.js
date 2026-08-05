@@ -79,7 +79,7 @@ export default function ContactPage() {
     <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col gap-10 sm:gap-12">
+      <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
         {/* Page Title */}
         <div className="border-b border-white/10 pb-6 sm:pb-8">
           <span className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">

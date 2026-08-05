@@ -30,7 +30,7 @@ export default function Hero() {
 
       {/* Hero Section Content */}
       <section className="relative z-10 flex w-full flex-1 items-stretch py-8 md:items-center md:py-16 lg:py-20">
-        <div className="mx-auto flex w-full max-w-[90rem] flex-1 animate-fade-in-up flex-col items-center px-4 pt-16 text-center sm:px-6 md:flex-none md:pt-0 lg:px-8">
+        <div className="site-content-shell flex flex-1 animate-fade-in-up flex-col items-center pt-16 text-center md:flex-none md:pt-0">
 
           <span className="type-eyebrow relative inline-block pb-3 font-label-sm text-white/90 after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-14 after:-translate-x-1/2 after:bg-gradient-to-r after:from-[#999933] after:to-[#cc6633] after:content-['']">
             Ethnobotanical specialists since 2000

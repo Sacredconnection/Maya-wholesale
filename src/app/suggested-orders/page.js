@@ -17,7 +17,7 @@ export default function SuggestedOrdersPage() {
   return (
     <div className="site-background-page flex min-h-screen flex-col bg-[#25362D] text-[#e5e2e1]">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
-      <main className="mx-auto w-full max-w-7xl flex-grow px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <main className="site-content-shell flex-grow py-10 sm:py-12">
         <header className="mb-8 max-w-3xl">
           <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#d8c58f]">
             Stock-aware assortments

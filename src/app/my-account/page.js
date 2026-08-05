@@ -267,7 +267,7 @@ export default function MyAccountPage() {
       <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
         <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
-        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 flex items-center justify-center">
+        <main className="site-content-shell flex flex-grow items-center justify-center py-16 sm:py-20 lg:py-24">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 max-w-lg w-full text-center relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/10 blur-xl pointer-events-none rounded-full"></div>
 
@@ -487,7 +487,7 @@ export default function MyAccountPage() {
       {/* Hero Header Section */}
       <section className="bg-[#1c1c1c] border-b border-white/15 py-8 sm:py-10 lg:py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#999933]/10 via-transparent to-transparent opacity-60"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center gap-4 sm:gap-6">
+        <div className="site-content-shell relative flex items-center gap-4 sm:gap-6">
           {/* Avatar */}
           <button
             type="button"
@@ -540,7 +540,7 @@ export default function MyAccountPage() {
       </section>
 
       {/* Main Account Portal Area */}
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+      <main className="site-content-shell flex-grow py-10 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 sm:gap-12 items-start">
 
           {/* Tabs Sidebar */}

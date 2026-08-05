@@ -69,7 +69,7 @@ export default function BotanicalCategories() {
               ) : null}
             </div>
 
-            <div className="flex flex-1 flex-col bg-white px-7 py-7">
+            <div className="flex flex-1 flex-col bg-white px-7 pb-8 pt-7">
               <h2 className="type-card-title text-[#2D2D2D] font-headline-md">
                 {name}
               </h2>

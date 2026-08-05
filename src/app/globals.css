@@ -235,21 +235,24 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
   min-height: calc(100svh - var(--site-header-height));
 }
 
-/* Shared horizontal rhythm for every contained section on the homepage. */
+/* Shared horizontal rhythm aligned with the header across the whole site. */
+.site-content-shell,
 .home-content-shell {
   width: 100%;
-  max-width: 80rem;
+  max-width: 90rem;
   margin-inline: auto;
   padding-inline: 1rem;
 }
 
 @media (min-width: 640px) {
+  .site-content-shell,
   .home-content-shell {
     padding-inline: 1.5rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
+  .site-content-shell,
   .home-content-shell {
     padding-inline: 2rem;
   }
@@ -621,12 +624,12 @@ html[data-theme="light"] [class~="before:bg-[#131313]"]::before {
 }
 
 .maya-wholesale-banner {
-  background-image: url("/banner/maya-wholesale/maya-wholesale-banner-desktop.webp");
+  background-image: url("/banner/maya-wholesale-cta/maya-wholesale-cta-banner-desktop.webp");
 }
 
 @media (max-width: 639px) {
   .maya-wholesale-banner {
-    background-image: url("/banner/maya-wholesale/maya-wholesale-banner-mobile.webp");
+    background-image: url("/banner/maya-wholesale-cta/maya-wholesale-cta-banner-mobile.webp");
     background-position: center;
   }
 }
@@ -770,7 +773,7 @@ html[data-theme="light"] :is(
   align-items: center;
   justify-content: space-between;
   gap: 1.4rem;
-  margin-top: auto;
+  margin-top: 1.5rem;
   padding: 0.78rem 0.85rem 0.78rem 1rem;
   border: 1px solid transparent;
   border-radius: 0.3rem;

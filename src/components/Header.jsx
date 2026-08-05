@@ -45,7 +45,7 @@ export default function Header({ onOpenLogin }) {
 
   return (
     <header className="site-header sticky top-0 z-50 w-full border-t border-[#2d2d2d] bg-white text-[#1e1e1e] shadow-[0_8px_24px_rgba(45,45,45,0.08)]">
-      <div className="mx-auto flex h-20 w-full max-w-[90rem] items-center justify-between gap-5 px-4 sm:h-24 sm:px-6 xl:h-28 xl:gap-7 xl:px-8">
+      <div className="site-content-shell flex h-20 items-center justify-between gap-5 sm:h-24 xl:h-28 xl:gap-7">
         {/* Logotipo (Left) */}
         <Link className="group flex self-stretch shrink-0 items-center" href="/" onClick={handleHomeClick}>
           <Image

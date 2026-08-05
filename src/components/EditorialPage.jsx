@@ -66,7 +66,7 @@ export default function EditorialPage({
           className="editorial-hero relative isolate overflow-hidden"
           style={bannerStyle}
         >
-          <div className="relative mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="site-content-shell relative py-14 sm:py-20 lg:py-24">
             <Link
               href="/"
               className="mb-12 inline-flex items-center gap-2 font-label-sm text-xs font-bold uppercase tracking-[0.16em] text-white/50 transition-colors hover:text-[#f2f2f2]"
@@ -99,7 +99,7 @@ export default function EditorialPage({
         </header>
 
         <div className="editorial-content">
-          <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8">
+          <div className="site-content-shell grid gap-10 py-10 sm:gap-12 sm:py-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
             <article className="editorial-card min-w-0 rounded-xl border border-white/10 bg-[#1a1a1a] p-6 sm:p-10 lg:p-12">
               {children}
             </article>

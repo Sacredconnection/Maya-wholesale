@@ -489,7 +489,7 @@ export default function CatalogPage() {
         </div>
       )}
 
-      <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-12 lg:px-8">
+      <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
         <header className="flex flex-col gap-6 border-b border-white/10 pb-8">
           <div className="max-w-3xl">
             <span className="type-eyebrow mb-3 inline-flex rounded-full border border-[#999933]/40 bg-[#999933]/15 px-3 py-1 text-[#f2f2f2] font-label-sm">
