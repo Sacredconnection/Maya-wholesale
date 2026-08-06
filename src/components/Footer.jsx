@@ -42,7 +42,7 @@ export default function Footer() {
                 width={494}
                 height={201}
                 unoptimized
-                className="h-20 w-auto md:h-24"
+                className="h-16 w-auto md:h-20"
               />
             </Link>
           </div>

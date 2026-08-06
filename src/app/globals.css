@@ -1180,14 +1180,14 @@ html[data-theme="light"] .home-no-glass .wholesale-format-card {
 /* Shared editorial treatment for About and policy pages. */
 .editorial-hero {
   border-bottom: 0;
-  background-color: #131313;
+  background-color: #25362d;
   background-image:
     linear-gradient(
       90deg,
-      rgb(19 19 19 / 0.98) 0%,
-      rgb(19 19 19 / 0.92) 42%,
-      rgb(19 19 19 / 0.56) 68%,
-      rgb(19 19 19 / 0.24) 100%
+      rgb(24 36 30 / 0.98) 0%,
+      rgb(31 48 40 / 0.92) 42%,
+      rgb(37 54 45 / 0.64) 68%,
+      rgb(37 54 45 / 0.3) 100%
     ),
     var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
   background-position: center, var(--editorial-banner-position, center);
@@ -1260,16 +1260,16 @@ html[data-theme="light"] .home-no-glass .wholesale-format-card {
 }
 
 html[data-theme="light"] .editorial-hero {
-  background-color: #f5f7f6;
+  background-color: #25362d;
   background-image:
     linear-gradient(
       90deg,
-      rgb(255 255 255 / 0.98) 0%,
-      rgb(255 255 255 / 0.94) 42%,
-      rgb(245 247 246 / 0.65) 68%,
-      rgb(245 247 246 / 0.28) 100%
+      rgb(24 36 30 / 0.98) 0%,
+      rgb(31 48 40 / 0.92) 42%,
+      rgb(37 54 45 / 0.64) 68%,
+      rgb(37 54 45 / 0.3) 100%
     ),
-    var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background-light.webp"));
+    var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
 }
 
 html[data-theme="light"] .editorial-card,
@@ -1320,14 +1320,14 @@ html[data-theme="light"] .editorial-contact a:hover {
 @media (max-width: 767px) {
   .editorial-hero {
     background-image:
-      linear-gradient(90deg, rgb(19 19 19 / 0.96), rgb(19 19 19 / 0.76)),
+      linear-gradient(90deg, rgb(24 36 30 / 0.96), rgb(37 54 45 / 0.78)),
       var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
   }
 
   html[data-theme="light"] .editorial-hero {
     background-image:
-      linear-gradient(90deg, rgb(255 255 255 / 0.97), rgb(245 247 246 / 0.82)),
-      var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background-light.webp"));
+      linear-gradient(90deg, rgb(24 36 30 / 0.96), rgb(37 54 45 / 0.78)),
+      var(--editorial-banner-image, url("/backgrounds/maya-wholesale-background.webp"));
   }
 }
 
