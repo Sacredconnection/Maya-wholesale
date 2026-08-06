@@ -56,6 +56,11 @@ export function isLocalDevSession(session) {
   );
 }
 
+export function getLocalDevSessionUser(request, session) {
+  if (!isLocalDevRequest(request) || !isLocalDevSession(session)) return null;
+  return getLocalDevUser();
+}
+
 export function getLocalDevUser() {
   const email = process.env.LOCAL_DEV_LOGIN_EMAIL.trim().toLowerCase();
 

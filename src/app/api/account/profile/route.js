@@ -6,6 +6,7 @@ import {
 } from "@/lib/woocommerce";
 import { isApprovedWholesaleCustomer, mapCustomerToUser } from "@/lib/wc-mappers";
 import { getSession } from "@/lib/session";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import {
   cleanText,
   isSameOrigin,
@@ -41,6 +42,13 @@ async function authenticatedCustomer() {
 export async function POST(request) {
   if (!isSameOrigin(request)) {
     return securityError("Cross-origin request rejected.", 403);
+  }
+  const session = await getSession();
+  if (session?.localDev) {
+    if (!getLocalDevSessionUser(request, session)) {
+      return securityError("Authentication required.", 401);
+    }
+    return securityError("Temporary local accounts are read-only.", 403);
   }
   if (!isWooCommerceConfigured()) {
     return securityError("Account backend unavailable.", 503);

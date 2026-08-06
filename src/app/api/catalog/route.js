@@ -18,6 +18,7 @@ import {
 import { optionPriceForUser } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { securityError } from "@/lib/request-security";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import {
   getRequiredCommerceStores,
   isCommerceStoreConfigured,
@@ -93,9 +94,12 @@ async function mapWithConcurrency(items, concurrency, mapper) {
   return results;
 }
 
-async function resolveCustomer() {
+async function resolveCustomer(request) {
   const session = await getSession();
   if (!session) return null;
+
+  const localDevUser = getLocalDevSessionUser(request, session);
+  if (session.localDev) return localDevUser;
 
   const customer = await getCustomerByEmail(session.email);
   if (
@@ -194,7 +198,7 @@ async function loadLocalCatalogSnapshot() {
 }
 
 export async function GET(request) {
-  const customer = await resolveCustomer();
+  const customer = await resolveCustomer(request);
   if (!customer) return securityError("Authentication required.", 401);
 
   const { searchParams } = new URL(request.url);

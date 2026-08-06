@@ -35,6 +35,7 @@ import {
   securityError,
 } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import { isSupportedCountryCode } from "@/lib/countries";
 import {
   bankTransferOrderNote,
@@ -140,9 +141,17 @@ const addressIsComplete = (address) =>
   );
 
 // Lists orders from both backends for My Account.
-export async function GET() {
+export async function GET(request) {
   const session = await getSession();
   if (!session) return securityError("Authentication required.", 401);
+  const localDevUser = getLocalDevSessionUser(request, session);
+  if (session.localDev) {
+    if (!localDevUser) return securityError("Authentication required.", 401);
+    return Response.json(
+      { orders: [], failures: [] },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  }
   const configurationError = missingBackendsResponse();
   if (configurationError) return configurationError;
 
@@ -186,6 +195,11 @@ export async function POST(request) {
   if (!isSameOrigin(request)) return securityError("Cross-origin request rejected.", 403);
   const session = await getSession();
   if (!session) return securityError("Authentication required.", 401);
+  const localDevUser = getLocalDevSessionUser(request, session);
+  if (session.localDev) {
+    if (!localDevUser) return securityError("Authentication required.", 401);
+    return securityError("Temporary local accounts cannot place orders.", 403);
+  }
   const configurationError = missingBackendsResponse();
   if (configurationError) return configurationError;
   const idempotencyKey = request.headers.get("idempotency-key")?.trim() || "";

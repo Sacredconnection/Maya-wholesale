@@ -12,6 +12,7 @@ import {
 import { buildCategoryContext, isApprovedWholesaleCustomer, mapProductForRole } from "@/lib/wc-mappers";
 import { securityError } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 
 const catalogCacheSeconds = (() => {
   const value = Number(process.env.WC_REVALIDATE_SECONDS);
@@ -39,6 +40,10 @@ const getCachedStoreCatalog = unstable_cache(
 export async function GET(request) {
   const session = await getSession();
   if (!session) return securityError("Authentication required.", 401);
+  const localDevUser = getLocalDevSessionUser(request, session);
+  if (session.localDev && !localDevUser) {
+    return securityError("Authentication required.", 401);
+  }
 
   const requestedStoreId = new URL(request.url).searchParams.get("store");
   const allStores = getRequiredCommerceStores();
@@ -58,13 +63,17 @@ export async function GET(request) {
   }
 
   try {
-    const customer = await getCustomerByEmail(session.email);
-    if (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId) {
-      return securityError("Authentication required.", 401);
+    let role = localDevUser?.role || null;
+    if (!localDevUser) {
+      const customer = await getCustomerByEmail(session.email);
+      if (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId) {
+        return securityError("Authentication required.", 401);
+      }
+      role = customer.role;
     }
 
     const catalogs = await Promise.all(
-      stores.map((store) => getCachedStoreCatalog(store.id, store.name, customer.role))
+      stores.map((store) => getCachedStoreCatalog(store.id, store.name, role))
     );
     const products = catalogs.flat().sort((a, b) => a.name.localeCompare(b.name));
 

@@ -96,7 +96,8 @@ The catalog is sourced exclusively from Maya Herbs. Configuration is entirely se
 For local UI access without a WordPress customer, set
 `LOCAL_DEV_LOGIN_ENABLED=true`, `LOCAL_DEV_LOGIN_EMAIL` and
 `LOCAL_DEV_LOGIN_PASSWORD` in `.env.local`. This development account is
-accepted only on localhost and is always disabled in production. Set
+accepted only on localhost, is always disabled in production, and has
+read-only portal access: orders and account changes remain blocked. Set
 `LOCAL_DEV_AUTO_LOGIN=true` to create the local session automatically and
 open protected pages without the sign-in screen.
 *   **Vercel:** add all variables for Production and Preview, then redeploy.

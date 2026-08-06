@@ -9,6 +9,7 @@ import { getRequiredCommerceStores, isCommerceStoreConfigured } from "@/lib/comm
 import { buildCategoryContext, isApprovedWholesaleCustomer, mapProductForRole } from "@/lib/wc-mappers";
 import { securityError } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 
 function parseProductIdentifier(identifier) {
   if (typeof identifier !== "string" || identifier.length > 240) return null;
@@ -23,6 +24,10 @@ function parseProductIdentifier(identifier) {
 export async function GET(request, { params }) {
   const session = await getSession();
   if (!session) return securityError("Authentication required.", 401);
+  const localDevUser = getLocalDevSessionUser(request, session);
+  if (session.localDev && !localDevUser) {
+    return securityError("Authentication required.", 401);
+  }
 
   const { id } = await params;
   const identity = parseProductIdentifier(id);
@@ -33,10 +38,13 @@ export async function GET(request, { params }) {
 
   try {
     const [customer, wcProduct] = await Promise.all([
-      getCustomerByEmail(session.email),
+      localDevUser ? Promise.resolve(null) : getCustomerByEmail(session.email),
       getProductBySlug(identity.slug, identity.store.id),
     ]);
-    if (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId) {
+    if (
+      !localDevUser &&
+      (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId)
+    ) {
       return securityError("Authentication required.", 401);
     }
     if (!wcProduct) return Response.json({ error: "Product not found." }, { status: 404 });
@@ -53,7 +61,7 @@ export async function GET(request, { params }) {
           wcProduct,
           variations,
           buildCategoryContext(categories),
-          customer.role,
+          localDevUser?.role || customer.role,
           identity.store
         ),
       },

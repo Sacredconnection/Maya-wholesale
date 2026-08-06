@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/session";
+import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import { getMissingCommerceStores, getRequiredCommerceStores } from "@/lib/commerce-stores";
 import { getPaymentGateway } from "@/lib/woocommerce";
 import {
@@ -19,9 +20,15 @@ async function gatewayAvailableEverywhere(gatewayId, stores) {
   );
 }
 
-export async function GET() {
+export async function GET(request) {
   const session = await getSession();
   if (!session) {
+    return Response.json(
+      { error: "Authentication required." },
+      { status: 401, headers: responseHeaders }
+    );
+  }
+  if (session.localDev && !getLocalDevSessionUser(request, session)) {
     return Response.json(
       { error: "Authentication required." },
       { status: 401, headers: responseHeaders }
