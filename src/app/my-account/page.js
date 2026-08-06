@@ -481,12 +481,11 @@ export default function MyAccountPage() {
   };
 
   return (
-    <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
+    <div id="top" className="account-page site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased justify-between">
       <Header onOpenLogin={() => setIsLoginOpen(true)} />
 
       {/* Hero Header Section */}
-      <section className="bg-[#1c1c1c] border-b border-white/15 py-8 sm:py-10 lg:py-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#999933]/10 via-transparent to-transparent opacity-60"></div>
+      <section className="account-hero bg-white border-b border-[#999933] py-8 sm:py-10 lg:py-12 relative overflow-hidden">
         <div className="site-content-shell relative flex items-center gap-4 sm:gap-6">
           {/* Avatar */}
           <button
@@ -509,7 +508,7 @@ export default function MyAccountPage() {
                 {(user.firstName || user.displayName || "?")[0]?.toUpperCase()}
               </span>
             )}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition-opacity">
+            <div className="account-avatar-overlay absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition-opacity">
               <Camera className="w-5 h-5 text-white" />
               <span className="text-[9px] font-mono text-white uppercase">Change</span>
             </div>
@@ -526,14 +525,14 @@ export default function MyAccountPage() {
           />
 
           <div className="min-w-0">
-            <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase">
+            <span className="account-hero-eyebrow text-[10px] font-mono tracking-widest uppercase">
               B2B Partner Portal
             </span>
-            <h1 className="type-page-title break-words font-headline-lg text-white mt-1">
+            <h1 className="account-hero-title type-page-title break-words font-headline-lg mt-1">
               My Account
             </h1>
-            <p className="break-words text-sm text-white/50 mt-1.5 font-mono">
-              Welcome back, <span className="text-[#f2f2f2] font-bold">{user.displayName}</span> · ID: {user.accountId}
+            <p className="account-hero-meta break-words text-sm mt-1.5 font-mono">
+              Welcome back, <span className="account-hero-name font-bold">{user.displayName}</span> · ID: {user.accountId}
             </p>
           </div>
         </div>

@@ -931,6 +931,52 @@ html[data-theme="light"] .theme-dark-zone [class~="border-white/5"] {
   border-color: rgb(255 255 255 / 0.05) !important;
 }
 
+/* Account portal: match the site's clean white header with olive accents. */
+.account-hero {
+  background-color: #ffffff !important;
+  border-color: #999933 !important;
+}
+
+.account-hero .account-hero-eyebrow {
+  color: #6f701f !important;
+}
+
+.account-hero .account-hero-title {
+  color: #2d2d2d !important;
+}
+
+.account-hero .account-hero-meta {
+  color: #615b50 !important;
+}
+
+.account-hero .account-hero-name {
+  color: #2d2d2d !important;
+}
+
+.account-hero .account-avatar-overlay :is(svg, span) {
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .account-page [class~="text-emerald-400"] {
+  color: #18794e !important;
+}
+
+html[data-theme="light"] .account-page [class~="text-[#ffb4ab]"] {
+  color: #9f3028 !important;
+}
+
+html[data-theme="light"] .account-page [class~="text-[#eadcae]"] {
+  color: #6f701f !important;
+}
+
+html[data-theme="light"] .account-page [class~="bg-[#93000a]/15"] {
+  background-color: rgb(159 48 40 / 0.08) !important;
+}
+
+html[data-theme="light"] .account-page [class~="border-[#ffb4ab]/20"] {
+  border-color: rgb(159 48 40 / 0.28) !important;
+}
+
 html[data-theme="light"] .theme-dark-zone .lineage-card {
   box-shadow: 0 8px 24px rgb(23 32 30 / 0.06) !important;
 }
