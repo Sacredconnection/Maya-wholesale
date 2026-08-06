@@ -846,7 +846,6 @@ html[data-theme="light"] .ngo-logo-light {
 html[data-theme="light"] .ngo-section-watermark {
   filter: brightness(0) saturate(100%) invert(24%) sepia(18%) saturate(1227%) hue-rotate(81deg) brightness(91%) contrast(90%);
   mix-blend-mode: multiply;
-  opacity: 0.04;
 }
 
 /* Header, hero, lineage, retail banner and footer retain their dark treatment. */

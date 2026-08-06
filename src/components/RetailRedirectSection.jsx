@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function RetailRedirectSection() {
   return (
     <section
@@ -15,6 +17,16 @@ export default function RetailRedirectSection() {
 
       <div className="home-content-shell relative z-10 flex min-h-[430px] items-start pb-14 pt-8 sm:min-h-[380px] sm:pb-16 sm:pt-10 md:items-center md:py-16 lg:min-h-[420px] lg:py-20">
           <div className="mx-auto max-w-xl text-center md:mx-0 md:text-left">
+            <Image
+              src="/banner/retail-sanctuary/symbol/maya-retail-symbol.svg"
+              alt=""
+              width={134}
+              height={78}
+              unoptimized
+              aria-hidden="true"
+              className="mx-auto mb-5 h-auto w-24 md:mx-0 md:w-28"
+            />
+
             <p className="type-eyebrow mb-3 font-label-sm text-[#f2f2f2]">
               Individual Orders &amp; Retail
             </p>

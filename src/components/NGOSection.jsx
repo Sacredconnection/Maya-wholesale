@@ -79,7 +79,8 @@ export default function NGOSection() {
           alt=""
           width={750}
           height={750}
-          className="ngo-section-watermark absolute bottom-[-160px] right-[-120px] w-[500px] h-[500px] md:w-[650px] md:h-[650px] lg:w-[750px] lg:h-[750px] opacity-[0.035] pointer-events-none select-none z-0 mix-blend-screen"
+          unoptimized
+          className="ngo-section-watermark absolute bottom-[-160px] right-[-120px] w-[500px] h-[500px] md:w-[650px] md:h-[650px] lg:w-[750px] lg:h-[750px] pointer-events-none select-none z-0 mix-blend-screen"
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 xl:gap-16 items-center z-10 relative">
