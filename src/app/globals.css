@@ -61,7 +61,8 @@
   --color-tertiary-fixed-dim: #c6c6c7;
   --color-on-error: #690005;
 
-  --radius-DEFAULT: 0.125rem;
+  /* Compact actions, with progressively softer corners reserved for surfaces. */
+  --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.25rem;
   --radius-xl: 0.5rem;
   --radius-full: 9999px;
@@ -387,6 +388,11 @@ button, input, select, textarea {
 code, pre, .font-mono {
   font-family: "Futura PT", var(--font-maya-display), sans-serif;
 }
+}
+
+/* Keep every non-circular action as compact as the header buttons. */
+:where(button, a)[class*="rounded"]:not(.rounded-full) {
+  border-radius: var(--radius-DEFAULT);
 }
 
 /* Shared typographic roles keep hierarchy consistent across routes. */
@@ -776,7 +782,7 @@ html[data-theme="light"] :is(
   margin-top: 1.5rem;
   padding: 0.78rem 0.85rem 0.78rem 1rem;
   border: 1px solid transparent;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-DEFAULT);
   background: #cc6633;
   color: #ffffff !important;
   font-size: 0.62rem;

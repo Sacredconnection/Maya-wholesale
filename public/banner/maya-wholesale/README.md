@@ -24,6 +24,21 @@ This folder is reserved for the homepage hero and the shared Maya Wholesale logo
    - Do not include text, logos, or buttons in this background image.
    - Recommended maximum file size: 350 KB.
 
+4. `maya-wholesale-banner-02.webp` — second rotating hero desktop background
+   - Format: WebP.
+   - Current size: 2560 × 590 px.
+   - Keep the central area visually quiet for the overlaid text and button.
+   - Keep important subjects away from the edges because the image uses `object-fit: cover`.
+   - Do not include text, logos, or buttons in this background image.
+   - Recommended maximum file size: 500 KB.
+
+5. `maya-wholesale-banner-mobile-02.webp` — second rotating hero mobile background
+   - Format: WebP.
+   - Current size: 1080 × 1080 px.
+   - Keep the central area visually quiet for the overlaid text and button.
+   - Do not include text, logos, or buttons in this background image.
+   - Recommended maximum file size: 350 KB.
+
 The lower wholesale conversion banner uses separate assets in
 `/public/banner/maya-wholesale-cta/`. Replacing files in this hero folder no
 longer changes that banner.
