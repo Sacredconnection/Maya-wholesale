@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
@@ -220,12 +221,22 @@ export default function ContactPage() {
           <div className="lg:col-span-5 flex flex-col gap-6 w-full">
 
             {/* Contact Details Card */}
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-8 shadow-xl flex flex-col gap-5 sm:gap-6">
-              <h3 className="font-headline-md text-lg font-bold text-white border-b border-white/5 pb-3">
+            <div className="relative isolate overflow-hidden bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-8 shadow-xl flex flex-col gap-5 sm:gap-6">
+              <Image
+                src="/contact/corporate-details/corporate-details-watermark.svg"
+                alt=""
+                aria-hidden="true"
+                width={320}
+                height={320}
+                unoptimized
+                className="pointer-events-none absolute bottom-0 right-0 z-0 h-auto w-48 select-none sm:w-56 lg:w-64"
+              />
+
+              <h3 className="relative z-10 font-headline-md text-lg font-bold text-white border-b border-white/5 pb-3">
                 Corporate Details
               </h3>
 
-              <div className="flex flex-col gap-5">
+              <div className="relative z-10 flex flex-col gap-5">
                 {/* Email */}
                 <div className="flex gap-4">
                   <div className="w-10 h-10 rounded bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2] shrink-0">

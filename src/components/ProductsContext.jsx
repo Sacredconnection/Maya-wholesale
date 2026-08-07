@@ -4,15 +4,15 @@
 // Keeping this provider above the pages lets /catalog reuse the loaded data.
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 
 const ProductsContext = createContext(null);
 const CLIENT_CATALOG_TIMEOUT_MS = 35000;
-const LOCAL_CATALOG_PREVIEW = process.env.NODE_ENV === "development";
-const LOCAL_CATALOG_TIMEOUT_MS = 120000;
 
 export function ProductsProvider({ children }) {
   const { isLoggedIn, loading: authLoading, invalidateSession } = useAuth();
+  const pathname = usePathname();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,7 +62,17 @@ export function ProductsProvider({ children }) {
     let cancelled = false;
 
     if (authLoading) return () => {};
-    if (!isLoggedIn && !LOCAL_CATALOG_PREVIEW) {
+    // The public digital catalog owns its own complete, price-free data flow.
+    // Do not preload the authenticated purchasing catalog on this route.
+    if (pathname === "/digital-catalog") {
+      const clearTimer = window.setTimeout(() => {
+        setError("");
+        setWarning("");
+        setLoading(false);
+      }, 0);
+      return () => window.clearTimeout(clearTimer);
+    }
+    if (!isLoggedIn) {
       const clearTimer = window.setTimeout(() => {
         setProducts([]);
         setError("");
@@ -75,32 +85,17 @@ export function ProductsProvider({ children }) {
     async function loadCatalog() {
       setLoading(true);
       setError("");
-      setWarning(
-        LOCAL_CATALOG_PREVIEW && !isLoggedIn
-          ? "Local catalog preview uses public Maya Herbs pricing. Sign in to verify partner-specific pricing."
-          : ""
-      );
+      setWarning("");
 
       try {
-        const isLocalAnonymousPreview =
-          LOCAL_CATALOG_PREVIEW && !isLoggedIn;
-        const response = await fetch(
-          isLocalAnonymousPreview
-            ? "/api/catalog?export=true"
-            : "/api/products",
-          {
+        const response = await fetch("/api/products", {
           credentials: "same-origin",
           cache: "no-store",
-          signal: AbortSignal.timeout(
-            isLocalAnonymousPreview
-              ? LOCAL_CATALOG_TIMEOUT_MS
-              : CLIENT_CATALOG_TIMEOUT_MS
-          ),
-          }
-        );
+          signal: AbortSignal.timeout(CLIENT_CATALOG_TIMEOUT_MS),
+        });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          if (response.status === 401 && !isLocalAnonymousPreview) {
+          if (response.status === 401) {
             invalidateSession();
             return;
           }
@@ -127,7 +122,7 @@ export function ProductsProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, invalidateSession, isLoggedIn, reloadKey]);
+  }, [authLoading, invalidateSession, isLoggedIn, pathname, reloadKey]);
 
   return (
     <ProductsContext.Provider value={{ products, loading, error, warning, reload, resolveProduct }}>

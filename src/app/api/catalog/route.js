@@ -17,7 +17,6 @@ import {
 } from "@/lib/wc-mappers";
 import { optionPriceForUser } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
-import { securityError } from "@/lib/request-security";
 import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import {
   getRequiredCommerceStores,
@@ -199,7 +198,6 @@ async function loadLocalCatalogSnapshot() {
 
 export async function GET(request) {
   const customer = await resolveCustomer(request);
-  if (!customer) return securityError("Authentication required.", 401);
 
   const { searchParams } = new URL(request.url);
   const search = queryText(searchParams, "q");
@@ -213,7 +211,13 @@ export async function GET(request) {
   const onlyInStock = searchParams.get("inStock") === "true";
   const exportAll = searchParams.get("export") === "true";
   const requestedPage = pageNumber(searchParams.get("page"));
-  const catalogFetchOptions = { revalidate: exportAll ? 0 : undefined };
+  // Local PDF generation must reuse the catalog cache. A full uncached export
+  // can trigger the upstream firewall because it requests every product and
+  // variation at once. Production exports remain fresh as documented.
+  const catalogFetchOptions = {
+    revalidate:
+      exportAll && process.env.NODE_ENV === "production" ? 0 : undefined,
+  };
 
   try {
     let products = null;

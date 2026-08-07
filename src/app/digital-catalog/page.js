@@ -19,7 +19,6 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
-import AuthGate from "@/components/AuthGate";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import ProductCard from "@/components/catalog/ProductCard";
 import { useAuth } from "@/components/AuthContext";
@@ -118,7 +117,7 @@ export default function CatalogPage() {
   }, [filters.search]);
 
   useEffect(() => {
-    if (authLoading || !isLoggedIn) return undefined;
+    if (authLoading) return undefined;
     const controller = new AbortController();
 
     async function loadCatalog() {
@@ -132,14 +131,20 @@ export default function CatalogPage() {
       if (filters.childCategory) params.set("childCategory", filters.childCategory);
       appendAttributeFilters(params, filters.attributes);
       try {
-        const response = await fetch(`/api/catalog?${params.toString()}`, {
-          credentials: "same-origin",
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "The catalog could not be loaded.");
+        let response;
+        let data;
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          response = await fetch(`/api/catalog?${params.toString()}`, {
+            credentials: "same-origin",
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          data = await response.json();
+          if (response.ok) break;
+          if (response.status < 500 || attempt === 2) {
+            throw new Error(data.error || "The catalog could not be loaded.");
+          }
+          await new Promise((resolve) => window.setTimeout(resolve, 650));
         }
 
         const nextCategories = data.filters?.categories || [];
@@ -193,8 +198,13 @@ export default function CatalogPage() {
       }
     }
 
-    loadCatalog();
-    return () => controller.abort();
+    // Deferring one tick prevents React development mode from issuing the
+    // complete catalog request twice during its effect safety check.
+    const loadTimer = window.setTimeout(loadCatalog, 0);
+    return () => {
+      window.clearTimeout(loadTimer);
+      controller.abort();
+    };
   }, [
     page,
     debouncedSearch,
@@ -371,8 +381,6 @@ export default function CatalogPage() {
     setImportItems([]);
     setIsCartOpen(true);
   };
-
-  if (authLoading || !isLoggedIn) return <AuthGate loading={authLoading} />;
 
   return (
     <div id="top" className="site-background-page flex min-h-screen flex-col bg-[#25362D] text-[#f2f2f2] antialiased">
