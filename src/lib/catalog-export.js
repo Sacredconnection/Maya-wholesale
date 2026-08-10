@@ -877,7 +877,7 @@ function gridProductCardLayout(pdf, product) {
   return {
     descriptionLines,
     variations,
-    height: Math.max(117, 66 + descriptionLines.length * 5 + (variationRows ? 8 + variationRows * 11 : 0)),
+    height: Math.max(117, 80 + descriptionLines.length * 5 + (variationRows ? 8 + variationRows * 11 : 0)),
   };
 }
 
@@ -932,17 +932,12 @@ function drawGridProductCard(
   pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 24, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10.5);
-  pdf.setTextColor(113, 128, 123);
+  pdf.setTextColor(33, 33, 33);
   const price = includePrices && product.options?.[0]
     ? optionPriceForUser(product.options[0], user, product.category)
     : null;
   const sku = pdfSafeText(product.sku || "-");
   pdf.text(sku, identityX, y + 43);
-  if (Number.isFinite(price)) {
-    pdf.setFontSize(17);
-    pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
-    pdf.text(`$${price.toFixed(2)}`, identityX + pdf.getTextWidth(sku) + 6, y + 43);
-  }
 
   pdf.setDrawColor(220, 229, 226);
   pdf.line(identityX, y + 50, x + width - 7, y + 50);
@@ -951,12 +946,20 @@ function drawGridProductCard(
   pdf.setTextColor(65, 80, 75);
   pdf.text(layout.descriptionLines, identityX, y + 61, { lineHeightFactor: 1.15 });
 
+  const descriptionEndY = y + 61 + layout.descriptionLines.length * 5;
+  if (Number.isFinite(price)) {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(17);
+    pdf.setTextColor(33, 33, 33);
+    pdf.text(`$${price.toFixed(2)}`, identityX, descriptionEndY + 11);
+  }
+
   const { variations } = layout;
   if (variations.length) {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7.5);
     pdf.setTextColor(...accent);
-    const variationsY = y + 61 + layout.descriptionLines.length * 5 + 6;
+    const variationsY = descriptionEndY + (Number.isFinite(price) ? 20 : 6);
     pdf.text("AVAILABLE VARIATIONS", identityX, variationsY);
 
     const tableX = identityX;
