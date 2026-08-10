@@ -584,9 +584,7 @@ function drawPdfCover(
   const isCompleteCatalog =
     !normalizedFilterLabel ||
     normalizedFilterLabel.toLowerCase() === "complete catalog";
-  const scopeEyebrow = isCompleteCatalog
-    ? "CATALOG EDITION"
-    : "FILTER PATH";
+  const scopeEyebrow = isCompleteCatalog ? "MAYA HERBS" : "SELECTED PRODUCTS";
   const scopeTitle = isCompleteCatalog
     ? "COMPLETE CATALOG"
     : normalizedFilterLabel.replace(/\s*\|\s*/g, " / ");
@@ -609,13 +607,13 @@ function drawPdfCover(
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(130, 214, 197);
-  pdf.text("INTERACTIVE DIGITAL CATALOG", 16, 68);
+  pdf.text("WHOLESALE CATALOG", 16, 68);
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(31);
   pdf.setTextColor(255, 255, 255);
-  pdf.text("Wholesale", 16, 101);
-  pdf.text("Product Catalog", 16, 116);
+  pdf.text("Maya Herbs", 16, 101);
+  pdf.text("Wholesale Catalog", 16, 116);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10.5);
@@ -623,7 +621,7 @@ function drawPdfCover(
   pdf.text(
     truncatePdfLines(
       pdf,
-      "A curated guide to Maya Herbs products, organized by collection and product details.",
+      "A selection of Maya Herbs products for wholesale partners.",
       130,
       4
     ),
@@ -656,9 +654,9 @@ function drawPdfCover(
   pdf.setFillColor(255, 255, 255);
   pdf.roundedRect(16, 180, 178, 48, 2.5, 2.5, "F");
   const stats = [
-    [String(traditionCount), "TRADITIONS"],
+    [String(traditionCount), "ORIGINS"],
     [String(products.length), "PRODUCTS"],
-    [String(categoryCount), "CATEGORIES"],
+    [String(categoryCount), "COLLECTIONS"],
   ];
   stats.forEach(([value, label], index) => {
     const x = 45 + index * 59;
@@ -786,7 +784,7 @@ function drawGridHeader(
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(6.5);
   pdf.setTextColor(...theme.headerMuted);
-  pdf.text(`DIGITAL CATALOG  |  ${pageNumber}/${pageCount}`, 198, 19, { align: "right" });
+  pdf.text(`MAYA HERBS WHOLESALE  |  ${pageNumber}/${pageCount}`, 198, 19, { align: "right" });
 }
 
 function drawCategoryCover(
@@ -867,24 +865,10 @@ function drawCategoryCover(
   drawGenerationStamp(pdf, generatedAtLabel, { darkBackground: true });
 }
 
-function pdfProductTarget(product, includeLinks) {
-  const productionOrigin = process.env.NEXT_PUBLIC_SITE_URL ||
-    (window.location.hostname === "localhost"
-      ? "https://wholesale.mayaherbs.com"
-      : window.location.origin);
-  const productUrl = new URL(product.productUrl || "/catalog", productionOrigin);
-  if (includeLinks) return productUrl.href;
-  const loginUrl = new URL("/my-account", productionOrigin);
-  loginUrl.searchParams.set("login", "1");
-  loginUrl.searchParams.set("redirect", productUrl.pathname + productUrl.search);
-  return loginUrl.href;
-}
-
 function drawGridProductCard(
   pdf,
   product,
   image,
-  includeLinks,
   includePrices,
   user,
   x,
@@ -895,7 +879,6 @@ function drawGridProductCard(
   const accent = ethnicityColor(product);
   const accentSoft = mixWithWhite(accent, 0.92);
   const accentBorder = mixWithWhite(accent, 0.72);
-  const buttonText = buttonTextColor(accent);
   pdf.setFillColor(255, 255, 255);
   pdf.setDrawColor(...accentBorder);
   pdf.setLineWidth(0.3);
@@ -1004,18 +987,6 @@ function drawGridProductCard(
     }
   }
 
-  pdf.setFillColor(...accent);
-  pdf.roundedRect(x + 4, y + 96, width - 8, 8, 1, 1, "F");
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(5.8);
-  pdf.setTextColor(...buttonText);
-  pdf.text(includeLinks ? "VIEW PRODUCT" : "LOGIN TO VIEW PRODUCT", x + 8, y + 101.3);
-  if (variations.length) {
-    pdf.text(`${variations.length} VARIATIONS  >`, x + width - 8, y + 101.3, {
-      align: "right",
-    });
-  }
-  pdf.link(x, y, width, height, { url: pdfProductTarget(product, includeLinks) });
 }
 
 function drawIndexNavigationButton(
@@ -1049,25 +1020,8 @@ function drawGridFooter(
   category,
   pageNumber,
   pageCount,
-  generatedAtLabel,
-  storeIndexDestinations
+  generatedAtLabel
 ) {
-  drawIndexNavigationButton(
-    pdf,
-    12,
-    "HOME",
-    { primary: [26, 26, 26] },
-    { pageNumber: 1 },
-    36
-  );
-  drawIndexNavigationButton(
-    pdf,
-    53,
-    "CATALOG INDEX",
-    storePdfTheme(MAYA_STORE_ID),
-    storeIndexDestinations.get(MAYA_STORE_ID),
-    58
-  );
   pdf.setDrawColor(220, 229, 226);
   pdf.line(12, 282, 198, 282);
   pdf.setFont("helvetica", "normal");
@@ -1087,7 +1041,6 @@ function drawGridPage(pdf, {
   products,
   images,
   logo,
-  includeLinks,
   includePrices,
   user,
   storeId,
@@ -1096,7 +1049,6 @@ function drawGridPage(pdf, {
   pageNumber,
   pageCount,
   generatedAtLabel,
-  storeIndexDestinations,
 }) {
   drawGridHeader(
     pdf,
@@ -1114,7 +1066,6 @@ function drawGridPage(pdf, {
       pdf,
       product,
       images[index],
-      includeLinks,
       includePrices,
       user,
       12 + column * 96,
@@ -1127,8 +1078,7 @@ function drawGridPage(pdf, {
     category,
     pageNumber,
     pageCount,
-    generatedAtLabel,
-    storeIndexDestinations
+    generatedAtLabel
   );
 }
 
@@ -1418,7 +1368,6 @@ async function buildDigitalCatalogPdf(options = {}) {
   const products = await fetchDigitalCatalogProducts(options);
   const pdf = await renderDigitalCatalogPdf({
     products,
-    includeLinks: false,
     includePrices: Boolean(options.includePrices),
     user: options.user || null,
     filterLabel: options.filterLabel || "Complete catalog",
@@ -1451,7 +1400,6 @@ export async function downloadDigitalCatalogPdf(options = {}) {
 
 async function renderDigitalCatalogPdf({
   products,
-  includeLinks,
   includePrices,
   user,
   filterLabel,
@@ -1509,78 +1457,12 @@ async function renderDigitalCatalogPdf({
     };
   });
   const categoryGroups = storeGroups.flatMap((store) => store.categoryGroups);
-  const firstProductByEthnicity = new Map();
-  categoryGroups.forEach((group) => {
-    group.products.forEach((product) => {
-      const ethnicity = product.tribe || group.category;
-      const key = `${group.storeId}\u0000${ethnicity}`;
-      if (!firstProductByEthnicity.has(key)) {
-        firstProductByEthnicity.set(key, {
-          storeId: group.storeId,
-          label: ethnicity,
-          product,
-        });
-      }
-    });
-  });
-  const indexEthnicities = [...firstProductByEthnicity.values()].sort(
-    (a, b) => {
-      const storeComparison =
-        preferredStoreOrder.indexOf(a.storeId) -
-        preferredStoreOrder.indexOf(b.storeId);
-      return storeComparison || a.label.localeCompare(b.label);
-    }
-  );
-  const storeIndexes = storeGroups.map((store) => ({
-    storeId: store.storeId,
-    storeName: store.storeName,
-    pages: paginateIndexRows(buildIndexRows(store)),
-  }));
-  const storeIndexDestinations = new Map();
-  let storeIndexPageNumber = 2;
-  storeIndexes.forEach((storeIndex) => {
-    if (storeIndex.pages.length) {
-      storeIndexDestinations.set(storeIndex.storeId, {
-        pageNumber: storeIndexPageNumber,
-      });
-    }
-    storeIndexPageNumber += storeIndex.pages.length;
-  });
-  const indexPageCount = storeIndexes.reduce(
-    (total, storeIndex) => total + storeIndex.pages.length,
-    0
-  );
   const pageCount =
     1 +
-    indexPageCount +
-    storeGroups.length +
-    categoryGroups.length +
     categoryGroups.reduce(
       (total, group) => total + Math.ceil(group.products.length / 4),
       0
     );
-  const productDestinations = new Map();
-  let destinationPage = 1 + indexPageCount;
-  storeGroups.forEach((store) => {
-    destinationPage += 1;
-    store.categoryGroups.forEach((group) => {
-      destinationPage += 1;
-      for (let start = 0; start < group.products.length; start += 4) {
-        destinationPage += 1;
-        group.products.slice(start, start + 4).forEach((product, index) => {
-          productDestinations.set(product, {
-            pageNumber: destinationPage,
-            top: 35 + Math.floor(index / 2) * 117,
-          });
-        });
-      }
-    });
-  });
-  const ethnicityLinks = indexEthnicities.map((item) => ({
-    storeId: item.storeId,
-    label: item.label,
-    destination: productDestinations.get(item.product),
-  }));
   const pdf = new jsPDF({
     unit: "mm",
     format: "a4",
@@ -1591,7 +1473,7 @@ async function renderDigitalCatalogPdf({
   pdf.setDisplayMode("100%", "continuous", "UseNone");
   pdf.setProperties({
     title: "Maya Herbs Wholesale Catalog",
-    subject: "Interactive wholesale product catalog",
+    subject: "Maya Herbs wholesale catalog",
     author: "Maya Herbs",
     creator: "Wholesale Digital Catalog",
   });
@@ -1662,59 +1544,8 @@ async function renderDigitalCatalogPdf({
     generatedAtLabel
   );
   let currentPage = 1;
-  storeIndexes.forEach((storeIndex) => {
-    const storeEthnicityLinks = ethnicityLinks.filter(
-      (item) => item.storeId === storeIndex.storeId
-    );
-    storeIndex.pages.forEach((columns, indexPage) => {
-      pdf.addPage("a4", "portrait");
-      currentPage += 1;
-      drawIndexPage(pdf, {
-        columns,
-        ethnicityLinks: storeEthnicityLinks,
-        logo,
-        productDestinations,
-        storeId: storeIndex.storeId,
-        storeName: storeIndex.storeName,
-        pageNumber: currentPage,
-        pageCount,
-        indexPage: indexPage + 1,
-        indexPageCount: storeIndex.pages.length,
-        generatedAtLabel,
-      });
-    });
-  });
-  storeGroups.forEach((store, storeIndex) => {
-    pdf.addPage("a4", "portrait");
-    currentPage += 1;
-    drawStoreCover(
-      pdf,
-      logo,
-      coverBackground,
-      coverDecoration,
-      store,
-      storeIndex,
-      currentPage,
-      pageCount,
-      generatedAtLabel
-    );
-    store.categoryGroups.forEach((group, categoryIndex) => {
-      pdf.addPage("a4", "portrait");
-      currentPage += 1;
-      drawCategoryCover(
-        pdf,
-        logo,
-        coverBackground,
-        coverDecoration,
-        store.storeId,
-        store.storeName,
-        group.category,
-        group.products,
-        categoryIndex,
-        currentPage,
-        pageCount,
-        generatedAtLabel
-      );
+  storeGroups.forEach((store) => {
+    store.categoryGroups.forEach((group) => {
       for (let start = 0; start < group.products.length; start += 4) {
         const pageProducts = group.products.slice(start, start + 4);
         pdf.addPage("a4", "portrait");
@@ -1726,7 +1557,6 @@ async function renderDigitalCatalogPdf({
               imagesByProduct.get(product.id || product.sku) || null
           ),
           logo,
-          includeLinks,
           includePrices,
           user,
           storeId: store.storeId,
@@ -1735,7 +1565,6 @@ async function renderDigitalCatalogPdf({
           pageNumber: currentPage,
           pageCount,
           generatedAtLabel,
-          storeIndexDestinations,
         });
       }
     });
