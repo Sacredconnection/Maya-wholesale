@@ -950,18 +950,10 @@ function drawGridProductCard(
   if (Number.isFinite(price)) {
     const priceLabel = `$${price.toFixed(2)}`;
     const priceY = descriptionEndY + 11;
-    pdf.setFont("helvetica", "boldoblique");
+    pdf.setFont("helvetica", "bold");
     pdf.setFontSize(18);
-    pdf.setTextColor(255, 204, 229);
-    pdf.text(priceLabel, identityX - 0.35, priceY);
-    pdf.text(priceLabel, identityX + 0.35, priceY);
-    pdf.text(priceLabel, identityX, priceY - 0.35);
-    pdf.text(priceLabel, identityX, priceY + 0.35);
-    pdf.setTextColor(255, 40, 135);
+    pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
     pdf.text(priceLabel, identityX, priceY);
-    pdf.setFontSize(10);
-    pdf.setTextColor(255, 237, 246);
-    pdf.text(priceLabel, identityX, priceY - 0.1);
   }
 
   const { variations } = layout;
