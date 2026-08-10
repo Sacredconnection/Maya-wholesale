@@ -874,8 +874,8 @@ function drawGridProductCard(
   x,
   y
 ) {
-  const width = 90;
-  const height = 108;
+  const width = 186;
+  const height = 112;
   const accent = ethnicityColor(product);
   const accentSoft = mixWithWhite(accent, 0.92);
   const accentBorder = mixWithWhite(accent, 0.72);
@@ -884,50 +884,58 @@ function drawGridProductCard(
   pdf.setLineWidth(0.3);
   pdf.roundedRect(x, y, width, height, 1.8, 1.8, "FD");
 
+  pdf.setFillColor(...accent);
+  pdf.roundedRect(x, y, 3, height, 1.8, 1.8, "F");
   pdf.setFillColor(239, 244, 242);
-  pdf.roundedRect(x + 4, y + 5, 30, 30, 1.2, 1.2, "F");
+  pdf.roundedRect(x + 7, y + 5, 52, 102, 1.2, 1.2, "F");
   if (image?.dataUrl && image?.format) {
     pdf.addImage(
       image.dataUrl,
       image.format,
-      x + 4,
+      x + 7,
       y + 5,
-      30,
-      30,
+      52,
+      102,
       `catalog-product-${pdfSafeText(product.id || product.sku || product.name)}`,
       "FAST"
     );
   } else {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
+    pdf.setFontSize(28);
     pdf.setTextColor(...accent);
-    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 19, y + 23, { align: "center" });
+    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 33, y + 59, { align: "center" });
   }
 
-  const identityX = x + 38;
+  const identityX = x + 66;
+  const contentWidth = 112;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(5.8);
+  pdf.setFontSize(6.5);
   pdf.setTextColor(...accent);
-  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 8);
-  pdf.setFontSize(9.2);
+  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 11);
+  pdf.setFontSize(12.5);
   pdf.setTextColor(26, 26, 26);
-  pdf.text(truncatePdfLines(pdf, product.name, 48, 3), identityX, y + 14, { lineHeightFactor: 1.05 });
+  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 19, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(5.8);
+  pdf.setFontSize(6.3);
   pdf.setTextColor(113, 128, 123);
-  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 30.5);
+  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 32.5);
 
   pdf.setDrawColor(220, 229, 226);
-  pdf.line(x + 4, y + 41, x + width - 4, y + 41);
+  pdf.line(identityX, y + 39, x + width - 7, y + 39);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(5.8);
+  pdf.setFontSize(6.2);
   pdf.setTextColor(...accent);
-  pdf.text("DESCRIPTION", x + 4, y + 47);
+  pdf.text("DESCRIPTION", identityX, y + 46);
   const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(6.2);
+  pdf.setFontSize(7.4);
   pdf.setTextColor(65, 80, 75);
-  pdf.text(truncatePdfLines(pdf, description, 82, 5), x + 4, y + 53, { lineHeightFactor: 1.25 });
+  pdf.text(
+    truncatePdfLines(pdf, description, contentWidth, 4),
+    identityX,
+    y + 53,
+    { lineHeightFactor: 1.28 }
+  );
 
   const variations =
     product.productType === "variable" && Array.isArray(product.options)
@@ -935,17 +943,17 @@ function drawGridProductCard(
       : [];
   if (variations.length) {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(5.8);
+    pdf.setFontSize(6.2);
     pdf.setTextColor(...accent);
-    pdf.text("AVAILABLE VARIATIONS", x + 4, y + 77.5);
+    pdf.text("AVAILABLE VARIATIONS", identityX, y + 77);
 
-    const tableX = x + 4;
-    const tableY = y + 80.5;
-    const columnCount = 5;
-    const columnGap = 1;
-    const rowGap = 0.8;
-    const cellWidth = (82 - columnGap * (columnCount - 1)) / columnCount;
-    const cellHeight = 6.2;
+    const tableX = identityX;
+    const tableY = y + 80;
+    const columnCount = 3;
+    const columnGap = 2;
+    const rowGap = 2;
+    const cellWidth = (contentWidth - columnGap * (columnCount - 1)) / columnCount;
+    const cellHeight = 10;
     variations.forEach((option, index) => {
       const column = index % columnCount;
       const row = Math.floor(index / columnCount);
@@ -957,19 +965,19 @@ function drawGridProductCard(
       pdf.setLineWidth(0.2);
       pdf.roundedRect(cellX, cellY, cellWidth, cellHeight, 0.7, 0.7, "FD");
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(includePrices ? 4.1 : 4.5);
+      pdf.setFontSize(includePrices ? 5.1 : 5.8);
       pdf.setTextColor(...accent);
       pdf.text(
-        truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 1, 1),
+        truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 3, 1),
         cellX + cellWidth / 2,
-        includePrices ? cellY + 2.8 : cellY + 4.05,
+        includePrices ? cellY + 3.9 : cellY + 6,
         { align: "center" }
       );
       if (includePrices && Number.isFinite(price)) {
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(3.8);
+        pdf.setFontSize(5.1);
         pdf.setTextColor(65, 80, 75);
-        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 5.45, {
+        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 7.7, {
           align: "center",
         });
       }
@@ -978,12 +986,12 @@ function drawGridProductCard(
     const price = optionPriceForUser(product.options[0], user, product.category);
     if (Number.isFinite(price)) {
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(5.8);
+      pdf.setFontSize(6.2);
       pdf.setTextColor(...accent);
-      pdf.text("PRICE", x + 4, y + 79);
-      pdf.setFontSize(10);
+      pdf.text("PRICE", identityX, y + 79);
+      pdf.setFontSize(13);
       pdf.setTextColor(26, 26, 26);
-      pdf.text(`$${price.toFixed(2)}`, x + 4, y + 87);
+      pdf.text(`$${price.toFixed(2)}`, identityX, y + 89);
     }
   }
 
@@ -1060,16 +1068,14 @@ function drawGridPage(pdf, {
     pageCount
   );
   products.forEach((product, index) => {
-    const column = index % 2;
-    const row = Math.floor(index / 2);
     drawGridProductCard(
       pdf,
       product,
       images[index],
       includePrices,
       user,
-      12 + column * 96,
-      39 + row * 117
+      12,
+      35 + index * 117
     );
   });
   drawGridFooter(
@@ -1460,7 +1466,7 @@ async function renderDigitalCatalogPdf({
   const pageCount =
     1 +
     categoryGroups.reduce(
-      (total, group) => total + Math.ceil(group.products.length / 4),
+      (total, group) => total + Math.ceil(group.products.length / 2),
       0
     );
   const pdf = new jsPDF({
@@ -1546,8 +1552,8 @@ async function renderDigitalCatalogPdf({
   let currentPage = 1;
   storeGroups.forEach((store) => {
     store.categoryGroups.forEach((group) => {
-      for (let start = 0; start < group.products.length; start += 4) {
-        const pageProducts = group.products.slice(start, start + 4);
+      for (let start = 0; start < group.products.length; start += 2) {
+        const pageProducts = group.products.slice(start, start + 2);
         pdf.addPage("a4", "portrait");
         currentPage += 1;
         drawGridPage(pdf, {
