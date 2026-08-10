@@ -909,32 +909,32 @@ function drawGridProductCard(
   const identityX = x + 66;
   const contentWidth = 112;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(6.5);
+  pdf.setFontSize(7.2);
   pdf.setTextColor(...accent);
   pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 11);
-  pdf.setFontSize(12.5);
+  pdf.setFontSize(15);
   pdf.setTextColor(26, 26, 26);
   pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 19, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(6.3);
+  pdf.setFontSize(7);
   pdf.setTextColor(113, 128, 123);
-  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 32.5);
+  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 36);
 
   pdf.setDrawColor(220, 229, 226);
-  pdf.line(identityX, y + 39, x + width - 7, y + 39);
+  pdf.line(identityX, y + 42, x + width - 7, y + 42);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(6.2);
+  pdf.setFontSize(7);
   pdf.setTextColor(...accent);
-  pdf.text("DESCRIPTION", identityX, y + 46);
+  pdf.text("DESCRIPTION", identityX, y + 50);
   const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(7.4);
+  pdf.setFontSize(8.4);
   pdf.setTextColor(65, 80, 75);
   pdf.text(
     truncatePdfLines(pdf, description, contentWidth, 4),
     identityX,
-    y + 53,
-    { lineHeightFactor: 1.28 }
+    y + 57,
+    { lineHeightFactor: 1.24 }
   );
 
   const variations =
@@ -943,17 +943,17 @@ function drawGridProductCard(
       : [];
   if (variations.length) {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.2);
+    pdf.setFontSize(7);
     pdf.setTextColor(...accent);
-    pdf.text("AVAILABLE VARIATIONS", identityX, y + 70);
+    pdf.text("AVAILABLE VARIATIONS", identityX, y + 75);
 
     const tableX = identityX;
-    const tableY = y + 73;
+    const tableY = y + 78;
     const columnCount = 3;
     const columnGap = 2;
     const rowGap = 2;
     const cellWidth = (contentWidth - columnGap * (columnCount - 1)) / columnCount;
-    const cellHeight = 10;
+    const cellHeight = 11;
     variations.forEach((option, index) => {
       const column = index % columnCount;
       const row = Math.floor(index / columnCount);
@@ -965,19 +965,19 @@ function drawGridProductCard(
       pdf.setLineWidth(0.2);
       pdf.roundedRect(cellX, cellY, cellWidth, cellHeight, 0.7, 0.7, "FD");
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(includePrices ? 5.1 : 5.8);
+      pdf.setFontSize(includePrices ? 5.7 : 6.3);
       pdf.setTextColor(...accent);
       pdf.text(
         truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 3, 1),
         cellX + cellWidth / 2,
-        includePrices ? cellY + 3.9 : cellY + 6,
+        includePrices ? cellY + 4.3 : cellY + 6.5,
         { align: "center" }
       );
       if (includePrices && Number.isFinite(price)) {
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(5.1);
+        pdf.setFontSize(5.7);
         pdf.setTextColor(65, 80, 75);
-        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 7.7, {
+        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 8.6, {
           align: "center",
         });
       }
@@ -988,14 +988,14 @@ function drawGridProductCard(
       pdf.setFillColor(...accentSoft);
       pdf.setDrawColor(...accentBorder);
       pdf.setLineWidth(0.2);
-      pdf.roundedRect(identityX, y + 70, contentWidth, 18, 1, 1, "FD");
+      pdf.roundedRect(identityX, y + 75, contentWidth, 21, 1, 1, "FD");
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(6.2);
+      pdf.setFontSize(7);
       pdf.setTextColor(...accent);
-      pdf.text("PRICE", identityX + 4, y + 77);
-      pdf.setFontSize(13);
+      pdf.text("PRICE", identityX + 4, y + 83);
+      pdf.setFontSize(16);
       pdf.setTextColor(26, 26, 26);
-      pdf.text(`$${price.toFixed(2)}`, identityX + 4, y + 84);
+      pdf.text(`$${price.toFixed(2)}`, identityX + 4, y + 92);
     }
   }
 
