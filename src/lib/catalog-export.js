@@ -871,13 +871,13 @@ function gridProductCardLayout(pdf, product) {
     ? product.options
     : [];
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10.5);
-  const descriptionLines = pdf.splitTextToSize(description, 112);
+  pdf.setFontSize(12.5);
+  const descriptionLines = pdf.splitTextToSize(description, 96);
   const variationRows = Math.ceil(variations.length / 2);
   return {
     descriptionLines,
     variations,
-    height: Math.max(104, 64 + descriptionLines.length * 4.35 + (variationRows ? 8 + variationRows * 11 : 0)),
+    height: Math.max(117, 66 + descriptionLines.length * 5 + (variationRows ? 8 + variationRows * 11 : 0)),
   };
 }
 
@@ -901,41 +901,37 @@ function drawGridProductCard(
   pdf.setLineWidth(0.3);
   pdf.roundedRect(x, y, width, height, 1.8, 1.8, "FD");
 
-  pdf.setFillColor(51, 51, 51);
-  pdf.roundedRect(x, y, width, 5, 1.8, 1.8, "F");
-  pdf.setFillColor(...accent);
-  pdf.roundedRect(x, y + 5, 3, height - 5, 1.8, 1.8, "F");
   pdf.setFillColor(239, 244, 242);
-  pdf.roundedRect(x + 7, y + 12, 52, 52, 1.2, 1.2, "F");
+  pdf.roundedRect(x + 8, y + 20, 76, 76, 1.2, 1.2, "F");
   if (image?.dataUrl && image?.format) {
     pdf.addImage(
       image.dataUrl,
       image.format,
-      x + 7,
-      y + 12,
-      52,
-      52,
+      x + 8,
+      y + 20,
+      76,
+      76,
       `catalog-product-${pdfSafeText(product.id || product.sku || product.name)}`,
       "FAST"
     );
   } else {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(28);
+    pdf.setFontSize(34);
     pdf.setTextColor(...accent);
-    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 33, y + 43, { align: "center" });
+    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 46, y + 65, { align: "center" });
   }
 
-  const identityX = x + 66;
-  const contentWidth = 112;
+  const identityX = x + 94;
+  const contentWidth = 96;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(6.5);
+  pdf.setFontSize(7.5);
   pdf.setTextColor(...accent);
-  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 12);
-  pdf.setFontSize(14);
+  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 14);
+  pdf.setFontSize(17);
   pdf.setTextColor(26, 26, 26);
-  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 20, { lineHeightFactor: 1.06 });
+  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 24, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(7);
+  pdf.setFontSize(8);
   pdf.setTextColor(113, 128, 123);
   const price = includePrices && product.options?.[0]
     ? optionPriceForUser(product.options[0], user, product.category)
@@ -943,26 +939,22 @@ function drawGridProductCard(
   pdf.text(
     `SKU ${pdfSafeText(product.sku || "-")}${Number.isFinite(price) ? `  ·  $${price.toFixed(2)}` : ""}`,
     identityX,
-    y + 36
+    y + 43
   );
 
   pdf.setDrawColor(220, 229, 226);
-  pdf.line(identityX, y + 43, x + width - 7, y + 43);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(...accent);
-  pdf.text("DESCRIPTION", identityX, y + 50);
+  pdf.line(identityX, y + 50, x + width - 7, y + 50);
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10.5);
+  pdf.setFontSize(12.5);
   pdf.setTextColor(65, 80, 75);
-  pdf.text(layout.descriptionLines, identityX, y + 57, { lineHeightFactor: 1.17 });
+  pdf.text(layout.descriptionLines, identityX, y + 61, { lineHeightFactor: 1.15 });
 
   const { variations } = layout;
   if (variations.length) {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7);
+    pdf.setFontSize(7.5);
     pdf.setTextColor(...accent);
-    const variationsY = y + 57 + layout.descriptionLines.length * 4.35 + 5;
+    const variationsY = y + 61 + layout.descriptionLines.length * 5 + 6;
     pdf.text("AVAILABLE VARIATIONS", identityX, variationsY);
 
     const tableX = identityX;
