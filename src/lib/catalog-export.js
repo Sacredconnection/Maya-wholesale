@@ -875,7 +875,7 @@ function drawGridProductCard(
   y
 ) {
   const width = 186;
-  const height = 112;
+  const height = 236;
   const accent = ethnicityColor(product);
   const accentSoft = mixWithWhite(accent, 0.92);
   const accentBorder = mixWithWhite(accent, 0.72);
@@ -884,48 +884,50 @@ function drawGridProductCard(
   pdf.setLineWidth(0.3);
   pdf.roundedRect(x, y, width, height, 1.8, 1.8, "FD");
 
+  pdf.setFillColor(51, 51, 51);
+  pdf.roundedRect(x, y, width, 7, 1.8, 1.8, "F");
   pdf.setFillColor(...accent);
-  pdf.roundedRect(x, y, 3, height, 1.8, 1.8, "F");
+  pdf.roundedRect(x, y + 7, 3, height - 7, 1.8, 1.8, "F");
   pdf.setFillColor(239, 244, 242);
-  pdf.roundedRect(x + 7, y + 25, 52, 62, 1.2, 1.2, "F");
+  pdf.roundedRect(x + 9, y + 28, 80, 98, 1.2, 1.2, "F");
   if (image?.dataUrl && image?.format) {
     pdf.addImage(
       image.dataUrl,
       image.format,
-      x + 7,
-      y + 30,
-      52,
-      52,
+      x + 11,
+      y + 38,
+      76,
+      76,
       `catalog-product-${pdfSafeText(product.id || product.sku || product.name)}`,
       "FAST"
     );
   } else {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(28);
+    pdf.setFontSize(34);
     pdf.setTextColor(...accent);
-    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 33, y + 60, { align: "center" });
+    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 49, y + 83, { align: "center" });
   }
 
-  const identityX = x + 66;
-  const contentWidth = 112;
+  const identityX = x + 100;
+  const contentWidth = 78;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(7.2);
+  pdf.setFontSize(7.5);
   pdf.setTextColor(...accent);
-  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 11);
-  pdf.setFontSize(15);
+  pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 27);
+  pdf.setFontSize(17);
   pdf.setTextColor(26, 26, 26);
-  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 19, { lineHeightFactor: 1.06 });
+  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 3), identityX, y + 37, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(7);
+  pdf.setFontSize(7.5);
   pdf.setTextColor(113, 128, 123);
-  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 36);
+  pdf.text(`SKU ${pdfSafeText(product.sku || "-")}`, identityX, y + 57);
 
   pdf.setDrawColor(220, 229, 226);
-  pdf.line(identityX, y + 42, x + width - 7, y + 42);
+  pdf.line(identityX, y + 65, x + width - 8, y + 65);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(7);
+  pdf.setFontSize(7.5);
   pdf.setTextColor(...accent);
-  pdf.text("DESCRIPTION", identityX, y + 50);
+  pdf.text("DESCRIPTION", identityX, y + 74);
   const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(12.6);
@@ -933,7 +935,7 @@ function drawGridProductCard(
   pdf.text(
     truncatePdfLines(pdf, description, contentWidth, 4),
     identityX,
-    y + 57,
+    y + 83,
     { lineHeightFactor: 1.1 }
   );
 
@@ -945,15 +947,15 @@ function drawGridProductCard(
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7);
     pdf.setTextColor(...accent);
-    pdf.text("AVAILABLE VARIATIONS", identityX, y + 75);
+    pdf.text("AVAILABLE VARIATIONS", identityX, y + 128);
 
     const tableX = identityX;
-    const tableY = y + 78;
-    const columnCount = 3;
+    const tableY = y + 132;
+    const columnCount = 2;
     const columnGap = 2;
     const rowGap = 2;
     const cellWidth = (contentWidth - columnGap * (columnCount - 1)) / columnCount;
-    const cellHeight = 11;
+    const cellHeight = 15;
     variations.forEach((option, index) => {
       const column = index % columnCount;
       const row = Math.floor(index / columnCount);
@@ -970,14 +972,14 @@ function drawGridProductCard(
       pdf.text(
         truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 3, 1),
         cellX + cellWidth / 2,
-        includePrices ? cellY + 4.3 : cellY + 6.5,
+        includePrices ? cellY + 5.4 : cellY + 8.7,
         { align: "center" }
       );
       if (includePrices && Number.isFinite(price)) {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(5.7);
         pdf.setTextColor(65, 80, 75);
-        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 8.6, {
+        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 11, {
           align: "center",
         });
       }
@@ -988,14 +990,14 @@ function drawGridProductCard(
       pdf.setFillColor(...accentSoft);
       pdf.setDrawColor(...accentBorder);
       pdf.setLineWidth(0.2);
-      pdf.roundedRect(identityX, y + 75, contentWidth, 21, 1, 1, "FD");
+      pdf.roundedRect(identityX, y + 132, contentWidth, 34, 1, 1, "FD");
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(7);
       pdf.setTextColor(...accent);
-      pdf.text("PRICE", identityX + 4, y + 83);
-      pdf.setFontSize(16);
+      pdf.text("PRICE", identityX + 5, y + 143);
+      pdf.setFontSize(21);
       pdf.setTextColor(26, 26, 26);
-      pdf.text(`$${price.toFixed(2)}`, identityX + 4, y + 92);
+      pdf.text(`$${price.toFixed(2)}`, identityX + 5, y + 157);
     }
   }
 
@@ -1079,7 +1081,7 @@ function drawGridPage(pdf, {
       includePrices,
       user,
       12,
-      35 + index * 117
+      35 + index * 241
     );
   });
   drawGridFooter(
@@ -1470,7 +1472,7 @@ async function renderDigitalCatalogPdf({
   const pageCount =
     1 +
     categoryGroups.reduce(
-      (total, group) => total + Math.ceil(group.products.length / 2),
+      (total, group) => total + group.products.length,
       0
     );
   const pdf = new jsPDF({
@@ -1556,8 +1558,8 @@ async function renderDigitalCatalogPdf({
   let currentPage = 1;
   storeGroups.forEach((store) => {
     store.categoryGroups.forEach((group) => {
-      for (let start = 0; start < group.products.length; start += 2) {
-        const pageProducts = group.products.slice(start, start + 2);
+      for (let start = 0; start < group.products.length; start += 1) {
+        const pageProducts = group.products.slice(start, start + 1);
         pdf.addPage("a4", "portrait");
         currentPage += 1;
         drawGridPage(pdf, {
