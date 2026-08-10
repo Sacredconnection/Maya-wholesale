@@ -96,7 +96,7 @@ The catalog is sourced exclusively from Maya Herbs. Configuration is entirely se
 
 **How it works:** [src/lib/commerce-stores.js](src/lib/commerce-stores.js) defines the server-only Maya Herbs backend. `/api/products` and `/api/catalog` load only that catalog. The cart preserves the product source, and `/api/orders` validates every item against Maya Herbs before creating the WooCommerce order. Authentication, the buyer profile, and order history remain authoritative in Maya Herbs.
 
-PDF exports always bypass the WooCommerce data cache, so every generated file uses the published products, current variations, and stock returned at generation time. Prices are intentionally omitted from the PDF catalog. Normal catalog browsing keeps the short `WC_REVALIDATE_SECONDS` cache for performance.
+PDF exports always bypass the WooCommerce data cache, so every generated file uses the published products, current variations, stock returned at generation time. When generated from an authenticated wholesale session, the PDF includes the customer's current price for each available format. Normal catalog browsing keeps the short `WC_REVALIDATE_SECONDS` cache for performance.
 
 Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://YOUR_DOMAIN/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
 

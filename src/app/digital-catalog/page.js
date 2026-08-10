@@ -295,6 +295,8 @@ export default function CatalogPage() {
     tribe: filters.subcategory,
     attributes: filters.attributes,
     filterLabel: filterLabel(),
+    includePrices: isLoggedIn,
+    user,
   });
 
   const handlePreviewPdf = async () => {
