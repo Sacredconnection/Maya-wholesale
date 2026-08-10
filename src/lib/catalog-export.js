@@ -872,7 +872,7 @@ function gridProductCardLayout(pdf, product) {
     : [];
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(12.5);
-  const descriptionLines = pdf.splitTextToSize(description, 96);
+  const descriptionLines = pdf.splitTextToSize(description, 88);
   const variationRows = Math.ceil(variations.length / 2);
   return {
     descriptionLines,
@@ -922,7 +922,7 @@ function drawGridProductCard(
   }
 
   const identityX = x + 94;
-  const contentWidth = 96;
+  const contentWidth = 88;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(7.5);
   pdf.setTextColor(...accent);
@@ -930,14 +930,14 @@ function drawGridProductCard(
   pdf.setFontSize(17);
   pdf.setTextColor(26, 26, 26);
   pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 24, { lineHeightFactor: 1.06 });
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(8);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10.5);
   pdf.setTextColor(113, 128, 123);
   const price = includePrices && product.options?.[0]
     ? optionPriceForUser(product.options[0], user, product.category)
     : null;
   pdf.text(
-    `SKU ${pdfSafeText(product.sku || "-")}${Number.isFinite(price) ? `  ·  $${price.toFixed(2)}` : ""}`,
+    `${pdfSafeText(product.sku || "-")}${Number.isFinite(price) ? `  ·  $${price.toFixed(2)}` : ""}`,
     identityX,
     y + 43
   );
