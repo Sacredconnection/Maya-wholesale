@@ -880,7 +880,16 @@ function pdfProductTarget(product, includeLinks) {
   return loginUrl.href;
 }
 
-function drawGridProductCard(pdf, product, image, includeLinks, x, y) {
+function drawGridProductCard(
+  pdf,
+  product,
+  image,
+  includeLinks,
+  includePrices,
+  user,
+  x,
+  y
+) {
   const width = 90;
   const height = 108;
   const accent = ethnicityColor(product);
@@ -937,38 +946,63 @@ function drawGridProductCard(pdf, product, image, includeLinks, x, y) {
   pdf.setTextColor(65, 80, 75);
   pdf.text(truncatePdfLines(pdf, description, 82, 5), x + 4, y + 53, { lineHeightFactor: 1.25 });
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(5.8);
-  pdf.setTextColor(...accent);
-  pdf.text("AVAILABLE FORMATS", x + 4, y + 77.5);
-
-  const tableOptions = product.options?.length
-    ? product.options
-    : [{ name: "Single format" }];
-  const tableX = x + 4;
-  const tableY = y + 80.5;
-  const columnCount = 5;
-  const columnGap = 1;
-  const rowGap = 0.8;
-  const cellWidth = (82 - columnGap * (columnCount - 1)) / columnCount;
-  const cellHeight = 6.2;
-  tableOptions.forEach((option, index) => {
-    const column = index % columnCount;
-    const row = Math.floor(index / columnCount);
-    const cellX = tableX + column * (cellWidth + columnGap);
-    const cellY = tableY + row * (cellHeight + rowGap);
-    const weightLabel = option.weightGrams
-      ? `${option.weightGrams}g`
-      : pdfSafeText(option.name || "Single format");
-    pdf.setFillColor(...accentSoft);
-    pdf.setDrawColor(...accentBorder);
-    pdf.setLineWidth(0.2);
-    pdf.roundedRect(cellX, cellY, cellWidth, cellHeight, 0.7, 0.7, "FD");
+  const variations =
+    product.productType === "variable" && Array.isArray(product.options)
+      ? product.options
+      : [];
+  if (variations.length) {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(4.5);
+    pdf.setFontSize(5.8);
     pdf.setTextColor(...accent);
-    pdf.text(weightLabel, cellX + cellWidth / 2, cellY + 4.05, { align: "center" });
-  });
+    pdf.text("AVAILABLE VARIATIONS", x + 4, y + 77.5);
+
+    const tableX = x + 4;
+    const tableY = y + 80.5;
+    const columnCount = 5;
+    const columnGap = 1;
+    const rowGap = 0.8;
+    const cellWidth = (82 - columnGap * (columnCount - 1)) / columnCount;
+    const cellHeight = 6.2;
+    variations.forEach((option, index) => {
+      const column = index % columnCount;
+      const row = Math.floor(index / columnCount);
+      const cellX = tableX + column * (cellWidth + columnGap);
+      const cellY = tableY + row * (cellHeight + rowGap);
+      const price = optionPriceForUser(option, user, product.category);
+      pdf.setFillColor(...accentSoft);
+      pdf.setDrawColor(...accentBorder);
+      pdf.setLineWidth(0.2);
+      pdf.roundedRect(cellX, cellY, cellWidth, cellHeight, 0.7, 0.7, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(includePrices ? 4.1 : 4.5);
+      pdf.setTextColor(...accent);
+      pdf.text(
+        truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 1, 1),
+        cellX + cellWidth / 2,
+        includePrices ? cellY + 2.8 : cellY + 4.05,
+        { align: "center" }
+      );
+      if (includePrices && Number.isFinite(price)) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(3.8);
+        pdf.setTextColor(65, 80, 75);
+        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 5.45, {
+          align: "center",
+        });
+      }
+    });
+  } else if (includePrices && product.options?.[0]) {
+    const price = optionPriceForUser(product.options[0], user, product.category);
+    if (Number.isFinite(price)) {
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(...accent);
+      pdf.text("PRICE", x + 4, y + 79);
+      pdf.setFontSize(10);
+      pdf.setTextColor(26, 26, 26);
+      pdf.text(`$${price.toFixed(2)}`, x + 4, y + 87);
+    }
+  }
 
   pdf.setFillColor(...accent);
   pdf.roundedRect(x + 4, y + 96, width - 8, 8, 1, 1, "F");
@@ -976,7 +1010,11 @@ function drawGridProductCard(pdf, product, image, includeLinks, x, y) {
   pdf.setFontSize(5.8);
   pdf.setTextColor(...buttonText);
   pdf.text(includeLinks ? "VIEW PRODUCT" : "LOGIN TO VIEW PRODUCT", x + 8, y + 101.3);
-  pdf.text(`${product.options?.length || 1} OPTIONS  >`, x + width - 8, y + 101.3, { align: "right" });
+  if (variations.length) {
+    pdf.text(`${variations.length} VARIATIONS  >`, x + width - 8, y + 101.3, {
+      align: "right",
+    });
+  }
   pdf.link(x, y, width, height, { url: pdfProductTarget(product, includeLinks) });
 }
 
@@ -1050,6 +1088,8 @@ function drawGridPage(pdf, {
   images,
   logo,
   includeLinks,
+  includePrices,
+  user,
   storeId,
   storeName,
   category,
@@ -1070,7 +1110,16 @@ function drawGridPage(pdf, {
   products.forEach((product, index) => {
     const column = index % 2;
     const row = Math.floor(index / 2);
-    drawGridProductCard(pdf, product, images[index], includeLinks, 12 + column * 96, 39 + row * 117);
+    drawGridProductCard(
+      pdf,
+      product,
+      images[index],
+      includeLinks,
+      includePrices,
+      user,
+      12 + column * 96,
+      39 + row * 117
+    );
   });
   drawGridFooter(
     pdf,
@@ -1342,7 +1391,7 @@ async function fetchDigitalCatalogProducts({
 
   const response = await fetch(`/api/catalog?${params.toString()}`, {
     cache: "no-store",
-    credentials: "omit",
+    credentials: "same-origin",
   });
   const data = await response.json();
   if (!response.ok) {
@@ -1370,6 +1419,8 @@ async function buildDigitalCatalogPdf(options = {}) {
   const pdf = await renderDigitalCatalogPdf({
     products,
     includeLinks: false,
+    includePrices: Boolean(options.includePrices),
+    user: options.user || null,
     filterLabel: options.filterLabel || "Complete catalog",
     generatedAt,
   });
@@ -1401,6 +1452,8 @@ export async function downloadDigitalCatalogPdf(options = {}) {
 async function renderDigitalCatalogPdf({
   products,
   includeLinks,
+  includePrices,
+  user,
   filterLabel,
   generatedAt,
 }) {
@@ -1674,6 +1727,8 @@ async function renderDigitalCatalogPdf({
           ),
           logo,
           includeLinks,
+          includePrices,
+          user,
           storeId: store.storeId,
           storeName: store.storeName,
           category: group.category,
