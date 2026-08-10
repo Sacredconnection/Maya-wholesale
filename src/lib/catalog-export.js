@@ -928,13 +928,13 @@ function drawGridProductCard(
   pdf.text("DESCRIPTION", identityX, y + 50);
   const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(8.4);
+  pdf.setFontSize(12.6);
   pdf.setTextColor(65, 80, 75);
   pdf.text(
     truncatePdfLines(pdf, description, contentWidth, 4),
     identityX,
     y + 57,
-    { lineHeightFactor: 1.24 }
+    { lineHeightFactor: 1.1 }
   );
 
   const variations =
