@@ -927,8 +927,8 @@ function drawGridProductCard(
   pdf.setFontSize(7.5);
   pdf.setTextColor(...accent);
   pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 14);
-  pdf.setFontSize(17);
-  pdf.setTextColor(26, 26, 26);
+  pdf.setFontSize(22);
+  pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
   pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 24, { lineHeightFactor: 1.06 });
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10.5);
@@ -936,11 +936,13 @@ function drawGridProductCard(
   const price = includePrices && product.options?.[0]
     ? optionPriceForUser(product.options[0], user, product.category)
     : null;
-  pdf.text(
-    `${pdfSafeText(product.sku || "-")}${Number.isFinite(price) ? `  ·  $${price.toFixed(2)}` : ""}`,
-    identityX,
-    y + 43
-  );
+  const sku = pdfSafeText(product.sku || "-");
+  pdf.text(sku, identityX, y + 43);
+  if (Number.isFinite(price)) {
+    pdf.setFontSize(17);
+    pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
+    pdf.text(`$${price.toFixed(2)}`, identityX + pdf.getTextWidth(sku) + 6, y + 43);
+  }
 
   pdf.setDrawColor(220, 229, 226);
   pdf.line(identityX, y + 50, x + width - 7, y + 50);
