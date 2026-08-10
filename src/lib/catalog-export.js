@@ -887,15 +887,15 @@ function drawGridProductCard(
   pdf.setFillColor(...accent);
   pdf.roundedRect(x, y, 3, height, 1.8, 1.8, "F");
   pdf.setFillColor(239, 244, 242);
-  pdf.roundedRect(x + 7, y + 5, 52, 102, 1.2, 1.2, "F");
+  pdf.roundedRect(x + 7, y + 25, 52, 62, 1.2, 1.2, "F");
   if (image?.dataUrl && image?.format) {
     pdf.addImage(
       image.dataUrl,
       image.format,
       x + 7,
-      y + 5,
+      y + 30,
       52,
-      102,
+      52,
       `catalog-product-${pdfSafeText(product.id || product.sku || product.name)}`,
       "FAST"
     );
@@ -903,7 +903,7 @@ function drawGridProductCard(
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(28);
     pdf.setTextColor(...accent);
-    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 33, y + 59, { align: "center" });
+    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 33, y + 60, { align: "center" });
   }
 
   const identityX = x + 66;
@@ -945,10 +945,10 @@ function drawGridProductCard(
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(6.2);
     pdf.setTextColor(...accent);
-    pdf.text("AVAILABLE VARIATIONS", identityX, y + 77);
+    pdf.text("AVAILABLE VARIATIONS", identityX, y + 70);
 
     const tableX = identityX;
-    const tableY = y + 80;
+    const tableY = y + 73;
     const columnCount = 3;
     const columnGap = 2;
     const rowGap = 2;
@@ -985,13 +985,17 @@ function drawGridProductCard(
   } else if (includePrices && product.options?.[0]) {
     const price = optionPriceForUser(product.options[0], user, product.category);
     if (Number.isFinite(price)) {
+      pdf.setFillColor(...accentSoft);
+      pdf.setDrawColor(...accentBorder);
+      pdf.setLineWidth(0.2);
+      pdf.roundedRect(identityX, y + 70, contentWidth, 18, 1, 1, "FD");
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(6.2);
       pdf.setTextColor(...accent);
-      pdf.text("PRICE", identityX, y + 79);
+      pdf.text("PRICE", identityX + 4, y + 77);
       pdf.setFontSize(13);
       pdf.setTextColor(26, 26, 26);
-      pdf.text(`$${price.toFixed(2)}`, identityX, y + 89);
+      pdf.text(`$${price.toFixed(2)}`, identityX + 4, y + 84);
     }
   }
 
