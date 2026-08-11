@@ -529,29 +529,29 @@ function drawCoverContactInfo(pdf, contactIcons) {
       values: ["info@mayaherbs.com"],
       x: 20,
       textX: 31,
-      y: 204,
+      y: 200,
       url: "mailto:info@mayaherbs.com",
-      linkWidth: 72,
+      linkWidth: 51,
       linkHeight: 9,
     },
     {
       type: "phone",
       values: ["+31 23 532 5192"],
-      x: 20,
-      textX: 31,
-      y: 220,
+      x: 77,
+      textX: 88,
+      y: 200,
       url: "tel:+31235325192",
-      linkWidth: 72,
+      linkWidth: 45,
       linkHeight: 9,
     },
     {
       type: "location",
       values: ["Mollerusweg 66", "2031 BZ Haarlem", "The Netherlands"],
-      x: 108,
-      textX: 119,
-      y: 204,
+      x: 128,
+      textX: 139,
+      y: 200,
       url: "https://www.google.com/maps/search/?api=1&query=Mollerusweg+66+2031+BZ+Haarlem",
-      linkWidth: 82,
+      linkWidth: 62,
       linkHeight: 20,
     },
   ];
@@ -615,14 +615,6 @@ function drawPdfCover(
   pdf.setFillColor(...MAYA_PRIMARY);
   pdf.rect(0, 42, 210, 1.5, "F");
 
-  pdf.setDrawColor(255, 228, 214);
-  pdf.setLineWidth(0.6);
-  pdf.line(20, 71, 51, 71);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(7.5);
-  pdf.setTextColor(255, 228, 214);
-  pdf.text("WHOLESALE CATALOG", 20, 65);
-
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(29);
   pdf.setTextColor(255, 255, 255);
@@ -663,10 +655,6 @@ function drawPdfCover(
     { lineHeightFactor: 1.08 }
   );
 
-  pdf.setDrawColor(255, 228, 214);
-  pdf.setLineWidth(0.35);
-  pdf.line(20, 174, 190, 174);
-
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
@@ -675,20 +663,21 @@ function drawPdfCover(
   pdf.setLineWidth(0.35);
   pdf.line(20, 195, 190, 195);
   drawCoverContactInfo(pdf, contactIcons);
+  pdf.setDrawColor(255, 228, 214);
+  pdf.setLineWidth(0.25);
+  pdf.line(72, 200, 72, 220);
+  pdf.line(123, 200, 123, 220);
 
   const wholesaleWebsiteLabel = "wholesale.mayaherbs.com";
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
-  pdf.text("ONLINE WHOLESALE", 20, 244);
-  pdf.setFontSize(11);
+  pdf.text("ONLINE WHOLESALE", 20, 237);
+  pdf.setFontSize(15);
   pdf.setTextColor(255, 255, 255);
-  pdf.text(wholesaleWebsiteLabel, 20, 254);
+  pdf.text(wholesaleWebsiteLabel, 20, 250);
   const wholesaleWebsiteWidth = pdf.getTextWidth(wholesaleWebsiteLabel);
-  pdf.setDrawColor(255, 255, 255);
-  pdf.setLineWidth(0.45);
-  pdf.line(20, 257, 20 + wholesaleWebsiteWidth, 257);
-  pdf.link(18.5, 247, wholesaleWebsiteWidth + 4, 12, {
+  pdf.link(18.5, 240, wholesaleWebsiteWidth + 4, 14, {
     url: WHOLESALE_SITE_URL,
   });
 
