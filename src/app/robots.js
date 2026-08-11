@@ -11,7 +11,6 @@ export default function robots() {
         "/my-account",
         "/order-received",
         "/product/",
-        "/suggested-orders",
       ],
     },
     sitemap: "https://wholesale.mayaherbs.com/sitemap.xml",

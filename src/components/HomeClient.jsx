@@ -11,12 +11,9 @@ import RetailRedirectSection from '@/components/RetailRedirectSection';
 import MayaWholesaleBanner from '@/components/MayaWholesaleBanner';
 import Footer from '@/components/Footer';
 import LoginModal from '@/components/LoginModal';
-import SuggestedOrdersPreview from '@/components/SuggestedOrdersPreview';
-import { useAuth } from '@/components/AuthContext';
 
 export default function HomeClient({ categories = [] }) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const { isLoggedIn, loading: authLoading } = useAuth();
 
   return (
     <div id="top" className="site-background-page home-no-glass bg-white text-[#2D2D2D] min-h-screen flex flex-col font-sans antialiased">
@@ -32,7 +29,6 @@ export default function HomeClient({ categories = [] }) {
       {/* Main Page Area */}
       <main className="flex w-full flex-grow flex-col gap-12 bg-white pb-12 lg:gap-16 lg:pb-16">
         <div className="home-content-shell flex flex-col gap-12 lg:gap-16">
-          {!authLoading && isLoggedIn && <SuggestedOrdersPreview />}
           {/* B2B Onboarding Steps */}
           <Onboarding />
 

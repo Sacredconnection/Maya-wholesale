@@ -34,7 +34,7 @@ import {
   findOptionIndex,
   isStockedOption,
   mapWithClientConcurrency,
-} from "@/lib/order-suggestions";
+} from "@/lib/reorder-utils";
 import {
   BUNQ_CARD_PAYMENT,
   MANUAL_BANK_TRANSFER,

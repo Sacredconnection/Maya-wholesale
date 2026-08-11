@@ -75,15 +75,6 @@ export default function Header({ onOpenLogin }) {
           >
             Wholesale Catalog
           </Link>
-          {isLoggedIn && (
-            <Link
-              className={`${pathname === '/suggested-orders' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
-              href="/suggested-orders"
-              aria-current={pathname === '/suggested-orders' ? 'page' : undefined}
-            >
-              Suggested Orders
-            </Link>
-          )}
           <Link
             className={`${pathname === '/contact' ? 'text-[#2d2d2d] after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'} relative inline-flex items-center justify-center py-3 leading-none transition-colors duration-300 after:absolute after:bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-center after:transition-transform after:duration-300 after:content-['']`}
             href="/contact"
@@ -213,16 +204,6 @@ export default function Header({ onOpenLogin }) {
           >
             Wholesale Catalog
           </Link>
-          {isLoggedIn && (
-            <Link
-              className={`${pathname === '/suggested-orders' ? 'text-white' : 'text-[#f2f2f2]'} text-base font-medium transition-all duration-300 hover:translate-x-1.5 hover:text-white motion-reduce:transform-none`}
-              href="/suggested-orders"
-              aria-current={pathname === '/suggested-orders' ? 'page' : undefined}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Suggested Orders
-            </Link>
-          )}
           <Link
             className={`${pathname === '/contact' ? 'text-white' : 'text-white/70'} text-base font-medium transition-all duration-300 hover:text-[#f2f2f2] hover:translate-x-1.5 motion-reduce:transform-none`}
             href="/contact"

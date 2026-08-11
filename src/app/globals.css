@@ -319,6 +319,19 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
   color: #1e1e1e !important;
 }
 
+.site-header #mobile-navigation a[href="/digital-catalog"] {
+  border-color: rgb(190 190 90 / 0.72) !important;
+  background-color: rgb(153 153 51 / 0.18) !important;
+  color: #ffffff !important;
+}
+
+.site-header #mobile-navigation a[href="/digital-catalog"]:hover,
+.site-header #mobile-navigation a[href="/digital-catalog"][aria-current="page"] {
+  border-color: #bebe5a !important;
+  background-color: #7f802b !important;
+  color: #ffffff !important;
+}
+
 .site-header a[href="/register"] {
   border-color: #cc6633 !important;
   background-color: #cc6633 !important;
