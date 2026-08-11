@@ -437,7 +437,7 @@ button, input, select, textarea {
 }
 
 .site-header .header-action-button {
-  transition-property: transform, box-shadow, border-color, background-color, color !important;
+  transition-property: border-color, background-color, color !important;
   transition-duration: 220ms !important;
   transition-timing-function: ease-out !important;
 }
@@ -445,37 +445,22 @@ button, input, select, textarea {
 .site-header :is(a, button).header-action-button:hover {
   border-color: #cc6633 !important;
   color: #cc6633 !important;
-  transform: translateY(-2px) scale(1.015);
-}
-
-.site-header :is(a, button).header-action-button:active {
-  transform: translateY(0) scale(0.975);
-  transition-duration: 90ms !important;
 }
 
 .site-header a[href="/digital-catalog"].header-action-button:hover {
   border-color: #999933 !important;
   color: #6f701f !important;
-  box-shadow: 0 8px 18px rgb(153 153 51 / 0.24) !important;
 }
 
 .site-header a[href="/register"].header-action-button:hover {
   border-color: #cc6633 !important;
   background-color: #ffffff !important;
   color: #cc6633 !important;
-  box-shadow: 0 8px 18px rgb(204 102 51 / 0.3) !important;
-}
-
-.site-header .header-login-button:hover,
-.site-header .header-desktop-outline-button:hover {
-  box-shadow: 0 8px 18px rgb(45 45 45 / 0.16) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .site-header .header-action-button,
-  .site-header .header-action-button:hover,
-  .site-header .header-action-button:active {
-    transform: none;
+  .site-header .header-action-button:hover {
     transition: none !important;
   }
 }
@@ -969,6 +954,10 @@ html[data-theme="light"] .ngo-logo-dark {
 
 html[data-theme="light"] .ngo-logo-light {
   display: block;
+}
+
+.ngo-cta-arrow {
+  color: #ffffff !important;
 }
 
 html[data-theme="light"] .ngo-section-watermark {
