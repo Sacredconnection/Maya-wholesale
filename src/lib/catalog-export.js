@@ -662,27 +662,27 @@ function drawPdfCover(
     { lineHeightFactor: 1.08 }
   );
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(255, 228, 214);
-  pdf.text("CONTACT", 20, 207);
-  pdf.setDrawColor(255, 228, 214);
-  pdf.setLineWidth(0.35);
-  pdf.line(20, 212, 190, 212);
-  drawCoverContactInfo(pdf, contactIcons, 218);
-
   const wholesaleWebsiteLabel = "wholesale.mayaherbs.com";
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
-  pdf.text("ONLINE WHOLESALE", 20, 247);
+  pdf.text("ONLINE WHOLESALE", 20, 200);
   pdf.setFontSize(15);
   pdf.setTextColor(255, 255, 255);
-  pdf.text(wholesaleWebsiteLabel, 20, 259);
+  pdf.text(wholesaleWebsiteLabel, 20, 212);
   const wholesaleWebsiteWidth = pdf.getTextWidth(wholesaleWebsiteLabel);
-  pdf.link(18.5, 249, wholesaleWebsiteWidth + 4, 14, {
+  pdf.link(18.5, 202, wholesaleWebsiteWidth + 4, 14, {
     url: WHOLESALE_SITE_URL,
   });
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(255, 228, 214);
+  pdf.text("CONTACT", 20, 225);
+  pdf.setDrawColor(255, 228, 214);
+  pdf.setLineWidth(0.35);
+  pdf.line(20, 230, 190, 230);
+  drawCoverContactInfo(pdf, contactIcons, 236);
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
