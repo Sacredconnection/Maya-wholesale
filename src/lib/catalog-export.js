@@ -18,6 +18,7 @@ const DEFAULT_ETHNICITY_COLOR = [153, 153, 51];
 const MAYA_PRIMARY = [204, 102, 51];
 const MAYA_SECONDARY = [153, 153, 51];
 const MAYA_STORE_ID = "maya-herbs";
+const WHOLESALE_SITE_URL = "https://wholesale.mayaherbs.com/";
 const ETHNICITY_COLORS = {
   apurina: [74, 115, 13],
   "apurina\u00a3": [74, 115, 13],
@@ -51,6 +52,18 @@ function ethnicityColor(product) {
 
 function mixWithWhite(color, amount) {
   return color.map((channel) => Math.round(channel + (255 - channel) * amount));
+}
+
+function pdfProductUrl(product) {
+  const productUrl = String(product?.productUrl || "").trim();
+  if (!productUrl) return "";
+
+  try {
+    const url = new URL(productUrl, WHOLESALE_SITE_URL);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function relativeLuminance(color) {
@@ -516,7 +529,7 @@ function drawCoverContactInfo(pdf, contactIcons) {
       values: ["info@mayaherbs.com"],
       x: 20,
       textX: 31,
-      y: 242,
+      y: 204,
       url: "mailto:info@mayaherbs.com",
       linkWidth: 72,
       linkHeight: 9,
@@ -526,7 +539,7 @@ function drawCoverContactInfo(pdf, contactIcons) {
       values: ["+31 23 532 5192"],
       x: 20,
       textX: 31,
-      y: 255,
+      y: 220,
       url: "tel:+31235325192",
       linkWidth: 72,
       linkHeight: 9,
@@ -536,7 +549,7 @@ function drawCoverContactInfo(pdf, contactIcons) {
       values: ["Mollerusweg 66", "2031 BZ Haarlem", "The Netherlands"],
       x: 108,
       textX: 119,
-      y: 242,
+      y: 204,
       url: "https://www.google.com/maps/search/?api=1&query=Mollerusweg+66+2031+BZ+Haarlem",
       linkWidth: 82,
       linkHeight: 20,
@@ -545,7 +558,7 @@ function drawCoverContactInfo(pdf, contactIcons) {
 
   rows.forEach((row) => {
     drawContactIcon(pdf, row.type, row.x, row.y, contactIcons);
-    pdf.setFont("helvetica", "bold");
+    pdf.setFont("helvetica", "normal");
     pdf.setFontSize(7);
     pdf.setTextColor(255, 255, 255);
     row.values.forEach((value, index) => {
@@ -568,12 +581,9 @@ function drawPdfCover(
   pdf,
   logo,
   contactIcons,
-  products,
   filterLabel,
   generatedAtLabel
 ) {
-  const categoryCount = new Set(products.map((product) => product.category).filter(Boolean)).size;
-  const traditionCount = new Set(products.map((product) => product.tribe).filter(Boolean)).size;
   const rawFilterLabel = String(filterLabel || "").trim();
   const legacyCategoryMatch = rawFilterLabel.match(
     /^category:\s*([^|]+)(?:\s*\|.*)?$/i
@@ -644,7 +654,7 @@ function drawPdfCover(
     3
   );
   const scopeLineHeight = scopeFontSize * 0.3528 * 1.08;
-  const scopeStartY = 151 -
+  const scopeStartY = 158 -
     ((scopeLines.length - 1) * scopeLineHeight) / 2;
   pdf.text(
     scopeLines,
@@ -653,36 +663,34 @@ function drawPdfCover(
     { lineHeightFactor: 1.08 }
   );
 
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(20, 174, 170, 43, 2.5, 2.5, "F");
-  const stats = [
-    [String(traditionCount), "ORIGINS"],
-    [String(products.length), "PRODUCTS"],
-    [String(categoryCount), "COLLECTIONS"],
-  ];
-  stats.forEach(([value, label], index) => {
-    const x = 48 + index * 57;
-    if (index) {
-      pdf.setDrawColor(235, 220, 212);
-      pdf.line(x - 28.5, 184, x - 28.5, 207);
-    }
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
-    pdf.setTextColor(...MAYA_PRIMARY);
-    pdf.text(value, x, 193, { align: "center" });
-    pdf.setFontSize(6.5);
-    pdf.setTextColor(91, 78, 72);
-    pdf.text(label, x, 205, { align: "center" });
-  });
+  pdf.setDrawColor(255, 228, 214);
+  pdf.setLineWidth(0.35);
+  pdf.line(20, 174, 190, 174);
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
-  pdf.text("CONTACT", 20, 231);
+  pdf.text("CONTACT", 20, 190);
   pdf.setDrawColor(255, 228, 214);
   pdf.setLineWidth(0.35);
-  pdf.line(20, 235, 190, 235);
+  pdf.line(20, 195, 190, 195);
   drawCoverContactInfo(pdf, contactIcons);
+
+  const wholesaleWebsiteLabel = "wholesale.mayaherbs.com";
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(255, 228, 214);
+  pdf.text("ONLINE WHOLESALE", 20, 244);
+  pdf.setFontSize(11);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(wholesaleWebsiteLabel, 20, 254);
+  const wholesaleWebsiteWidth = pdf.getTextWidth(wholesaleWebsiteLabel);
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setLineWidth(0.45);
+  pdf.line(20, 257, 20 + wholesaleWebsiteWidth, 257);
+  pdf.link(18.5, 247, wholesaleWebsiteWidth + 4, 12, {
+    url: WHOLESALE_SITE_URL,
+  });
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
@@ -1028,6 +1036,11 @@ function drawGridProductCard(
     pdf.setFontSize(18);
     pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
     pdf.text(priceLabel, identityX, y + GRID_PRICE_Y);
+  }
+
+  const productUrl = pdfProductUrl(product);
+  if (productUrl) {
+    pdf.link(x, y, width, height, { url: productUrl });
   }
 }
 
@@ -1570,7 +1583,6 @@ async function renderDigitalCatalogPdf({
     pdf,
     logo,
     contactIcons,
-    products,
     filterLabel,
     generatedAtLabel
   );
