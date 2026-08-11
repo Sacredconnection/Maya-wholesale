@@ -100,6 +100,11 @@ accepted only on localhost, is always disabled in production, and has
 read-only portal access: orders and account changes remain blocked. Set
 `LOCAL_DEV_AUTO_LOGIN=true` to create the local session automatically and
 open protected pages without the sign-in screen.
+
+To keep the digital catalog available while the WooCommerce API is temporarily
+blocked or offline, run `npm run catalog:snapshot` after the live catalog has
+loaded once. Development automatically falls back to
+`tmp/catalog-snapshot.json`; set `CATALOG_SNAPSHOT_PATH` to use another file.
 *   **Vercel:** add all variables for Production and Preview, then redeploy.
 
 **How it works:** [src/lib/commerce-stores.js](src/lib/commerce-stores.js) defines the server-only Maya Herbs backend. `/api/products` and `/api/catalog` load only that catalog. The cart preserves the product source, and `/api/orders` validates every item against Maya Herbs before creating the WooCommerce order. Authentication, the buyer profile, and order history remain authoritative in Maya Herbs.

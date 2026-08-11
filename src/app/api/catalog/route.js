@@ -155,11 +155,49 @@ async function loadRestStoreCatalog(store, customer, catalogFetchOptions) {
   ).then((products) => products.filter(Boolean));
 }
 
-async function loadLocalCatalogSnapshot() {
-  const snapshotPath = process.env.CATALOG_SNAPSHOT_PATH;
-  if (process.env.NODE_ENV === "production" || !snapshotPath) return null;
+async function loadStoreApiCatalog(store, catalogFetchOptions) {
+  const storeCatalog = await getPublicStoreCatalog(store.id, catalogFetchOptions);
+  const categoryContext = buildCategoryContext(storeCatalog.categories);
+  const variationsByParent = new Map();
+  storeCatalog.variations.forEach((variation) => {
+    if (!variationsByParent.has(variation.parent)) {
+      variationsByParent.set(variation.parent, []);
+    }
+    variationsByParent.get(variation.parent).push(variation);
+  });
 
-  const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"));
+  return storeCatalog.products.map((product) => {
+    const mapped = mapStoreProduct(
+      product,
+      variationsByParent.get(product.id) || [],
+      categoryContext
+    );
+    const prices = mapped.options
+      .map((option) => Number(option.price))
+      .filter(Number.isFinite);
+    return {
+      ...mapped,
+      storeId: mapped.storeId || store.id,
+      storeName: mapped.storeName || store.name,
+      priceMin: prices.length ? Math.min(...prices) : 0,
+      priceMax: prices.length ? Math.max(...prices) : 0,
+      productUrl: `/product/${encodeURIComponent(mapped.id)}`,
+    };
+  });
+}
+
+async function loadLocalCatalogSnapshot() {
+  if (process.env.NODE_ENV === "production") return null;
+
+  const snapshotPath =
+    process.env.CATALOG_SNAPSHOT_PATH || "tmp/catalog-snapshot.json";
+  let snapshot;
+  try {
+    snapshot = JSON.parse(await readFile(snapshotPath, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
   if (!Array.isArray(snapshot.products)) {
     throw new Error("The local catalog snapshot must contain a products array.");
   }
@@ -228,43 +266,48 @@ export async function GET(request) {
       const configuredStores = getRequiredCommerceStores().filter((store) =>
         isCommerceStoreConfigured(store.id)
       );
-      const catalogs = await Promise.all(
-        configuredStores.map((store) =>
-          loadRestStoreCatalog(store, customer, catalogFetchOptions)
-        )
-      );
-      products = catalogs.flat();
+      try {
+        const catalogs = await Promise.all(
+          configuredStores.map((store) =>
+            loadRestStoreCatalog(store, customer, catalogFetchOptions)
+          )
+        );
+        products = catalogs.flat();
+      } catch (error) {
+        let storeApiError;
+        if (process.env.NODE_ENV !== "production") {
+          try {
+            const catalogs = await Promise.all(
+              configuredStores.map((store) =>
+                loadStoreApiCatalog(store, catalogFetchOptions)
+              )
+            );
+            console.warn(
+              `WooCommerce REST catalog unavailable in development; using Store API: ${error.message}`
+            );
+            source = "woocommerce-store";
+            products = catalogs.flat();
+          } catch (fallbackError) {
+            storeApiError = fallbackError;
+          }
+        }
+
+        if (!products) {
+          const snapshotProducts = await loadLocalCatalogSnapshot();
+          if (!snapshotProducts) throw storeApiError || error;
+          console.warn(
+            `WooCommerce catalog unavailable in development; using local snapshot: ${(storeApiError || error).message}`
+          );
+          source = "snapshot";
+          products = snapshotProducts;
+        }
+      }
     } else if (isWooCommerceStoreConfigured()) {
       source = "woocommerce-store";
-      const storeCatalog = await getPublicStoreCatalog(
-        PRIMARY_STORE_ID,
-        catalogFetchOptions
-      );
-      const categoryContext = buildCategoryContext(storeCatalog.categories);
-      const variationsByParent = new Map();
-      storeCatalog.variations.forEach((variation) => {
-        if (!variationsByParent.has(variation.parent)) {
-          variationsByParent.set(variation.parent, []);
-        }
-        variationsByParent.get(variation.parent).push(variation);
-      });
-
-      products = storeCatalog.products.map((product) => {
-        const mapped = mapStoreProduct(
-          product,
-          variationsByParent.get(product.id) || [],
-          categoryContext
-        );
-        const prices = mapped.options
-          .map((option) => Number(option.price))
-          .filter(Number.isFinite);
-        return {
-          ...mapped,
-          priceMin: prices.length ? Math.min(...prices) : 0,
-          priceMax: prices.length ? Math.max(...prices) : 0,
-          productUrl: `/product/${encodeURIComponent(mapped.id)}`,
-        };
-      });
+      const store = getRequiredCommerceStores().find(
+        (candidate) => candidate.id === PRIMARY_STORE_ID
+      ) || { id: PRIMARY_STORE_ID, name: "Maya Herbs" };
+      products = await loadStoreApiCatalog(store, catalogFetchOptions);
     } else {
       products = await loadLocalCatalogSnapshot();
       if (!products) {

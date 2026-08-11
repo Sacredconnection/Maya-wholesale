@@ -285,9 +285,10 @@ export default function CatalogPage() {
   };
 
   const filterLabel = () => {
+    if (filters.category) return filters.category;
+
     const labels = [];
     if (debouncedSearch) labels.push(`Search: ${debouncedSearch}`);
-    if (filters.category) labels.push(`Category: ${filters.category}`);
     if (filters.subcategory) labels.push(`Subcategory: ${filters.subcategory}`);
     if (filters.childCategory) {
       labels.push(`Subcategory level 2: ${filters.childCategory}`);

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node --use-system-ca --max-old-space-size=2048 node_modules/next/dist/bin/next dev --webpack --disable-source-maps",
+    "catalog:snapshot": "node scripts/sync-catalog-snapshot.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
