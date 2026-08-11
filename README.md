@@ -1,6 +1,6 @@
-# Maya Herbs Wholesale — B2B Portal
+# Maya Herbs Wholesale
 
-Welcome to the **Maya Herbs Wholesale B2B Portal**. This Next.js application serves approved retailers, practitioners and distributors sourcing ethnobotanical herbs, Aya plants, Kratom, Rapéh, superfoods, incense and related botanical products.
+Welcome to **Maya Herbs Wholesale**. This Next.js application serves approved retailers, practitioners and distributors sourcing ethnobotanical herbs, Aya plants, Kratom, Rapéh, superfoods, incense and related botanical products.
 
 ---
 

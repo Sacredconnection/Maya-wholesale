@@ -425,9 +425,6 @@ export default function CatalogPage() {
         {/* Page Title Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/10 pb-6 sm:pb-8 gap-4 sm:gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
-              B2B Portal
-            </div>
             <h1 className="type-page-title font-headline-lg text-white">
               Wholesale Product Catalog
             </h1>

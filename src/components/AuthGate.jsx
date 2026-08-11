@@ -29,9 +29,6 @@ export default function AuthGate({ loading = false }) {
               <Lock className="w-7 h-7 text-[#f2f2f2]" />
             </div>
 
-            <span className="text-[10px] font-mono tracking-widest text-[#f2f2f2] uppercase block mb-2">
-              B2B Partner Portal
-            </span>
             <h1 className="type-promo-title font-headline-lg text-white mb-3">
               Wholesale Access Only
             </h1>

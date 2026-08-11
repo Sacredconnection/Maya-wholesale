@@ -525,10 +525,7 @@ export default function MyAccountPage() {
           />
 
           <div className="min-w-0">
-            <span className="account-hero-eyebrow text-[10px] font-mono tracking-widest uppercase">
-              B2B Partner Portal
-            </span>
-            <h1 className="account-hero-title type-page-title break-words font-headline-lg mt-1">
+            <h1 className="account-hero-title type-page-title break-words font-headline-lg">
               My Account
             </h1>
             <p className="account-hero-meta break-words text-sm mt-1.5 font-mono">

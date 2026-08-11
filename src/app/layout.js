@@ -15,7 +15,7 @@ const roboto = Roboto({
 
 export const metadata = {
   metadataBase: new URL("https://wholesale.mayaherbs.com"),
-  title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
+  title: "Maya Herbs Wholesale | Ethnobotanical B2B Supply",
   description:
     "Wholesale ethnobotanical herbs, plant extracts, superfoods, incense and traditional preparations for professional buyers.",
   applicationName: "Maya Herbs Wholesale",

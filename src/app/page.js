@@ -2,7 +2,7 @@ import HomeClient from "@/components/HomeClient";
 import { getCategories } from "@/lib/woocommerce";
 
 export const metadata = {
-  title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
+  title: "Maya Herbs Wholesale | Ethnobotanical B2B Supply",
   description: "Wholesale ethnobotanical herbs, Aya plants, Kratom, Rapéh, superfoods and incense for approved professional buyers.",
   keywords: [
     "maya herbs",
@@ -17,7 +17,7 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
+    title: "Maya Herbs Wholesale | Ethnobotanical B2B Supply",
     description: "A professional wholesale source for authentic ethnobotanical herbs, plant extracts, superfoods and incense.",
     type: "website",
     locale: "en_US",
@@ -32,7 +32,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
+    title: "Maya Herbs Wholesale | Ethnobotanical B2B Supply",
     description: "Ethnobotanical herbs, plant extracts, superfoods and incense for approved wholesale partners.",
     images: ["/banner/maya-wholesale/maya-wholesale-banner-desktop.webp"],
   },
@@ -99,7 +99,7 @@ export default async function Page() {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "@id": "https://wholesale.mayaherbs.com/#website",
-      "name": "Maya Herbs Wholesale | Ethnobotanical B2B Portal",
+      "name": "Maya Herbs Wholesale | Ethnobotanical B2B Supply",
       "url": "https://wholesale.mayaherbs.com"
     }
   ];
