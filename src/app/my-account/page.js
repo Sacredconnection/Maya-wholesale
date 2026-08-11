@@ -269,7 +269,7 @@ export default function MyAccountPage() {
 
         <main className="site-content-shell flex flex-grow items-center justify-center py-16 sm:py-20 lg:py-24">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 max-w-lg w-full text-center relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/10 blur-xl pointer-events-none rounded-full"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/10 pointer-events-none rounded-full"></div>
 
             <div className="w-16 h-16 rounded-full bg-[#93000a]/10 border border-[#93000a]/30 flex items-center justify-center text-3xl mx-auto mb-6">
               <AlertCircle className="w-8 h-8 text-[#ffb4ab]" />
@@ -585,7 +585,7 @@ export default function MyAccountPage() {
             {activeTab === "dashboard" && (
               <div className="flex flex-col gap-10 sm:gap-12 animate-fade-in">
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 md:p-8 relative overflow-hidden shadow-xl">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#999933]/5 blur-2xl pointer-events-none rounded-full"></div>
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#999933]/5 pointer-events-none rounded-full"></div>
 
                   <h2 className="font-headline-md text-2xl font-bold text-white mb-4">
                     Hello, {user.firstName || user.displayName}!

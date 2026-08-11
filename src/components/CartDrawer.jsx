@@ -76,7 +76,7 @@ export default function CartDrawer() {
           <div
             aria-hidden="true"
             onClick={closeCart}
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+            className="absolute inset-0 bg-black/60"
           />
 
           <div

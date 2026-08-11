@@ -67,7 +67,7 @@ export default function LoginModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-[#0c0c0c]/85 p-3 backdrop-blur-md sm:p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-[#0c0c0c]/85 p-3 sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -82,7 +82,7 @@ export default function LoginModal({ isOpen, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/15 blur-xl pointer-events-none rounded-full"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/15 pointer-events-none rounded-full"></div>
 
         {/* Close Button */}
         <button

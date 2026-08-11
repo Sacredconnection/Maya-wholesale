@@ -205,20 +205,6 @@
   list-style: none;
 }
 
-.steps::before {
-  position: absolute;
-  top: 4.1rem;
-  bottom: 4.1rem;
-  left: 2.15rem;
-  width: 1px;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgb(153 153 51 / 0.62) 0 0.24rem,
-    transparent 0.24rem 0.54rem
-  );
-  content: "";
-}
-
 .step {
   position: relative;
   display: grid;
@@ -226,12 +212,16 @@
   gap: clamp(1rem, 3vw, 2.1rem);
   padding: clamp(1.45rem, 3vw, 2.1rem) 0;
   opacity: 0;
-  filter: blur(0.3rem);
   transform: translate3d(2rem, 1.25rem, 0);
   transition:
-    opacity 100ms linear,
-    filter 100ms linear,
-    transform 100ms linear;
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--entry-delay, 0ms);
+}
+
+.visible .step {
+  opacity: 1;
+  transform: none;
 }
 
 .step:not(:last-child) {
@@ -275,22 +265,6 @@
   letter-spacing: 0.08em;
 }
 
-.visible .marker {
-  animation: process-marker-pulse 8.4s ease-in-out var(--flow-delay) infinite;
-}
-
-.visible .marker::before {
-  animation: process-flow-horizontal 8.4s ease-in-out var(--flow-delay) infinite;
-}
-
-.visible .marker::after {
-  animation: process-flow-vertical 8.4s ease-in-out var(--flow-delay) infinite;
-}
-
-.visible .stepCopy {
-  animation: process-copy-flow 8.4s ease-in-out var(--flow-delay) infinite;
-}
-
 .stepCopy {
   align-self: center;
 }
@@ -320,72 +294,6 @@
   color: rgb(16 43 37 / 0.67);
   font-size: 0.87rem;
   line-height: 1.65;
-}
-
-@keyframes process-marker-pulse {
-  0%,
-  8%,
-  24%,
-  100% {
-    border-color: rgb(45 45 45 / 0.32);
-    box-shadow: 0 0 0 0 rgb(153 153 51 / 0);
-    transform: scale(1);
-  }
-
-  14%,
-  19% {
-    border-color: rgb(153 153 51 / 0.82);
-    box-shadow: 0 0 0 0.55rem rgb(153 153 51 / 0.14);
-    transform: scale(1.045);
-  }
-}
-
-@keyframes process-flow-horizontal {
-  0%,
-  8%,
-  24%,
-  100% {
-    opacity: 0.45;
-    transform: translateX(0);
-  }
-
-  14%,
-  19% {
-    opacity: 1;
-    transform: translateX(0.28rem);
-  }
-}
-
-@keyframes process-flow-vertical {
-  0%,
-  8%,
-  24%,
-  100% {
-    opacity: 0.45;
-    transform: translateY(0);
-  }
-
-  14%,
-  19% {
-    opacity: 1;
-    transform: translateY(0.28rem);
-  }
-}
-
-@keyframes process-copy-flow {
-  0%,
-  8%,
-  24%,
-  100% {
-    opacity: 0.68;
-    transform: translateX(0);
-  }
-
-  14%,
-  19% {
-    opacity: 1;
-    transform: translateX(0.4rem);
-  }
 }
 
 @media (max-width: 767px) {
@@ -444,17 +352,12 @@
     height: 3.5rem;
   }
 
-  .steps::before {
-    left: 1.75rem;
-  }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
   .step {
     animation: none;
     opacity: 1;
-    filter: none;
     transform: none;
     transition: none;
   }

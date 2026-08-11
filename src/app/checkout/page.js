@@ -155,7 +155,7 @@ function OrderSubmissionOverlay({ stage }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#111812]/92 px-4 py-8 backdrop-blur-md"
+      className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#111812]/92 px-4 py-8"
       role="dialog"
       aria-modal="true"
       aria-labelledby="order-progress-title"

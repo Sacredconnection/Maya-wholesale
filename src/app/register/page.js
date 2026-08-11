@@ -114,7 +114,7 @@ export default function RegisterPage() {
 
       {/* Main Container */}
       <div className="flex-grow flex items-center justify-center py-8 sm:py-10 lg:py-12 px-4 sm:px-6 relative">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#999933]/5 blur-3xl pointer-events-none rounded-full" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#999933]/5 pointer-events-none rounded-full" />
 
         <div className="w-full max-w-md z-10">
           {!submitted ? (

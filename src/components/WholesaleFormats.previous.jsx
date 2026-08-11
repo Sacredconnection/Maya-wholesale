@@ -50,8 +50,8 @@ export default function WholesaleFormatsPrevious() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
         {PREVIOUS_FORMATS.map(({ title, category, description, icon: Icon, image, imageAlt, sizes }, index) => (
-          <article key={title} className="group relative flex overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-[#f2f2f2]/40 hover:bg-white/[0.07] hover:shadow-[0_22px_55px_rgba(0,0,0,0.18)]">
-            <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-[#f2f2f2]/0 blur-3xl transition-colors duration-300 group-hover:bg-[#f2f2f2]/10" />
+          <article key={title} className="group relative flex overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-[#f2f2f2]/40 hover:bg-white/[0.07] hover:shadow-[0_22px_55px_rgba(0,0,0,0.18)]">
+            <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-[#f2f2f2]/0 transition-colors duration-300 group-hover:bg-[#f2f2f2]/10" />
             <div className="relative flex w-full flex-col">
               <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-white/10 bg-[#131313]/35">
                 {image ? (

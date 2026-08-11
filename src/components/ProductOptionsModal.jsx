@@ -60,7 +60,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-[#0c0c0c]/85 p-3 backdrop-blur-md sm:p-4"
+      className="fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-[#0c0c0c]/85 p-3 sm:p-4"
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
     >
       <div

@@ -55,7 +55,7 @@ export default function WholesaleFormats() {
         {FORMATS.map(({ title, category, description, image, imageAlt, sizes }) => (
           <article
             key={title}
-            className="wholesale-format-card home-green-outline group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-white/[0.03] p-5 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_26px_65px_rgba(0,0,0,0.24)] sm:p-7 lg:p-8"
+            className="wholesale-format-card home-green-outline group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-white/[0.03] p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_26px_65px_rgba(0,0,0,0.24)] sm:p-7 lg:p-8"
           >
             <div className="relative z-10 mb-8 flex h-56 items-center justify-center sm:h-64 lg:h-72">
               <Image

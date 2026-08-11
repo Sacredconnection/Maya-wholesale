@@ -294,12 +294,12 @@ export default function LineageShowcase() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/40 to-transparent"></div>
 
                 {/* Hover Eye Badge */}
-                <div className="lineage-glass-surface absolute top-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 rounded-full p-2 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
+                <div className="lineage-glass-surface absolute top-4 right-4 bg-black/60 border border-white/10 rounded-full p-2 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
                   <Eye className="w-4 h-4" style={{ color: readableAccentColor }} aria-hidden="true" />
                 </div>
 
                 {/* Bottom details */}
-                <div className="lineage-glass-surface absolute bottom-0 left-0 w-full p-6 flex flex-col gap-2 backdrop-blur-sm bg-[#131313]/50 border-t border-white/10">
+                <div className="lineage-glass-surface absolute bottom-0 left-0 w-full p-6 flex flex-col gap-2 bg-[#131313]/50 border-t border-white/10">
                   <span className="lineage-location font-label-sm text-xs text-[#f2f2f2] uppercase tracking-widest transition-colors group-hover:[color:var(--ethnicity-readable)]">
                     {tribe.region}
                   </span>
@@ -317,7 +317,7 @@ export default function LineageShowcase() {
       {/* Tribe Detail Modal Overlay */}
       {selectedTribe && createPortal(
         <div
-          className="fixed inset-0 bg-[#0c0c0c]/90 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          className="fixed inset-0 bg-[#0c0c0c]/90 z-[100] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
           onClick={() => setSelectedTribe(null)}
         >
           <div

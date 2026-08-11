@@ -101,7 +101,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-[#0c0c0c]/85 backdrop-blur-md z-[60] flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 bg-[#0c0c0c]/85 z-[60] flex items-center justify-center p-4 overflow-y-auto"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) handleClose();
       }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BadgeCheck, Globe2, Sprout } from 'lucide-react';
 import OptionalPublicImage from '@/components/OptionalPublicImage';
 
@@ -22,61 +22,30 @@ const PILLARS = [
   },
 ];
 
-const CARD_ENTRY_DIRECTIONS = [
-  { x: -6, y: -3 },
-  { x: 0, y: 5 },
-  { x: 6, y: -3 },
-];
-
 export default function TrustBar() {
-  const cardRefs = useRef([]);
+  const headerRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const header = headerRef.current;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!header) return undefined;
 
     if (reducedMotion.matches) return undefined;
 
-    let animationFrame;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -22% 0px' }
+    );
 
-    const updateCards = () => {
-      animationFrame = undefined;
-      const startLine = window.innerHeight * 0.94;
-      const endLine = window.innerHeight * 0.5;
-      const travelDistance = startLine - endLine;
+    observer.observe(header);
 
-      cardRefs.current.forEach((card, index) => {
-        if (!card) return;
-
-        const cardTop = card.getBoundingClientRect().top;
-        const columnDelay = index * 0.08;
-        const rawProgress = (startLine - cardTop) / travelDistance;
-        const progress = Math.min(
-          1,
-          Math.max(0, (rawProgress - columnDelay) / (1 - columnDelay))
-        );
-        const direction = CARD_ENTRY_DIRECTIONS[index];
-        const remainingDistance = 1 - progress;
-
-        card.style.opacity = String(progress);
-        card.style.filter = `blur(${remainingDistance * 0.45}rem)`;
-        card.style.transform = `translate3d(${direction.x * remainingDistance}rem, ${direction.y * remainingDistance}rem, 0) scale(${0.96 + progress * 0.04})`;
-      });
-    };
-
-    const requestCardsUpdate = () => {
-      if (animationFrame) return;
-      animationFrame = window.requestAnimationFrame(updateCards);
-    };
-
-    updateCards();
-    window.addEventListener('scroll', requestCardsUpdate, { passive: true });
-    window.addEventListener('resize', requestCardsUpdate);
-
-    return () => {
-      window.removeEventListener('scroll', requestCardsUpdate);
-      window.removeEventListener('resize', requestCardsUpdate);
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -89,7 +58,12 @@ export default function TrustBar() {
         className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#999933] to-[#CC6633]"
       />
       <div className="home-content-shell relative">
-        <header className="mx-auto max-w-4xl text-center">
+        <header
+          ref={headerRef}
+          className={`trust-header-arrival mx-auto max-w-4xl text-center ${
+            isVisible ? 'is-visible' : ''
+          }`}
+        >
           <OptionalPublicImage
             src="/symbols/about/about-maya-symbol-01.svg"
             alt=""
@@ -112,19 +86,9 @@ export default function TrustBar() {
         </header>
 
         <div className="mt-12 grid gap-6 md:grid-cols-3 lg:mt-16">
-          {PILLARS.map(({ title, description, icon: Icon }, index) => (
-            <div
-              key={title}
-              ref={(element) => {
-                cardRefs.current[index] = element;
-              }}
-              className="trust-card-arrival"
-              style={{
-                '--card-entry-x': `${CARD_ENTRY_DIRECTIONS[index].x}rem`,
-                '--card-entry-y': `${CARD_ENTRY_DIRECTIONS[index].y}rem`,
-              }}
-            >
-              <article className="group relative h-full overflow-hidden rounded-xl border border-[#999933] bg-white p-7 shadow-[0_14px_32px_rgba(45,45,45,0.12)] transition-transform duration-300 hover:-translate-y-1 motion-reduce:transform-none">
+          {PILLARS.map(({ title, description, icon: Icon }) => (
+            <div key={title}>
+              <article className="relative h-full overflow-hidden rounded-xl border border-[#999933] bg-white p-7 shadow-[0_14px_32px_rgba(45,45,45,0.12)]">
                 <div
                   aria-hidden="true"
                   className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#999933] to-[#CC6633]"

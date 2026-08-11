@@ -391,7 +391,7 @@ export default function CatalogPage() {
 
       {(exporting === "pdf" || exporting === "preview") && (
         <div
-          className={`theme-dark-zone fixed inset-0 z-[140] flex items-center justify-center bg-[#242f27]/95 px-5 backdrop-blur-sm ${
+          className={`theme-dark-zone fixed inset-0 z-[140] flex items-center justify-center bg-[#242f27]/95 px-5 ${
             exporting === "pdf" ? "xl:hidden" : ""
           }`}
           role="status"
@@ -417,7 +417,7 @@ export default function CatalogPage() {
 
       {isPreviewOpen && previewUrl && (
         <div
-          className="fixed inset-0 z-[120] bg-[#081d19]/95 p-0 backdrop-blur-md sm:p-4 lg:p-6"
+          className="fixed inset-0 z-[120] bg-[#081d19]/95 p-0 sm:p-4 lg:p-6"
           aria-hidden="false"
         >
           <section
@@ -759,7 +759,7 @@ export default function CatalogPage() {
 
       <Footer />
       {isImportOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="excel-import-title">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="excel-import-title">
           <div className="w-full max-w-2xl overflow-hidden rounded-xl border border-[#999933]/35 bg-[#1a1a1a] shadow-2xl">
             <div className="border-b border-white/10 p-6 sm:p-8">
               <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#d8c58f]">Excel order · review</span>

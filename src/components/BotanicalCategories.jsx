@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
@@ -61,53 +61,39 @@ const CARD_ENTRY_DIRECTIONS = [
 
 export default function BotanicalCategories() {
   const cardRefs = useRef([]);
+  const [visibleCards, setVisibleCards] = useState(() => new Set());
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     if (reducedMotion.matches) return undefined;
 
-    let animationFrame;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const newlyVisible = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => Number(entry.target.dataset.cardIndex));
 
-    const updateCards = () => {
-      animationFrame = undefined;
-      const startLine = window.innerHeight * 0.94;
-      const endLine = window.innerHeight * 0.46;
-      const travelDistance = startLine - endLine;
+        if (newlyVisible.length === 0) return;
 
-      cardRefs.current.forEach((card, index) => {
-        if (!card) return;
+        setVisibleCards((currentCards) => {
+          const nextCards = new Set(currentCards);
+          newlyVisible.forEach((index) => nextCards.add(index));
+          return nextCards;
+        });
 
-        const cardTop = card.getBoundingClientRect().top;
-        const columnDelay = (index % 3) * 0.08;
-        const rawProgress = (startLine - cardTop) / travelDistance;
-        const progress = Math.min(
-          1,
-          Math.max(0, (rawProgress - columnDelay) / (1 - columnDelay))
-        );
-        const direction = CARD_ENTRY_DIRECTIONS[index];
-        const remainingDistance = 1 - progress;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.16, rootMargin: "0px 0px -22% 0px" }
+    );
 
-        card.style.opacity = String(progress);
-        card.style.filter = `blur(${remainingDistance * 0.45}rem)`;
-        card.style.transform = `translate3d(${direction.x * remainingDistance}rem, ${direction.y * remainingDistance}rem, 0) scale(${0.96 + progress * 0.04})`;
-      });
-    };
+    cardRefs.current.forEach((card) => {
+      if (card) observer.observe(card);
+    });
 
-    const requestCardsUpdate = () => {
-      if (animationFrame) return;
-      animationFrame = window.requestAnimationFrame(updateCards);
-    };
-
-    updateCards();
-    window.addEventListener("scroll", requestCardsUpdate, { passive: true });
-    window.addEventListener("resize", requestCardsUpdate);
-
-    return () => {
-      window.removeEventListener("scroll", requestCardsUpdate);
-      window.removeEventListener("resize", requestCardsUpdate);
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -123,7 +109,10 @@ export default function BotanicalCategories() {
             ref={(element) => {
               cardRefs.current[index] = element;
             }}
-            className="botanical-card-arrival"
+            data-card-index={index}
+            className={`botanical-card-arrival ${
+              visibleCards.has(index) ? "is-visible" : ""
+            }`}
             style={{
               "--card-entry-x": `${CARD_ENTRY_DIRECTIONS[index].x}rem`,
               "--card-entry-y": `${CARD_ENTRY_DIRECTIONS[index].y}rem`,

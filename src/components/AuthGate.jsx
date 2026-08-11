@@ -23,7 +23,7 @@ export default function AuthGate({ loading = false }) {
           <div className="w-10 h-10 border-4 border-[#999933] border-t-transparent rounded-full animate-spin"></div>
         ) : (
           <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 max-w-lg w-full text-center relative overflow-hidden shadow-2xl animate-fade-in">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#999933]/10 blur-2xl pointer-events-none rounded-full"></div>
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#999933]/10 pointer-events-none rounded-full"></div>
 
             <div className="w-16 h-16 rounded-full bg-[#999933]/15 border border-[#999933]/30 flex items-center justify-center mx-auto mb-6">
               <Lock className="w-7 h-7 text-[#f2f2f2]" />

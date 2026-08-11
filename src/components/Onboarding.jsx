@@ -34,7 +34,6 @@ const ONBOARDING_TITLE = "Wholesale,\nwithout the\nguesswork.";
 
 export default function Onboarding() {
   const sectionRef = useRef(null);
-  const stepRefs = useRef([]);
   const [isVisible, setIsVisible] = useState(false);
   const [typedTitle, setTypedTitle] = useState("");
 
@@ -50,7 +49,7 @@ export default function Onboarding() {
           observer.disconnect();
         }
       },
-      { threshold: 0.18 }
+      { threshold: 0.18, rootMargin: "0px 0px -22% 0px" }
     );
 
     observer.observe(section);
@@ -90,51 +89,6 @@ export default function Onboarding() {
       if (typingTimer) window.clearInterval(typingTimer);
     };
   }, [isVisible]);
-
-  useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    if (reducedMotion.matches) return undefined;
-
-    let animationFrame;
-
-    const updateSteps = () => {
-      animationFrame = undefined;
-      const startLine = window.innerHeight * 0.92;
-      const endLine = window.innerHeight * 0.55;
-      const travelDistance = startLine - endLine;
-
-      stepRefs.current.forEach((step) => {
-        if (!step) return;
-
-        const stepTop = step.getBoundingClientRect().top;
-        const progress = Math.min(
-          1,
-          Math.max(0, (startLine - stepTop) / travelDistance)
-        );
-        const remainingDistance = 1 - progress;
-
-        step.style.opacity = String(progress);
-        step.style.filter = `blur(${remainingDistance * 0.3}rem)`;
-        step.style.transform = `translate3d(${remainingDistance * 2}rem, ${remainingDistance * 1.25}rem, 0)`;
-      });
-    };
-
-    const requestStepsUpdate = () => {
-      if (animationFrame) return;
-      animationFrame = window.requestAnimationFrame(updateSteps);
-    };
-
-    updateSteps();
-    window.addEventListener("scroll", requestStepsUpdate, { passive: true });
-    window.addEventListener("resize", requestStepsUpdate);
-
-    return () => {
-      window.removeEventListener("scroll", requestStepsUpdate);
-      window.removeEventListener("resize", requestStepsUpdate);
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    };
-  }, []);
 
   return (
     <section
@@ -204,12 +158,9 @@ export default function Onboarding() {
           {steps.map((step, index) => (
             <li
               key={step.number}
-              ref={(element) => {
-                stepRefs.current[index] = element;
-              }}
               className={styles.step}
               style={{
-                "--flow-delay": `${index * 2800}ms`,
+                "--entry-delay": `${index * 140}ms`,
               }}
             >
               <div className={styles.marker}>
