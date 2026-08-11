@@ -59,6 +59,8 @@ const CARD_ENTRY_DIRECTIONS = [
   { x: 6, y: 4 },
 ];
 
+const getHoverImage = (image) => image.replace(/(\.[^.]+)$/, "-02$1");
+
 export default function BotanicalCategories() {
   const cardRefs = useRef([]);
   const [visibleCards, setVisibleCards] = useState(() => new Set());
@@ -127,7 +129,17 @@ export default function BotanicalCategories() {
                     fill
                     unoptimized
                     sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-1000 ease-in-out will-change-transform group-hover:scale-[1.015] group-focus-within:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none"
+                    className="object-cover opacity-100 transition-[opacity,transform] duration-500 ease-in-out will-change-[opacity,transform] group-hover:scale-[1.015] group-hover:opacity-0 group-focus-within:scale-[1.015] group-focus-within:opacity-0 motion-reduce:transform-none motion-reduce:transition-none"
+                  />
+                ) : null}
+                {image ? (
+                  <Image
+                    src={getHoverImage(image)}
+                    alt=""
+                    fill
+                    unoptimized
+                    sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                    className="object-cover opacity-0 transition-[opacity,transform] duration-500 ease-in-out will-change-[opacity,transform] group-hover:scale-[1.015] group-hover:opacity-100 group-focus-within:scale-[1.015] group-focus-within:opacity-100 motion-reduce:transform-none motion-reduce:transition-none"
                   />
                 ) : null}
               </div>
