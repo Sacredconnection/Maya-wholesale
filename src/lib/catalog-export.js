@@ -522,34 +522,37 @@ function drawContactIcon(pdf, type, x, y, contactIcons) {
   if (icon) pdf.addImage(icon, "PNG", x, y, 7.5, 7.5, `catalog-contact-${type}`, "FAST");
 }
 
-function drawCoverContactInfo(pdf, contactIcons) {
+function drawCoverContactInfo(pdf, contactIcons, startY) {
   const rows = [
     {
       type: "email",
+      label: "EMAIL",
       values: ["info@mayaherbs.com"],
       x: 20,
       textX: 31,
-      y: 200,
+      y: startY,
       url: "mailto:info@mayaherbs.com",
       linkWidth: 51,
       linkHeight: 9,
     },
     {
       type: "phone",
+      label: "PHONE",
       values: ["+31 23 532 5192"],
       x: 77,
       textX: 88,
-      y: 200,
+      y: startY,
       url: "tel:+31235325192",
       linkWidth: 45,
       linkHeight: 9,
     },
     {
       type: "location",
+      label: "ADDRESS",
       values: ["Mollerusweg 66", "2031 BZ Haarlem", "The Netherlands"],
       x: 128,
       textX: 139,
-      y: 200,
+      y: startY,
       url: "https://www.google.com/maps/search/?api=1&query=Mollerusweg+66+2031+BZ+Haarlem",
       linkWidth: 62,
       linkHeight: 20,
@@ -557,14 +560,18 @@ function drawCoverContactInfo(pdf, contactIcons) {
   ];
 
   rows.forEach((row) => {
-    drawContactIcon(pdf, row.type, row.x, row.y, contactIcons);
+    drawContactIcon(pdf, row.type, row.x, row.y + 1.5, contactIcons);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(255, 228, 214);
+    pdf.text(row.label, row.textX, row.y + 2.8);
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(7);
+    pdf.setFontSize(7.2);
     pdf.setTextColor(255, 255, 255);
     row.values.forEach((value, index) => {
-      pdf.text(value, row.textX, row.y + 5.2 + index * 4.5);
+      pdf.text(value, row.textX, row.y + 9.2 + index * 4.8);
     });
-    pdf.link(row.x - 1, row.y - 1, row.linkWidth, row.linkHeight, { url: row.url });
+    pdf.link(row.x - 1, row.y, row.linkWidth, Math.max(row.linkHeight, 20), { url: row.url });
   });
 }
 
@@ -618,8 +625,8 @@ function drawPdfCover(
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(29);
   pdf.setTextColor(255, 255, 255);
-  pdf.text("Maya Herbs", 20, 91);
-  pdf.text("Wholesale Catalog", 20, 105);
+  pdf.text("Maya Herbs", 20, 77);
+  pdf.text("Wholesale Catalog", 20, 91);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9.5);
@@ -632,7 +639,7 @@ function drawPdfCover(
       2
     ),
     20,
-    121,
+    108,
     { lineHeightFactor: 1.45 }
   );
 
@@ -646,7 +653,7 @@ function drawPdfCover(
     3
   );
   const scopeLineHeight = scopeFontSize * 0.3528 * 1.08;
-  const scopeStartY = 158 -
+  const scopeStartY = 143 -
     ((scopeLines.length - 1) * scopeLineHeight) / 2;
   pdf.text(
     scopeLines,
@@ -658,26 +665,22 @@ function drawPdfCover(
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
-  pdf.text("CONTACT", 20, 190);
+  pdf.text("CONTACT", 20, 207);
   pdf.setDrawColor(255, 228, 214);
   pdf.setLineWidth(0.35);
-  pdf.line(20, 195, 190, 195);
-  drawCoverContactInfo(pdf, contactIcons);
-  pdf.setDrawColor(255, 228, 214);
-  pdf.setLineWidth(0.25);
-  pdf.line(72, 200, 72, 220);
-  pdf.line(123, 200, 123, 220);
+  pdf.line(20, 212, 190, 212);
+  drawCoverContactInfo(pdf, contactIcons, 218);
 
   const wholesaleWebsiteLabel = "wholesale.mayaherbs.com";
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(6.5);
   pdf.setTextColor(255, 228, 214);
-  pdf.text("ONLINE WHOLESALE", 20, 237);
+  pdf.text("ONLINE WHOLESALE", 20, 247);
   pdf.setFontSize(15);
   pdf.setTextColor(255, 255, 255);
-  pdf.text(wholesaleWebsiteLabel, 20, 250);
+  pdf.text(wholesaleWebsiteLabel, 20, 259);
   const wholesaleWebsiteWidth = pdf.getTextWidth(wholesaleWebsiteLabel);
-  pdf.link(18.5, 240, wholesaleWebsiteWidth + 4, 14, {
+  pdf.link(18.5, 249, wholesaleWebsiteWidth + 4, 14, {
     url: WHOLESALE_SITE_URL,
   });
 
