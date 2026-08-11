@@ -85,13 +85,13 @@ export default function Header({ onOpenLogin }) {
         </nav>
 
         {/* CTA Actions (Right - Desktop Only) */}
-        <div className="hidden shrink-0 items-center justify-center gap-2 self-stretch xl:flex 2xl:gap-2.5">
+        <div className="hidden shrink-0 items-center justify-center gap-4 self-stretch xl:flex">
           {/* Cart Icon Trigger */}
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
             aria-label={`Open order sheet${cartTotalItems > 0 ? `, ${cartTotalItems} items` : ''}`}
-            className="header-cart-button relative order-4 ml-2 flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border px-2.5 text-[#2d2d2d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
+            className="header-action-button header-cart-button header-desktop-outline-button relative order-4 flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border px-2.5 text-[#2d2d2d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
           >
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
             <span className="header-cart-label whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.07em]">
@@ -105,7 +105,7 @@ export default function Header({ onOpenLogin }) {
           </button>
 
           <Link
-            className={`${pathname === '/digital-catalog' ? 'border-[#999933] bg-[#999933]/20' : 'border-[#999933]/45 bg-[#999933]/10 hover:border-[#999933] hover:bg-[#999933]/15'} order-1 inline-flex h-9 items-center justify-center rounded border px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300`}
+            className={`${pathname === '/digital-catalog' ? 'border-[#999933] bg-[#999933]/20' : 'border-[#999933]/45 bg-[#999933]/10 hover:border-[#999933] hover:bg-[#999933]/15'} header-action-button order-1 inline-flex h-9 items-center justify-center rounded border px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300`}
             href="/digital-catalog"
             aria-current={pathname === '/digital-catalog' ? 'page' : undefined}
           >
@@ -117,14 +117,14 @@ export default function Header({ onOpenLogin }) {
               <Link
                 href="/my-account"
                 aria-current={pathname === '/my-account' ? 'page' : undefined}
-                className={`order-2 ml-2 px-2 py-3 text-[0.9375rem] font-semibold ${pathname === '/my-account' ? 'border-b-2 border-[#999933]' : ''} transition-colors`}
+                className={`order-2 px-2 py-3 text-[0.9375rem] font-semibold ${pathname === '/my-account' ? 'border-b-2 border-[#999933]' : ''} transition-colors`}
               >
                 My Account
               </Link>
               <button
                 type="button"
                 onClick={handleHeaderLogout}
-                className="order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#93000a]/25 bg-[#93000a]/10 px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#93000a] transition-colors duration-300 hover:border-[#93000a]/45 hover:bg-[#93000a]/15"
+                className="header-action-button header-desktop-outline-button order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#93000a]/25 bg-[#93000a]/10 px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#93000a] transition-colors duration-300 hover:border-[#93000a]/45 hover:bg-[#93000a]/15"
               >
                 Exit Portal
                 <LogOut className="h-3 w-3" />
@@ -135,13 +135,13 @@ export default function Header({ onOpenLogin }) {
               <button
                 type="button"
                 onClick={onOpenLogin}
-                className="order-2 ml-2 flex h-9 cursor-pointer items-center rounded border border-[#2d2d2d]/20 bg-white px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300 hover:border-[#999933]/70 hover:bg-[#f7f7f3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933] font-label-sm"
+                className="header-action-button header-login-button order-2 flex h-9 cursor-pointer items-center rounded border border-[#2d2d2d]/20 bg-white px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#2d2d2d] transition-colors duration-300 hover:border-[#999933]/70 hover:bg-[#f7f7f3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933] font-label-sm"
               >
                 Client Login
               </button>
               <Link
                 href="/register"
-                className="order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#cc6633] bg-[#cc6633] px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-white no-underline transition-colors duration-300 hover:border-[#b6532a] hover:bg-[#b6532a] font-label-sm"
+                className="header-action-button order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#cc6633] bg-[#cc6633] px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-white no-underline transition-colors duration-300 hover:border-[#b6532a] hover:bg-[#b6532a] font-label-sm"
               >
                 Register Account
                 <ArrowRight className="h-3 w-3" />

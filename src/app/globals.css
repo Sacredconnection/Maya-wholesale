@@ -428,6 +428,51 @@ button, input, select, textarea {
   font: inherit;
 }
 
+.site-header :is(a, button).header-desktop-outline-button,
+.site-header :is(a, button).header-desktop-outline-button:hover,
+.site-header :is(a, button).header-desktop-outline-button[aria-current="page"] {
+  border-color: #2d2d2d !important;
+  background-color: transparent !important;
+  color: #2d2d2d !important;
+}
+
+.site-header .header-action-button {
+  transition-property: transform, box-shadow, border-color, background-color, color !important;
+  transition-duration: 220ms !important;
+  transition-timing-function: ease-out !important;
+}
+
+.site-header .header-action-button:hover {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.site-header .header-action-button:active {
+  transform: translateY(0) scale(0.975);
+  transition-duration: 90ms !important;
+}
+
+.site-header a[href="/digital-catalog"].header-action-button:hover {
+  box-shadow: 0 8px 18px rgb(153 153 51 / 0.24) !important;
+}
+
+.site-header a[href="/register"].header-action-button:hover {
+  box-shadow: 0 8px 18px rgb(204 102 51 / 0.3) !important;
+}
+
+.site-header .header-login-button:hover,
+.site-header .header-desktop-outline-button:hover {
+  box-shadow: 0 8px 18px rgb(45 45 45 / 0.16) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header .header-action-button,
+  .site-header .header-action-button:hover,
+  .site-header .header-action-button:active {
+    transform: none;
+    transition: none !important;
+  }
+}
+
 code, pre, .font-mono {
   font-family: "Futura PT", var(--font-maya-display), sans-serif;
 }
@@ -840,7 +885,8 @@ html[data-theme="light"] :is(
     transform 180ms ease;
 }
 
-.botanical-card-arrival {
+.botanical-card-arrival,
+.trust-card-arrival {
   opacity: 0;
   filter: blur(0.45rem);
   transform: translate3d(
@@ -857,7 +903,8 @@ html[data-theme="light"] :is(
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .botanical-card-arrival {
+  .botanical-card-arrival,
+  .trust-card-arrival {
     opacity: 1;
     filter: none;
     transform: none;
