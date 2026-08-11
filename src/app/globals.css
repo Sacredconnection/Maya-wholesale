@@ -442,20 +442,27 @@ button, input, select, textarea {
   transition-timing-function: ease-out !important;
 }
 
-.site-header .header-action-button:hover {
+.site-header :is(a, button).header-action-button:hover {
+  border-color: #cc6633 !important;
+  color: #cc6633 !important;
   transform: translateY(-2px) scale(1.015);
 }
 
-.site-header .header-action-button:active {
+.site-header :is(a, button).header-action-button:active {
   transform: translateY(0) scale(0.975);
   transition-duration: 90ms !important;
 }
 
 .site-header a[href="/digital-catalog"].header-action-button:hover {
+  border-color: #999933 !important;
+  color: #6f701f !important;
   box-shadow: 0 8px 18px rgb(153 153 51 / 0.24) !important;
 }
 
 .site-header a[href="/register"].header-action-button:hover {
+  border-color: #cc6633 !important;
+  background-color: #ffffff !important;
+  color: #cc6633 !important;
   box-shadow: 0 8px 18px rgb(204 102 51 / 0.3) !important;
 }
 
