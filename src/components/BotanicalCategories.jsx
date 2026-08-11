@@ -102,7 +102,7 @@ export default function BotanicalCategories() {
     <section
       id="categories"
       aria-label="Botanical product categories"
-      className="w-full scroll-mt-28"
+      className="mx-auto w-full max-w-[78rem] scroll-mt-28"
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {CATEGORIES.map(({ name, description, image, imageAlt }, index) => (
