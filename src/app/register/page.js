@@ -96,20 +96,22 @@ export default function RegisterPage() {
   return (
     <div className="site-background-page min-h-screen bg-[#0f0f0f] text-[#f2f2f2] flex flex-col antialiased">
       {/* Top Header */}
-      <div className="theme-dark-zone w-full border-b border-white/5 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between bg-[#131313] z-10">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/banner/maya-wholesale/logo-maya-wholesale.svg"
-            alt="Maya Herbs Wholesale"
-            width={494}
-            height={201}
-            unoptimized
-            className="h-14 w-auto opacity-90 transition-opacity hover:opacity-100"
-          />
-        </Link>
-        <Link href="/" className="text-xs font-mono text-[#f2f2f2] hover:text-white transition-colors flex items-center gap-1 font-bold">
-          <ChevronLeft className="w-4 h-4" /> Back to Home
-        </Link>
+      <div className="theme-dark-zone z-10 w-full border-b border-white/5 bg-[#131313] py-3 sm:py-4">
+        <div className="site-content-shell flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/banner/maya-wholesale/logo-maya-wholesale.svg"
+              alt="Maya Herbs Wholesale"
+              width={494}
+              height={201}
+              unoptimized
+              className="h-14 w-auto opacity-90 transition-opacity hover:opacity-100"
+            />
+          </Link>
+          <Link href="/" className="text-xs font-mono text-[#f2f2f2] hover:text-white transition-colors flex items-center gap-1 font-bold">
+            <ChevronLeft className="w-4 h-4" /> Back to Home
+          </Link>
+        </div>
       </div>
 
       {/* Main Container */}

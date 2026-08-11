@@ -162,7 +162,7 @@
 
 @layer base {
 html {
-  --site-header-height: 5.4375rem;
+  --site-header-height: 5.0625rem;
   font-family: var(--font-roboto), Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -249,13 +249,13 @@ html[data-theme="dark"] [class~="bg-[#131313]/60"] {
 
 @media (min-width: 640px) {
   html {
-    --site-header-height: 6.4375rem;
+    --site-header-height: 6.0625rem;
   }
 }
 
 @media (min-width: 1280px) {
   html {
-    --site-header-height: 7.4375rem;
+    --site-header-height: 7.0625rem;
   }
 }
 

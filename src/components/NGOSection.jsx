@@ -171,7 +171,11 @@ export default function NGOSection() {
                 className="inline-flex w-full sm:w-auto items-center justify-center gap-3 bg-[#284e32] hover:bg-[#1f3d27] text-white font-label-sm text-sm font-bold uppercase tracking-widest py-4 sm:py-5 px-7 sm:px-10 rounded-sm transition-all duration-300 shadow-lg shadow-black/20 hover:shadow-[#284e32]/20 cursor-pointer no-underline group border-0"
               >
                 Visit Conexão Ancestral
-                <ArrowUpRight className="ngo-cta-arrow w-4 h-4 text-white transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ArrowUpRight
+                  color="#ffffff"
+                  stroke="#ffffff"
+                  className="ngo-cta-arrow w-4 h-4 text-white transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
               </a>
             </div>
           </div>

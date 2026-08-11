@@ -99,7 +99,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 items-start">
 
           {/* Left Column: Contact Form */}
-          <div className="lg:col-span-7 bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-10 shadow-xl relative overflow-hidden">
+          <div className="lg:col-span-7 bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-6 lg:p-8 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#999933]/5 pointer-events-none rounded-full"></div>
 
             <h2 className="font-headline-md text-2xl font-bold text-white mb-6">
