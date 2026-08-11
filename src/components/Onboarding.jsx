@@ -36,7 +36,6 @@ export default function Onboarding() {
   const sectionRef = useRef(null);
   const stepRefs = useRef([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [visibleSteps, setVisibleSteps] = useState(() => new Set());
   const [typedTitle, setTypedTitle] = useState("");
 
   useEffect(() => {
@@ -93,37 +92,48 @@ export default function Onboarding() {
   }, [isVisible]);
 
   useEffect(() => {
-    const observedSteps = stepRefs.current.filter(Boolean);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    if (reducedMotion.matches) {
-      return undefined;
-    }
+    if (reducedMotion.matches) return undefined;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
+    let animationFrame;
 
-          const stepIndex = Number(entry.target.dataset.stepIndex);
-          setVisibleSteps((currentSteps) => {
-            if (currentSteps.has(stepIndex)) return currentSteps;
+    const updateSteps = () => {
+      animationFrame = undefined;
+      const startLine = window.innerHeight * 0.92;
+      const endLine = window.innerHeight * 0.55;
+      const travelDistance = startLine - endLine;
 
-            const nextSteps = new Set(currentSteps);
-            nextSteps.add(stepIndex);
-            return nextSteps;
-          });
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: "0px 0px -22% 0px",
-      }
-    );
+      stepRefs.current.forEach((step) => {
+        if (!step) return;
 
-    observedSteps.forEach((step) => observer.observe(step));
-    return () => observer.disconnect();
+        const stepTop = step.getBoundingClientRect().top;
+        const progress = Math.min(
+          1,
+          Math.max(0, (startLine - stepTop) / travelDistance)
+        );
+        const remainingDistance = 1 - progress;
+
+        step.style.opacity = String(progress);
+        step.style.filter = `blur(${remainingDistance * 0.3}rem)`;
+        step.style.transform = `translate3d(${remainingDistance * 2}rem, ${remainingDistance * 1.25}rem, 0)`;
+      });
+    };
+
+    const requestStepsUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateSteps);
+    };
+
+    updateSteps();
+    window.addEventListener("scroll", requestStepsUpdate, { passive: true });
+    window.addEventListener("resize", requestStepsUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", requestStepsUpdate);
+      window.removeEventListener("resize", requestStepsUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
   return (
@@ -197,10 +207,7 @@ export default function Onboarding() {
               ref={(element) => {
                 stepRefs.current[index] = element;
               }}
-              data-step-index={index}
-              className={`${styles.step} ${
-                visibleSteps.has(index) ? styles.stepVisible : ""
-              }`}
+              className={styles.step}
               style={{
                 "--flow-delay": `${index * 2800}ms`,
               }}

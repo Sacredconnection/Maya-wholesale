@@ -4,8 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ArrowUpRight, Leaf, Shield, Droplets } from 'lucide-react';
 
+const PHOTO_ENTRY_DIRECTIONS = [
+  { x: 6, y: -4 },
+  { x: -5, y: -3 },
+  { x: 5, y: -3 },
+  { x: -5, y: 4 },
+  { x: 5, y: 4 },
+];
+
 export default function NGOSection() {
   const sectionRef = useRef(null);
+  const photoRefs = useRef([]);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -22,24 +31,60 @@ export default function NGOSection() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (reducedMotion.matches) return undefined;
+
+    let animationFrame;
+
+    const updatePhotos = () => {
+      animationFrame = undefined;
+      const startLine = window.innerHeight * 0.94;
+      const endLine = window.innerHeight * 0.46;
+      const travelDistance = startLine - endLine;
+
+      photoRefs.current.forEach((photo, index) => {
+        if (!photo) return;
+
+        const photoTop = photo.getBoundingClientRect().top;
+        const columnDelay = index > 0 ? ((index - 1) % 2) * 0.08 : 0;
+        const rawProgress = (startLine - photoTop) / travelDistance;
+        const progress = Math.min(
+          1,
+          Math.max(0, (rawProgress - columnDelay) / (1 - columnDelay))
+        );
+        const direction = PHOTO_ENTRY_DIRECTIONS[index];
+        const remainingDistance = 1 - progress;
+
+        photo.style.opacity = String(progress);
+        photo.style.filter = `blur(${remainingDistance * 0.45}rem)`;
+        photo.style.transform = `translate3d(${direction.x * remainingDistance}rem, ${direction.y * remainingDistance}rem, 0) scale(${0.96 + progress * 0.04})`;
+      });
+    };
+
+    const requestPhotosUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updatePhotos);
+    };
+
+    updatePhotos();
+    window.addEventListener('scroll', requestPhotosUpdate, { passive: true });
+    window.addEventListener('resize', requestPhotosUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', requestPhotosUpdate);
+      window.removeEventListener('resize', requestPhotosUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   return (
     <>
       <style>{`
         @keyframes ngoFadeUp {
           from { opacity: 0; transform: translateY(40px); }
           to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes ngoPhotoReveal {
-          from {
-            opacity: 0;
-            transform: translate3d(0, 24px, 0) scale(0.96);
-            clip-path: inset(10% 4% round 18px);
-          }
-          to {
-            opacity: 1;
-            transform: translate3d(0, 0, 0) scale(1);
-            clip-path: inset(0 round 0);
-          }
         }
         .ngo-animate-item {
           opacity: 0;
@@ -50,20 +95,16 @@ export default function NGOSection() {
         }
         .ngo-photo-reveal {
           opacity: 0;
-          transform: translate3d(0, 24px, 0) scale(0.96);
-          clip-path: inset(10% 4% round 18px);
-        }
-        .ngo-photo-reveal.animate {
-          animation: ngoPhotoReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity, clip-path;
+          filter: blur(0.45rem);
+          transform: translate3d(var(--photo-entry-x, 0), var(--photo-entry-y, 3rem), 0) scale(0.96);
+          will-change: transform, opacity, filter;
         }
         @media (prefers-reduced-motion: reduce) {
-          .ngo-photo-reveal,
-          .ngo-photo-reveal.animate {
+          .ngo-photo-reveal {
             animation: none;
             opacity: 1;
+            filter: none;
             transform: none;
-            clip-path: none;
           }
         }
       `}</style>
@@ -189,14 +230,12 @@ export default function NGOSection() {
           </div>
 
           {/* Right Column: Harmonic Collage Grid */}
-          <div
-            className={`lg:col-span-5 flex flex-col gap-4 w-full ngo-animate-item ${visible ? 'animate' : ''}`}
-            style={visible ? { animationDelay: '0.35s' } : {}}
-          >
+          <div className="lg:col-span-5 flex flex-col gap-4 w-full">
             {/* Centerpiece Image (Large) */}
             <div
-              className={`ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-xl aspect-[16/10] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-2xl hover:shadow-[#f2f2f2]/10 ${visible ? 'animate' : ''}`}
-              style={visible ? { animationDelay: '0.45s' } : {}}
+              ref={(element) => { photoRefs.current[0] = element; }}
+              className="ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-xl aspect-[16/10] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-2xl hover:shadow-[#f2f2f2]/10"
+              style={{ '--photo-entry-x': '6rem', '--photo-entry-y': '-4rem' }}
             >
               <Image
                 src="/ngo/collage-5.webp"
@@ -210,19 +249,19 @@ export default function NGOSection() {
 
             {/* 2x2 Grid of Corner Images */}
             <div className="grid grid-cols-2 gap-4">
-              <div className={`ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10 ${visible ? 'animate' : ''}`} style={visible ? { animationDelay: '0.56s' } : {}}>
+              <div ref={(element) => { photoRefs.current[1] = element; }} className="ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10" style={{ '--photo-entry-x': '-5rem', '--photo-entry-y': '-3rem' }}>
                 <Image src="/ngo/collage-1.webp" alt="Amazon Forest Canopy" fill sizes="(min-width: 1024px) 17vw, 50vw" className="object-cover transition-[transform,filter] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.055] group-hover:brightness-105 group-hover:saturate-110 motion-reduce:transition-none" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131313]/25 to-transparent opacity-80 group-hover:opacity-25 transition-opacity duration-700 pointer-events-none" />
               </div>
-              <div className={`ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10 ${visible ? 'animate' : ''}`} style={visible ? { animationDelay: '0.64s' } : {}}>
+              <div ref={(element) => { photoRefs.current[2] = element; }} className="ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10" style={{ '--photo-entry-x': '5rem', '--photo-entry-y': '-3rem' }}>
                 <Image src="/ngo/collage-2.webp" alt="Indigenous Community & Culture" fill sizes="(min-width: 1024px) 17vw, 50vw" className="object-cover transition-[transform,filter] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.055] group-hover:brightness-105 group-hover:saturate-110 motion-reduce:transition-none" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131313]/25 to-transparent opacity-80 group-hover:opacity-25 transition-opacity duration-700 pointer-events-none" />
               </div>
-              <div className={`ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10 ${visible ? 'animate' : ''}`} style={visible ? { animationDelay: '0.72s' } : {}}>
+              <div ref={(element) => { photoRefs.current[3] = element; }} className="ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10" style={{ '--photo-entry-x': '-5rem', '--photo-entry-y': '4rem' }}>
                 <Image src="/ngo/collage-3.webp" alt="Sacred Amazonian Botanicals" fill sizes="(min-width: 1024px) 17vw, 50vw" className="object-cover transition-[transform,filter] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.055] group-hover:brightness-105 group-hover:saturate-110 motion-reduce:transition-none" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131313]/25 to-transparent opacity-80 group-hover:opacity-25 transition-opacity duration-700 pointer-events-none" />
               </div>
-              <div className={`ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10 ${visible ? 'animate' : ''}`} style={visible ? { animationDelay: '0.8s' } : {}}>
+              <div ref={(element) => { photoRefs.current[4] = element; }} className="ngo-photo-reveal rounded-xl overflow-hidden border border-white/10 shadow-lg aspect-[4/3] group cursor-pointer relative transition-[border-color,box-shadow] duration-500 hover:border-[#f2f2f2]/45 hover:shadow-xl hover:shadow-[#f2f2f2]/10" style={{ '--photo-entry-x': '5rem', '--photo-entry-y': '4rem' }}>
                 <Image src="/ngo/collage-4.webp" alt="Pristine Forest Stream" fill sizes="(min-width: 1024px) 17vw, 50vw" className="object-cover transition-[transform,filter] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.055] group-hover:brightness-105 group-hover:saturate-110 motion-reduce:transition-none" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131313]/25 to-transparent opacity-80 group-hover:opacity-25 transition-opacity duration-700 pointer-events-none" />
               </div>
