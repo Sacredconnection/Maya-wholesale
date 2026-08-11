@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -26,6 +26,8 @@ const HERO_SLIDES = [
 export default function Hero() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const heroRef = useRef(null);
+  const backgroundRef = useRef(null);
   const activeContent = HERO_SLIDES[activeSlide];
 
   useEffect(() => {
@@ -38,8 +40,45 @@ export default function Hero() {
     return () => window.clearInterval(rotationTimer);
   }, [isPaused]);
 
+  useEffect(() => {
+    const hero = heroRef.current;
+    const background = backgroundRef.current;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!hero || !background || reducedMotion.matches) return undefined;
+
+    let animationFrame;
+
+    const updateParallax = () => {
+      animationFrame = undefined;
+      const heroBounds = hero.getBoundingClientRect();
+
+      if (heroBounds.bottom <= 0 || heroBounds.top >= window.innerHeight) return;
+
+      const distanceScrolled = Math.max(0, -heroBounds.top);
+      const offset = Math.min(distanceScrolled * 0.38, heroBounds.height * 0.2);
+      background.style.setProperty('--hero-parallax-offset', `${offset}px`);
+    };
+
+    const requestParallaxUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateParallax);
+    };
+
+    updateParallax();
+    window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+    window.addEventListener('resize', requestParallaxUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', requestParallaxUpdate);
+      window.removeEventListener('resize', requestParallaxUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   return (
     <div
+      ref={heroRef}
       className="site-hero theme-dark-zone relative flex w-full flex-col overflow-hidden bg-[#25362D]"
       onFocusCapture={() => setIsPaused(true)}
       onBlurCapture={(event) => {
@@ -47,7 +86,11 @@ export default function Hero() {
       }}
     >
       {/* Responsive full-bleed hero background */}
-      <div className="absolute inset-0 z-0">
+      <div
+        ref={backgroundRef}
+        className="absolute inset-x-0 -top-[10%] z-0 h-[120%] will-change-transform motion-reduce:transform-none"
+        style={{ transform: 'translate3d(0, var(--hero-parallax-offset, 0px), 0)' }}
+      >
         <picture
           className={`absolute inset-0 block h-full w-full transition-opacity duration-1000 motion-reduce:transition-none ${
             activeSlide === 0 ? 'opacity-100' : 'opacity-0'
@@ -96,24 +139,36 @@ export default function Hero() {
       <section className="relative z-10 flex w-full flex-1 items-stretch py-8 md:items-center md:py-16 lg:py-20">
         <div
           key={activeSlide}
-          className="site-content-shell flex flex-1 animate-fade-in-up flex-col items-center pt-16 text-center md:flex-none md:pt-0"
+          className="site-content-shell flex flex-1 flex-col items-center pt-16 text-center md:flex-none md:pt-0"
         >
 
-          <span className="type-eyebrow relative inline-block pb-3 font-label-sm text-white/90 after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-14 after:-translate-x-1/2 after:bg-gradient-to-r after:from-[#999933] after:to-[#cc6633] after:content-['']">
+          <span
+            className="hero-content-rise type-eyebrow relative inline-block pb-3 font-label-sm text-white/90 after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-14 after:-translate-x-1/2 after:bg-gradient-to-r after:from-[#999933] after:to-[#cc6633] after:content-['']"
+            style={{ "--hero-content-delay": "120ms" }}
+          >
             {activeContent.eyebrow}
           </span>
 
-          <h1 className="type-display-title mt-4 font-headline-lg text-white sm:mt-5">
+          <h1
+            className="hero-content-rise type-display-title mt-4 font-headline-lg text-white sm:mt-5"
+            style={{ "--hero-content-delay": "240ms" }}
+          >
             {activeContent.heading.map((line) => (
               <span key={line} className="block">{line}</span>
             ))}
           </h1>
 
-          <p className="type-body-lead mt-5 max-w-[28rem] font-body-lg text-white/75 sm:mt-6 sm:max-w-md md:max-w-2xl md:text-white/70">
+          <p
+            className="hero-content-rise type-body-lead mt-5 max-w-[28rem] font-body-lg text-white/75 sm:mt-6 sm:max-w-md md:max-w-2xl md:text-white/70"
+            style={{ "--hero-content-delay": "380ms" }}
+          >
             {activeContent.description}
           </p>
 
-          <div className="mt-auto mb-10 flex w-full max-w-sm flex-col items-stretch gap-4 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center md:mt-8 md:mb-0 lg:mt-9">
+          <div
+            className="hero-content-rise mt-auto mb-10 flex w-full max-w-sm flex-col items-stretch gap-4 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center md:mt-8 md:mb-0 lg:mt-9"
+            style={{ "--hero-content-delay": "520ms" }}
+          >
             <Link
               href={activeContent.ctaHref}
               className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"

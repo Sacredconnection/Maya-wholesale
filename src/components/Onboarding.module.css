@@ -72,11 +72,17 @@
 
 .title {
   max-width: 10ch;
+  min-height: 2.73em;
   color: #f7f5e9;
   font-size: clamp(2.65rem, 5.25vw, 4.85rem);
   font-weight: 900;
   line-height: 0.91;
   letter-spacing: -0.04em;
+}
+
+.titleLine {
+  display: block;
+  min-height: 0.91em;
 }
 
 .summary {
@@ -213,37 +219,25 @@
   content: "";
 }
 
-.steps::after {
-  position: absolute;
-  top: 4.1rem;
-  left: calc(2.15rem - 0.22rem);
-  width: 0.44rem;
-  height: 0.44rem;
-  border-radius: 50%;
-  background: var(--orange);
-  box-shadow: 0 0 0 0.3rem rgb(204 102 51 / 0.14);
-  content: "";
-  opacity: 0;
-}
-
-.visible .steps::after {
-  animation: process-path-travel 8.4s linear 600ms infinite;
-}
-
 .step {
-  --step-delay: 0ms;
   position: relative;
   display: grid;
   grid-template-columns: 4.3rem minmax(0, 1fr);
   gap: clamp(1rem, 3vw, 2.1rem);
   padding: clamp(1.45rem, 3vw, 2.1rem) 0;
   opacity: 0;
-  transform: translateY(1.15rem);
+  filter: blur(0.3rem);
+  transform: translate3d(2rem, 1.25rem, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.visible .step {
-  animation: reveal-step 650ms cubic-bezier(0.22, 1, 0.36, 1)
-    var(--step-delay) forwards;
+.stepVisible {
+  opacity: 1;
+  filter: none;
+  transform: translate3d(0, 0, 0);
 }
 
 .step:not(:last-child) {
@@ -334,13 +328,6 @@
   line-height: 1.65;
 }
 
-@keyframes reveal-step {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes process-marker-pulse {
   0%,
   8%,
@@ -407,27 +394,6 @@
   }
 }
 
-@keyframes process-path-travel {
-  0% {
-    opacity: 0;
-    top: 4.1rem;
-  }
-
-  4% {
-    opacity: 1;
-  }
-
-  94% {
-    opacity: 1;
-    top: calc(100% - 4.55rem);
-  }
-
-  100% {
-    opacity: 0;
-    top: calc(100% - 4.55rem);
-  }
-}
-
 @media (max-width: 767px) {
   .section {
     min-height: 0;
@@ -488,24 +454,22 @@
     left: 1.75rem;
   }
 
-  .steps::after {
-    left: calc(1.75rem - 0.22rem);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .step,
-  .visible .step {
+  .stepVisible {
     animation: none;
     opacity: 1;
+    filter: none;
     transform: none;
+    transition: none;
   }
 
   .visible .marker,
   .visible .marker::before,
   .visible .marker::after,
-  .visible .stepCopy,
-  .visible .steps::after {
+  .visible .stepCopy {
     animation: none;
   }
 

@@ -30,9 +30,14 @@ const steps = [
   },
 ];
 
+const ONBOARDING_TITLE = "Wholesale,\nwithout the\nguesswork.";
+
 export default function Onboarding() {
   const sectionRef = useRef(null);
+  const stepRefs = useRef([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [visibleSteps, setVisibleSteps] = useState(() => new Set());
+  const [typedTitle, setTypedTitle] = useState("");
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -50,6 +55,74 @@ export default function Onboarding() {
     );
 
     observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (reducedMotion.matches) {
+      const reducedMotionTimer = window.setTimeout(() => {
+        setTypedTitle(ONBOARDING_TITLE);
+      }, 0);
+
+      return () => window.clearTimeout(reducedMotionTimer);
+    }
+
+    let typingTimer;
+    const startTimer = window.setTimeout(() => {
+      typingTimer = window.setInterval(() => {
+        setTypedTitle((currentTitle) => {
+          const nextTitle = ONBOARDING_TITLE.slice(0, currentTitle.length + 1);
+
+          if (nextTitle === ONBOARDING_TITLE) {
+            window.clearInterval(typingTimer);
+          }
+
+          return nextTitle;
+        });
+      }, 65);
+    }, 250);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      if (typingTimer) window.clearInterval(typingTimer);
+    };
+  }, [isVisible]);
+
+  useEffect(() => {
+    const observedSteps = stepRefs.current.filter(Boolean);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (reducedMotion.matches) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          const stepIndex = Number(entry.target.dataset.stepIndex);
+          setVisibleSteps((currentSteps) => {
+            if (currentSteps.has(stepIndex)) return currentSteps;
+
+            const nextSteps = new Set(currentSteps);
+            nextSteps.add(stepIndex);
+            return nextSteps;
+          });
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px 0px -22% 0px",
+      }
+    );
+
+    observedSteps.forEach((step) => observer.observe(step));
     return () => observer.disconnect();
   }, []);
 
@@ -77,12 +150,21 @@ export default function Onboarding() {
             Maya trade program
           </p>
 
-          <h2 id="onboarding-title" className={styles.title}>
-            Wholesale,
-            <br />
-            without the
-            <br />
-            guesswork.
+          <h2
+            id="onboarding-title"
+            className={styles.title}
+            aria-label={ONBOARDING_TITLE.replaceAll("\n", " ")}
+          >
+            <span aria-hidden="true">
+              {typedTitle.split("\n").map((line, index) => (
+                <span
+                  key={index}
+                  className={styles.titleLine}
+                >
+                  {line}
+                </span>
+              ))}
+            </span>
           </h2>
 
           <p className={styles.summary}>
@@ -112,9 +194,14 @@ export default function Onboarding() {
           {steps.map((step, index) => (
             <li
               key={step.number}
-              className={styles.step}
+              ref={(element) => {
+                stepRefs.current[index] = element;
+              }}
+              data-step-index={index}
+              className={`${styles.step} ${
+                visibleSteps.has(index) ? styles.stepVisible : ""
+              }`}
               style={{
-                "--step-delay": `${180 + index * 150}ms`,
                 "--flow-delay": `${index * 2800}ms`,
               }}
             >
