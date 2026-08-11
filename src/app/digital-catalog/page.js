@@ -503,9 +503,6 @@ export default function CatalogPage() {
       <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
         <header className="flex flex-col gap-6 border-b border-white/10 pb-8">
           <div className="max-w-3xl">
-            <span className="type-eyebrow mb-3 inline-flex rounded-full border border-[#999933]/40 bg-[#999933]/15 px-3 py-1 text-[#f2f2f2] font-label-sm">
-              Interactive digital catalog
-            </span>
             <h1 className="type-page-title font-headline-lg text-white">
               Wholesale Digital Catalog
             </h1>

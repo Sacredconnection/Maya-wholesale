@@ -83,9 +83,6 @@ export default function ContactPage() {
       <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
         {/* Page Title */}
         <div className="border-b border-white/10 pb-6 sm:pb-8">
-          <span className="inline-flex items-center gap-2 bg-[#999933]/15 border border-[#999933]/30 px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-[#f2f2f2] uppercase font-label-sm mb-3">
-            Get In Touch
-          </span>
           <h1 className="type-page-title font-headline-lg text-white">
             B2B Support &amp; Contact
           </h1>
