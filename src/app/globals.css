@@ -888,28 +888,8 @@ html[data-theme="light"] :is(
   transform: none;
 }
 
-.botanical-card-arrival {
-  opacity: 0;
-  transform: translate3d(
-      var(--card-entry-x, 0),
-      var(--card-entry-y, 3rem),
-      0
-    )
-    scale(0.98);
-  transition:
-    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.botanical-card-arrival.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .trust-header-arrival,
-  .botanical-card-arrival {
+  .trust-header-arrival {
     opacity: 1;
     transform: none;
     transition: none;
