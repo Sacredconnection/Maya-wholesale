@@ -1,7 +1,6 @@
 "use client";
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
@@ -52,7 +51,6 @@ export default function Hero() {
               className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"
             >
               Register B2B Account
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -66,7 +64,6 @@ export default function Hero() {
           className="mx-auto flex w-full max-w-xs items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] px-7 py-4 text-sm font-bold uppercase tracking-wide text-white no-underline shadow-lg shadow-[#cc6633]/10 transition-all duration-300 hover:bg-[#b6532a] hover:shadow-[#cc6633]/20 font-label-sm"
         >
           Register B2B Account
-          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 

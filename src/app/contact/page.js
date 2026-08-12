@@ -11,7 +11,6 @@ import {
   Send,
   Check,
   Loader2,
-  ArrowRight,
   Clock
 } from "lucide-react";
 

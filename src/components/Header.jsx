@@ -6,7 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/components/AuthContext';
 import { useCart } from '@/components/CartContext';
-import { Menu, X, ArrowRight, LogOut, ShoppingBag } from 'lucide-react';
+import { useShelf } from '@/components/ShelfContext';
+import { Menu, X, Bookmark, LogOut, ShoppingBag } from 'lucide-react';
 
 export default function Header({ onOpenLogin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ export default function Header({ onOpenLogin }) {
   const router = useRouter();
   const { isLoggedIn, user, logout } = useAuth();
   const { cartSubtotal, cartTotalItems, setIsCartOpen } = useCart();
+  const { count: shelfCount } = useShelf();
   const cartTotal =
     cartSubtotal * (1 - (isLoggedIn ? Number(user?.discountRate || 0) : 0) / 100);
 
@@ -121,6 +123,22 @@ export default function Header({ onOpenLogin }) {
             Digital Catalog
           </Link>
 
+          {isLoggedIn && (
+            <Link
+              href="/my-shelf"
+              aria-current={pathname === '/my-shelf' ? 'page' : undefined}
+              className={`${pathname === '/my-shelf' ? 'border-[#999933] bg-[#999933] text-white' : 'border-white/15 bg-white/5 text-white/80 hover:border-[#999933]/70 hover:bg-[#999933]/10 hover:text-white'} relative inline-flex h-10 items-center justify-center gap-2 rounded-sm border px-3 text-[10px] font-bold uppercase tracking-wider transition-colors`}
+            >
+              <Bookmark className={`h-3.5 w-3.5 ${shelfCount > 0 ? 'fill-current' : ''}`} aria-hidden="true" />
+              My Shelf
+              {shelfCount > 0 && (
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-white/15 px-1.5 py-0.5 text-[9px]" aria-label={`${shelfCount} saved products`}>
+                  {shelfCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {isLoggedIn ? (
             <>
               <Link
@@ -153,7 +171,6 @@ export default function Header({ onOpenLogin }) {
                 className="order-2 h-10 bg-white/10 hover:bg-white text-white hover:text-[#212121] text-xs font-bold tracking-wider uppercase px-5 py-3 rounded-sm border border-white/10 hover:border-white transition-all duration-300 flex items-center gap-2 font-label-sm cursor-pointer no-underline"
               >
                 Register Account
-                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
           )}
@@ -161,6 +178,21 @@ export default function Header({ onOpenLogin }) {
 
         {/* Mobile Cart and Hamburger Container (Mobile Only) */}
         <div className="flex items-center gap-2.5 sm:gap-3 lg:hidden">
+          {isLoggedIn && (
+            <Link
+              href="/my-shelf"
+              aria-label={`My Shelf${shelfCount > 0 ? `, ${shelfCount} saved products` : ''}`}
+              aria-current={pathname === '/my-shelf' ? 'page' : undefined}
+              className={`${pathname === '/my-shelf' ? 'border-[#999933] bg-[#999933]' : 'border-white/10 bg-white/5 hover:bg-white/10'} relative inline-flex h-10 w-10 items-center justify-center rounded-sm border text-white transition-colors`}
+            >
+              <Bookmark className={`h-4 w-4 ${shelfCount > 0 ? 'fill-current' : ''}`} aria-hidden="true" />
+              {shelfCount > 0 && (
+                <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full border border-[#131313] bg-[#cc6633] px-1 text-[9px] font-bold text-white">
+                  {shelfCount}
+                </span>
+              )}
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
@@ -242,6 +274,18 @@ export default function Header({ onOpenLogin }) {
           </Link>
           {isLoggedIn ? (
             <>
+              <Link
+                href="/my-shelf"
+                aria-current={pathname === '/my-shelf' ? 'page' : undefined}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`${pathname === '/my-shelf' ? 'border-[#999933] bg-[#999933]/20 text-white' : 'border-white/10 bg-white/5 text-[#f2f2f2]'} flex items-center justify-between rounded-sm border px-4 py-3 text-base font-medium transition-colors hover:border-[#999933]/60 hover:text-white`}
+              >
+                <span className="flex items-center gap-2">
+                  <Bookmark className={`h-4 w-4 ${shelfCount > 0 ? 'fill-current' : ''}`} aria-hidden="true" />
+                  My Shelf
+                </span>
+                <span className="text-xs text-white/50">{shelfCount}</span>
+              </Link>
               <Link
                 href="/my-account"
                 aria-current={pathname === '/my-account' ? 'page' : undefined}

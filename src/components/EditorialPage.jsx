@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowUpRight, CalendarDays } from 'lucide-react';
+import { ArrowLeft, CalendarDays } from 'lucide-react';
 import PublicPageShell from '@/components/PublicPageShell';
 
 export function EditorialSection({ id, number, title, children }) {
@@ -34,7 +34,6 @@ export function EditorialContact({ children }) {
     <div className="editorial-contact mt-8 rounded-lg border border-[#f2f2f2]/25 bg-[#1a1a1a] p-6 sm:p-8">
       <div className="mb-3 flex items-center gap-2 font-label-sm text-xs font-bold uppercase tracking-[0.16em] text-[#f2f2f2]">
         Contact our team
-        <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
       </div>
       <div className="text-base leading-7 text-white/65">{children}</div>
     </div>

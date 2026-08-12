@@ -4,8 +4,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, LockKeyhole, ShoppingBag } from "lucide-react";
+import { LockKeyhole, ShoppingBag } from "lucide-react";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
+import ShelfToggleButton from "@/components/ShelfToggleButton";
 
 export default function ProductCard({
   product,
@@ -15,6 +16,10 @@ export default function ProductCard({
 }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const selectedOption = product.options[0];
+  const variations =
+    product.productType === "variable" && Array.isArray(product.options)
+      ? product.options
+      : [];
   const description =
     product.description || "Wholesale product from the Maya Herbs collection.";
   const hasLongDescription = description.length > 180;
@@ -89,7 +94,11 @@ export default function ProductCard({
               </h2>
             )}
           </div>
-          <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-white/25 transition-colors group-hover:text-[#f2f2f2]" aria-hidden="true" />
+          <div className="flex shrink-0 items-center gap-2">
+            {isLoggedIn && (
+              <ShelfToggleButton productId={product.id} productName={product.name} variant="icon" />
+            )}
+          </div>
         </div>
 
         <div className={isDescriptionExpanded ? "" : "min-h-28 sm:min-h-28 xl:min-h-[4.5rem]"}>
@@ -131,25 +140,20 @@ export default function ProductCard({
               </span>
             </div>
 
-            {product.options.length > 0 && (
+            {variations.length > 0 && (
               <fieldset className="mt-2 min-w-0">
                 <legend className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/35">
-                  Available formats
+                  Available variations
                 </legend>
                 <div className="flex flex-wrap gap-1.5 xl:flex-nowrap">
-                  {product.options.map((option, index) => {
-                    const label = option.weightGrams
-                      ? `${option.weightGrams}g`
-                      : option.name;
-                    return (
-                      <span
-                        key={`${option.sku}-${index}`}
-                        className="catalog-format-tag inline-flex min-h-8 shrink-0 items-center rounded-sm border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-bold text-white/75"
-                      >
-                        {label}
-                      </span>
-                    );
-                  })}
+                  {variations.map((option, index) => (
+                    <span
+                      key={`${option.sku}-${index}`}
+                      className="catalog-format-tag inline-flex min-h-8 shrink-0 items-center rounded-sm border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-bold text-white/75"
+                    >
+                      {option.name || "Variation"}
+                    </span>
+                  ))}
                 </div>
               </fieldset>
             )}

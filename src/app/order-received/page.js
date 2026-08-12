@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
 import BankTransferDetails from "@/components/BankTransferDetails";
-import { Check, ClipboardList, ArrowRight } from "lucide-react";
+import { Check, ClipboardList } from "lucide-react";
 
 function OrderReceivedContent() {
   const searchParams = useSearchParams();
@@ -66,7 +66,6 @@ function OrderReceivedContent() {
           className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-xs font-bold uppercase tracking-widest py-4 px-8 rounded-sm transition-all duration-300 flex items-center justify-center gap-2 no-underline"
         >
           Continue Browsing
-          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     </main>

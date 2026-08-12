@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, PackageCheck, Sparkles } from "lucide-react";
+import { PackageCheck, Sparkles } from "lucide-react";
 import { useProducts } from "@/components/ProductsContext";
 
 export default function SuggestedOrdersPreview() {
@@ -34,7 +34,6 @@ export default function SuggestedOrdersPreview() {
             className="mt-5 inline-flex items-center gap-2 rounded-sm bg-[#cc6632] px-5 py-3 text-[10px] font-black uppercase tracking-wider text-white no-underline transition-colors hover:bg-[#b6532a]"
           >
             View suggested orders
-            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 

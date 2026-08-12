@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight, Globe, ShieldCheck, HeartHandshake, Eye } from 'lucide-react';
+import { Globe, ShieldCheck, HeartHandshake, Eye } from 'lucide-react';
 import { getEthnicityColor } from '@/lib/ethnicity-colors';
 import { useDialogAccessibility } from '@/lib/use-dialog-accessibility';
 
@@ -230,7 +230,7 @@ export default function LineageShowcase() {
             className="lineage-link text-[#f2f2f2] hover:text-[#999933] font-label-sm text-sm uppercase tracking-widest hover:underline flex items-center gap-1.5 transition-colors"
             href="/catalog"
           >
-            Explore Lineage <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+            Explore Lineage
           </Link>
         </div>
       </div>
@@ -409,7 +409,6 @@ export default function LineageShowcase() {
                   className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-sm transition-all duration-300 cursor-pointer border-0 flex items-center gap-1.5 no-underline"
                 >
                   Explore Products
-                  <ArrowUpRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
