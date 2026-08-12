@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/components/AuthContext';
 import { useCart } from '@/components/CartContext';
-import { Menu, X, ArrowRight, LogOut, ShoppingBag } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
 
 export default function Header({ onOpenLogin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -124,10 +124,9 @@ export default function Header({ onOpenLogin }) {
               <button
                 type="button"
                 onClick={handleHeaderLogout}
-                className="header-action-button header-desktop-outline-button order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#93000a]/25 bg-[#93000a]/10 px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-[#93000a] transition-colors duration-300 hover:border-[#93000a]/45 hover:bg-[#93000a]/15"
+                className="header-action-button header-desktop-outline-button order-3 flex h-9 cursor-pointer items-center justify-center rounded border border-[#93000a]/25 bg-[#93000a]/10 px-3 text-center text-[10px] font-bold uppercase tracking-[0.09em] text-[#93000a] transition-colors duration-300 hover:border-[#93000a]/45 hover:bg-[#93000a]/15"
               >
                 Exit Portal
-                <LogOut className="h-3 w-3" />
               </button>
             </>
           ) : (
@@ -141,10 +140,9 @@ export default function Header({ onOpenLogin }) {
               </button>
               <Link
                 href="/register"
-                className="header-action-button order-3 flex h-9 cursor-pointer items-center gap-1.5 rounded border border-[#cc6633] bg-[#cc6633] px-3 text-[10px] font-bold uppercase tracking-[0.09em] text-white no-underline transition-colors duration-300 hover:border-[#b6532a] hover:bg-[#b6532a] font-label-sm"
+                className="header-action-button order-3 flex h-9 cursor-pointer items-center justify-center rounded border border-[#cc6633] bg-[#cc6633] px-3 text-center text-[10px] font-bold uppercase tracking-[0.09em] text-white no-underline transition-colors duration-300 hover:border-[#b6532a] hover:bg-[#b6532a] font-label-sm"
               >
                 Register Account
-                <ArrowRight className="h-3 w-3" />
               </Link>
             </>
           )}
@@ -237,9 +235,8 @@ export default function Header({ onOpenLogin }) {
                   setMobileMenuOpen(false);
                   handleHeaderLogout();
                 }}
-                className="flex items-center gap-2 text-left text-[#ffb4ab] text-base font-medium py-2 bg-transparent border-0 cursor-pointer"
+                className="flex items-center text-left text-[#ffb4ab] text-base font-medium py-2 bg-transparent border-0 cursor-pointer"
               >
-                <LogOut className="w-4 h-4" />
                 Exit Portal
               </button>
             </>

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 
 const HERO_SLIDES = [
   {
@@ -168,10 +167,9 @@ export default function Hero() {
           >
             <Link
               href={activeContent.ctaHref}
-              className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"
+              className="bg-[#cc6633] hover:bg-[#b6532a] text-center text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center font-label-sm uppercase no-underline cursor-pointer border-0"
             >
               {activeContent.ctaLabel}
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
