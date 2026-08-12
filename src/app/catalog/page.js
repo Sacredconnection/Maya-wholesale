@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
 import ProductPurchaseControls from "@/components/ProductPurchaseControls";
+import ShelfToggleButton from "@/components/ShelfToggleButton";
 import AuthGate from "@/components/AuthGate";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import { useAuth } from "@/components/AuthContext";
@@ -19,7 +20,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  ArrowRight,
   FileSpreadsheet,
   PackageOpen,
   Upload,
@@ -599,16 +599,19 @@ export default function CatalogPage() {
 
                     {/* Name Column */}
                     <div className="col-span-1 flex min-w-0 flex-col gap-2">
-                      <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="hover:text-[#f2f2f2] transition-colors text-left no-underline group">
-                        <h3 className="catalog-product-title font-headline-md text-lg font-bold text-white group-hover:text-[#f2f2f2] transition-colors flex items-center gap-2 flex-wrap">
-                          {product.name}
-                          {product.isNew && (
-                            <span className="inline-block text-[9px] font-black tracking-widest bg-emerald-500 text-white px-1.5 py-0.5 rounded-sm uppercase align-middle">
-                              New
-                            </span>
-                          )}
-                        </h3>
-                      </Link>
+                      <div className="flex min-w-0 items-start justify-between gap-2">
+                        <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="min-w-0 hover:text-[#f2f2f2] transition-colors text-left no-underline group">
+                          <h3 className="catalog-product-title font-headline-md text-lg font-bold text-white group-hover:text-[#f2f2f2] transition-colors flex items-center gap-2 flex-wrap">
+                            {product.name}
+                            {product.isNew && (
+                              <span className="inline-block text-[9px] font-black tracking-widest bg-emerald-500 text-white px-1.5 py-0.5 rounded-sm uppercase align-middle">
+                                New
+                              </span>
+                            )}
+                          </h3>
+                        </Link>
+                        <ShelfToggleButton productId={product.id} productName={product.name} variant="icon" className="-mt-1 h-9 w-9" />
+                      </div>
                       <div className="flex min-w-0 flex-wrap gap-2">
                         <span className="max-w-full break-words text-[10px] font-semibold bg-[#999933]/15 text-[#f2f2f2] border border-[#999933]/30 px-2 py-0.5 rounded-sm uppercase tracking-wide font-label-sm">
                           {product.category}

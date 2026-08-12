@@ -2,6 +2,7 @@ import { Roboto } from "next/font/google";
 import { AuthProvider } from "@/components/AuthContext";
 import { CartProvider } from "@/components/CartContext";
 import { ProductsProvider } from "@/components/ProductsContext";
+import { ShelfProvider } from "@/components/ShelfContext";
 import CartDrawer from "@/components/CartDrawer";
 import BackToTop from "@/components/BackToTop";
 import "./globals.css";
@@ -35,11 +36,13 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <ProductsProvider>
-            <CartProvider>
-              {children}
-              <CartDrawer />
-              <BackToTop />
-            </CartProvider>
+            <ShelfProvider>
+              <CartProvider>
+                {children}
+                <CartDrawer />
+                <BackToTop />
+              </CartProvider>
+            </ShelfProvider>
           </ProductsProvider>
         </AuthProvider>
       </body>

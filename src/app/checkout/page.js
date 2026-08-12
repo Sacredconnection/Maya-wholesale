@@ -8,7 +8,6 @@ import Link from "next/link";
 import {
   AlertCircle,
   ArrowLeft,
-  ArrowRight,
   Check,
   ChevronDown,
   CreditCard,
@@ -643,7 +642,7 @@ export default function CheckoutPage() {
             <h2 className="mt-5 text-xl font-bold text-white">Your cart is empty</h2>
             <p className="mt-2 text-sm text-white/50">Add products from the wholesale catalog before starting checkout.</p>
             <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#cc6633] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white">
-              Browse catalog <ArrowRight className="h-4 w-4" />
+              Browse catalog
             </Link>
           </section>
         ) : (
@@ -893,7 +892,6 @@ export default function CheckoutPage() {
                       className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#cc6633]/15 transition-colors hover:bg-[#b6532a]"
                     >
                       {step === 0 ? "Continue to delivery" : "Review order"}
-                      <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
                     <>

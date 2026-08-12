@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maya Brand"
+  short_description: "Apply Maya's brand identity consistently"
+  default_prompt: "Use $maya-brand to create or review this Maya touchpoint for brand consistency."
