@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+
+const HERO_ROTATION_INTERVAL = 10000;
 
 const HERO_SLIDES = [
   {
@@ -25,17 +26,19 @@ const HERO_SLIDES = [
 
 export default function Hero() {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPointerPaused, setIsPointerPaused] = useState(false);
+  const [isFocusPaused, setIsFocusPaused] = useState(false);
   const heroRef = useRef(null);
   const backgroundRef = useRef(null);
   const activeContent = HERO_SLIDES[activeSlide];
+  const isPaused = isPointerPaused || isFocusPaused;
 
   useEffect(() => {
     if (isPaused) return undefined;
 
     const rotationTimer = window.setInterval(() => {
-      setActiveSlide((currentSlide) => (currentSlide + 1) % 2);
-    }, 6000);
+      setActiveSlide((currentSlide) => (currentSlide + 1) % HERO_SLIDES.length);
+    }, HERO_ROTATION_INTERVAL);
 
     return () => window.clearInterval(rotationTimer);
   }, [isPaused]);
@@ -80,9 +83,11 @@ export default function Hero() {
     <div
       ref={heroRef}
       className="site-hero theme-dark-zone relative flex w-full flex-col overflow-hidden bg-[#25362D]"
-      onFocusCapture={() => setIsPaused(true)}
+      onMouseEnter={() => setIsPointerPaused(true)}
+      onMouseLeave={() => setIsPointerPaused(false)}
+      onFocusCapture={() => setIsFocusPaused(true)}
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setIsPaused(false);
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsFocusPaused(false);
       }}
     >
       {/* Responsive full-bleed hero background */}
@@ -171,7 +176,6 @@ export default function Hero() {
               className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-sm font-bold tracking-wide px-7 sm:px-10 py-4 sm:py-5 rounded-sm shadow-lg shadow-[#cc6633]/10 hover:shadow-[#cc6633]/20 transition-all duration-300 flex items-center justify-center gap-3 group font-label-sm uppercase no-underline cursor-pointer border-0"
             >
               {activeContent.ctaLabel}
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 

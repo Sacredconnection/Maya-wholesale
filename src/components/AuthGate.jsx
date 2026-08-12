@@ -9,7 +9,7 @@ import Link from "next/link";
 import Header from "./Header";
 import Footer from "./Footer";
 import LoginModal from "./LoginModal";
-import { Lock, ArrowRight } from "lucide-react";
+import { Lock } from "lucide-react";
 
 export default function AuthGate({ loading = false }) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -44,7 +44,6 @@ export default function AuthGate({ loading = false }) {
                 className="bg-[#cc6633] hover:bg-[#b6532a] text-white text-xs font-bold uppercase tracking-widest py-4 rounded-sm transition-all duration-300 cursor-pointer border-0 w-full flex items-center justify-center gap-2 shadow-lg shadow-[#cc6633]/15"
               >
                 Sign In to Your Account
-                <ArrowRight className="w-4 h-4" />
               </button>
               <Link
                 href="/register"

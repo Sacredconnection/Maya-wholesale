@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import styles from "./Onboarding.module.css";
 
 const steps = [
@@ -144,7 +143,6 @@ export default function Onboarding() {
 
         <Link href="/register" className={styles.cta}>
           Create B2B account
-          <ArrowUpRight aria-hidden="true" />
         </Link>
       </div>
 

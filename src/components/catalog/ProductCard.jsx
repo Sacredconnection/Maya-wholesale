@@ -4,8 +4,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, LockKeyhole, ShoppingBag } from "lucide-react";
+import { LockKeyhole, ShoppingBag } from "lucide-react";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
+import ShelfToggleButton from "@/components/ShelfToggleButton";
 
 export default function ProductCard({
   product,
@@ -93,7 +94,11 @@ export default function ProductCard({
               </h2>
             )}
           </div>
-          <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-white/25 transition-colors group-hover:text-[#f2f2f2]" aria-hidden="true" />
+          <div className="flex shrink-0 items-center gap-2">
+            {isLoggedIn && (
+              <ShelfToggleButton productId={product.id} productName={product.name} variant="icon" />
+            )}
+          </div>
         </div>
 
         <div className={isDescriptionExpanded ? "" : "min-h-28 sm:min-h-28 xl:min-h-[4.5rem]"}>

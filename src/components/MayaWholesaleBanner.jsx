@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
 
 export default function MayaWholesaleBanner() {
   return (
@@ -48,7 +47,6 @@ export default function MayaWholesaleBanner() {
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#268072] px-6 py-3 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-black/20 transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-[#319888] hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e0c38b] motion-reduce:transform-none motion-reduce:transition-none md:mt-6"
           >
             Visit Sacred Snuff
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
       </div>

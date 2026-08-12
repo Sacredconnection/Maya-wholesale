@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
 
 const CATEGORIES = [
   {
@@ -96,7 +95,6 @@ export default function BotanicalCategories() {
                   aria-label={`View ${name} products`}
                 >
                   View products
-                  <ArrowUpRight aria-hidden="true" />
                 </Link>
               </div>
             </article>

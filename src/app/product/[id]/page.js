@@ -13,6 +13,7 @@ import { useProducts } from "@/components/ProductsContext";
 import { optionPriceForUser } from "@/lib/pricing";
 import { useCart } from "@/components/CartContext";
 import { useAuth } from "@/components/AuthContext";
+import ShelfToggleButton from "@/components/ShelfToggleButton";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -456,6 +457,13 @@ export default function ProductDetailPage() {
                 </div>
 
               </div>
+
+              <ShelfToggleButton
+                productId={product.id}
+                productName={product.name}
+                variant="wide"
+                className="w-full"
+              />
 
             </div>
 

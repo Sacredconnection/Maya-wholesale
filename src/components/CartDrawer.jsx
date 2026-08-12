@@ -4,7 +4,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Minus, Package, Plus, ShoppingBag, X } from "lucide-react";
+import { Minus, Package, Plus, ShoppingBag, X } from "lucide-react";
 import { useAuth } from "./AuthContext";
 import { useCart } from "./CartContext";
 import LoginModal from "./LoginModal";
@@ -256,7 +256,6 @@ export default function CartDrawer() {
                 className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] py-5 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-[#cc6633]/20 transition-all hover:bg-[#b6532a] hover:shadow-[#cc6633]/40 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {isLoggedIn ? "Proceed to checkout" : "Sign in to submit order"}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
