@@ -432,13 +432,13 @@ function truncatePdfLines(pdf, text, width, maxLines = 2) {
   return visible;
 }
 
-function drawCatalogLogo(pdf, logo, x, y, width = 45) {
+function drawCatalogLogo(pdf, logo, x, y, width = 45, fallbackColor = [255, 255, 255]) {
   if (logo) {
     pdf.addImage(logo, "PNG", x, y, width, width * 0.36, "catalog-logo", "FAST");
   } else {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(width / 4);
-    pdf.setTextColor(255, 255, 255);
+    pdf.setTextColor(...fallbackColor);
     pdf.text("Maya Herbs", x, y + width * 0.22);
   }
 }
@@ -453,23 +453,20 @@ function storePdfTheme() {
   };
 }
 
-function drawStoreBrand(pdf, logo, x, y, width = 45) {
-  drawCatalogLogo(pdf, logo, x, y, width);
+function drawStoreBrand(
+  pdf,
+  logo,
+  x,
+  y,
+  width = 45,
+  fallbackColor = [255, 255, 255]
+) {
+  drawCatalogLogo(pdf, logo, x, y, width, fallbackColor);
 }
 
-function drawSharedCatalogBrand(pdf, logo, x, y) {
+function drawSharedCatalogBrand(pdf, logo, x, y, fallbackColor) {
   const logoWidth = 36;
-  drawStoreBrand(pdf, logo, x, y, logoWidth);
-}
-
-function drawGreenCoverBackground(pdf, background) {
-  if (!background) return;
-  pdf.addImage(background, "PNG", 0, 0, 210, 297, "catalog-cover-background", "FAST");
-}
-
-function drawCoverDecoration(pdf, decoration) {
-  if (!decoration) return;
-  pdf.addImage(decoration, "PNG", 105, 0, 105, 42, "catalog-cover-decoration", "FAST");
+  drawStoreBrand(pdf, logo, x, y, logoWidth, fallbackColor);
 }
 
 const contactIconSvg = (content) =>
@@ -484,6 +481,9 @@ const CONTACT_ICON_SVGS = {
   ),
   location: contactIconSvg(
     '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>'
+  ),
+  website: contactIconSvg(
+    '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10"/>'
   ),
 };
 
@@ -520,50 +520,62 @@ function drawContactIcon(pdf, type, x, y, contactIcons) {
 }
 
 function drawCoverContactInfo(pdf, contactIcons) {
-  const iconX = 116;
-  const textX = 128;
-
   const rows = [
     {
       type: "email",
       values: ["info@mayaherbs.com"],
-      y: 238,
+      centerX: 38.25,
       url: "mailto:info@mayaherbs.com",
-      linkHeight: 10,
     },
     {
       type: "phone",
       values: ["+31 23 532 5192"],
-      y: 251.5,
+      centerX: 82.75,
       url: "tel:+31235325192",
-      linkHeight: 10,
     },
     {
       type: "location",
       values: ["Mollerusweg 66", "2031 BZ Haarlem", "The Netherlands"],
-      y: 265,
+      centerX: 127.25,
       url: "https://www.google.com/maps/search/?api=1&query=Mollerusweg+66+2031+BZ+Haarlem",
-      linkHeight: 19,
+    },
+    {
+      type: "website",
+      values: ["https://wholesale.mayaherbs.com/"],
+      centerX: 171.75,
+      url: "https://wholesale.mayaherbs.com/",
     },
   ];
 
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setLineWidth(0.4);
+  pdf.line(16, 226, 194, 226);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(7.5);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("CONTACT", 16, 236);
+
   rows.forEach((row) => {
-    drawContactIcon(pdf, row.type, iconX, row.y, contactIcons);
+    drawContactIcon(pdf, row.type, row.centerX - 3.75, 243.5, contactIcons);
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.7);
+    pdf.setFontSize(6.2);
     pdf.setTextColor(255, 255, 255);
     row.values.forEach((value, index) => {
-      pdf.text(value, textX, row.y + 5.2 + index * 4.5);
+      pdf.text(value, row.centerX, 257 + index * 4.5, { align: "center" });
     });
-    pdf.link(iconX - 1, row.y - 1, 79, row.linkHeight, { url: row.url });
+    pdf.link(row.centerX - 22.25, 242.5, 44.5, 26, { url: row.url });
   });
 }
 
-function drawGenerationStamp(pdf, generatedAtLabel, { darkBackground = false } = {}) {
+function drawGenerationStamp(
+  pdf,
+  generatedAtLabel,
+  { darkBackground = false, y = 293 } = {}
+) {
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(5.2);
-  pdf.setTextColor(...(darkBackground ? [180, 211, 202] : [113, 128, 123]));
-  pdf.text(`Generated: ${pdfSafeText(generatedAtLabel)}`, 198, 293, {
+  pdf.setTextColor(...(darkBackground ? [242, 242, 242] : [113, 128, 123]));
+  pdf.text(`Generated: ${pdfSafeText(generatedAtLabel)}`, 198, y, {
     align: "right",
   });
 }
@@ -571,20 +583,15 @@ function drawGenerationStamp(pdf, generatedAtLabel, { darkBackground = false } =
 function drawPdfCover(
   pdf,
   logo,
-  coverBackground,
-  coverDecoration,
   contactIcons,
-  products,
   filterLabel,
   generatedAtLabel
 ) {
-  const categoryCount = new Set(products.map((product) => product.category).filter(Boolean)).size;
-  const traditionCount = new Set(products.map((product) => product.tribe).filter(Boolean)).size;
   const normalizedFilterLabel = String(filterLabel || "").trim();
   const isCompleteCatalog =
     !normalizedFilterLabel ||
     normalizedFilterLabel.toLowerCase() === "complete catalog";
-  const scopeEyebrow = isCompleteCatalog ? "MAYA HERBS" : "SELECTED PRODUCTS";
+  const scopeEyebrow = isCompleteCatalog ? "" : "SELECTED PRODUCTS";
   const scopeTitle = isCompleteCatalog
     ? "COMPLETE CATALOG"
     : normalizedFilterLabel.replace(/\s*\|\s*/g, " / ");
@@ -593,31 +600,32 @@ function drawPdfCover(
     : normalizedFilterLabel.split("|").filter(Boolean).length;
   const scopeFontSize =
     filterDepth <= 1 ? 18 : filterDepth === 2 ? 13.5 : 10.5;
-  pdf.setFillColor(20, 65, 57);
+  pdf.setFillColor(...MAYA_PRIMARY);
   pdf.rect(0, 0, 210, 297, "F");
-  drawGreenCoverBackground(pdf, coverBackground);
-  pdf.setFillColor(26, 26, 26);
-  pdf.rect(0, 0, 210, 42, "F");
-  drawCoverDecoration(pdf, coverDecoration);
-  drawSharedCatalogBrand(pdf, logo, 16, 13);
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(0, 0, 210, 36, "F");
+  pdf.setDrawColor(...MAYA_SECONDARY);
+  pdf.setLineWidth(0.7);
+  pdf.line(0, 36, 210, 36);
+  drawStoreBrand(pdf, logo, 16, 10, 44, MAYA_PRIMARY);
 
-  pdf.setDrawColor(130, 214, 197);
-  pdf.setLineWidth(0.6);
-  pdf.line(16, 74, 54, 74);
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setLineWidth(0.55);
+  pdf.line(16, 64, 58, 64);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8);
-  pdf.setTextColor(130, 214, 197);
-  pdf.text("WHOLESALE CATALOG", 16, 68);
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(31);
+  pdf.setFontSize(7.5);
   pdf.setTextColor(255, 255, 255);
-  pdf.text("Maya Herbs", 16, 101);
-  pdf.text("Wholesale Catalog", 16, 116);
+  pdf.text("WHOLESALE CATALOG", 16, 58);
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(29);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Maya Herbs", 16, 84);
+  pdf.text("Wholesale Catalog", 16, 98);
 
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10.5);
-  pdf.setTextColor(218, 235, 230);
+  pdf.setFontSize(10);
+  pdf.setTextColor(242, 242, 242);
   pdf.text(
     truncatePdfLines(
       pdf,
@@ -626,14 +634,17 @@ function drawPdfCover(
       4
     ),
     16,
-    134,
+    116,
     { lineHeightFactor: 1.45 }
   );
 
+  if (scopeEyebrow) {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(scopeEyebrow, 16, 140);
+  }
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(7.5);
-  pdf.setTextColor(130, 214, 197);
-  pdf.text(scopeEyebrow, 16, 153);
   pdf.setFontSize(scopeFontSize);
   pdf.setTextColor(255, 255, 255);
   const scopeLines = truncatePdfLines(
@@ -643,7 +654,8 @@ function drawPdfCover(
     3
   );
   const scopeLineHeight = scopeFontSize * 0.3528 * 1.08;
-  const scopeStartY = 169 - ((scopeLines.length - 1) * scopeLineHeight) / 2;
+  const scopeCenterY = scopeEyebrow ? 156 : 145;
+  const scopeStartY = scopeCenterY - ((scopeLines.length - 1) * scopeLineHeight) / 2;
   pdf.text(
     scopeLines,
     16,
@@ -651,41 +663,17 @@ function drawPdfCover(
     { lineHeightFactor: 1.08 }
   );
 
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(16, 180, 178, 48, 2.5, 2.5, "F");
-  const stats = [
-    [String(traditionCount), "ORIGINS"],
-    [String(products.length), "PRODUCTS"],
-    [String(categoryCount), "COLLECTIONS"],
-  ];
-  stats.forEach(([value, label], index) => {
-    const x = 45 + index * 59;
-    if (index) {
-      pdf.setDrawColor(220, 229, 226);
-      pdf.line(x - 29, 191, x - 29, 217);
-    }
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(20);
-    pdf.setTextColor(38, 128, 114);
-    pdf.text(value, x, 201, { align: "center" });
-    pdf.setFontSize(7);
-    pdf.setTextColor(83, 105, 98);
-    pdf.text(label, x, 213, { align: "center" });
-  });
-
   drawCoverContactInfo(pdf, contactIcons);
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("MAYA HERBS", 16, 278);
-  drawGenerationStamp(pdf, generatedAtLabel, { darkBackground: true });
+  drawGenerationStamp(pdf, generatedAtLabel, {
+    darkBackground: true,
+    y: 284,
+  });
 }
 
 function drawStoreCover(
   pdf,
   logo,
-  coverBackground,
-  coverDecoration,
   store,
   storeIndex,
   pageNumber,
@@ -693,11 +681,9 @@ function drawStoreCover(
   generatedAtLabel
 ) {
   const theme = storePdfTheme(store.storeId);
-  const storeHeadingColor = theme.secondary;
+  const storeHeadingColor = [255, 255, 255];
   pdf.setFillColor(...theme.primary);
   pdf.rect(0, 0, 210, 297, "F");
-  drawGreenCoverBackground(pdf, coverBackground);
-  drawCoverDecoration(pdf, coverDecoration);
   drawStoreBrand(pdf, logo, 16, 14, 50);
 
   pdf.setFont("helvetica", "bold");
@@ -715,32 +701,11 @@ function drawStoreCover(
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-  pdf.setTextColor(...theme.secondarySoft);
+  pdf.setTextColor(242, 242, 242);
   const storeDescription =
     "Maya Herbs products presented by collection, including indigenous traditions, formats, identifiers, and product descriptions.";
   pdf.text(truncatePdfLines(pdf, storeDescription, 145, 5), 16, 139, {
     lineHeightFactor: 1.45,
-  });
-
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(16, 180, 178, 48, 2.5, 2.5, "F");
-  const storeStats = [
-    [String(store.products.length), "PRODUCTS"],
-    [String(store.categoryGroups.length), "CATEGORIES"],
-  ];
-  storeStats.forEach(([value, label], index) => {
-    const x = index === 0 ? 62 : 148;
-    if (index) {
-      pdf.setDrawColor(220, 229, 226);
-      pdf.line(105, 190, 105, 218);
-    }
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(21);
-    pdf.setTextColor(...theme.primary);
-    pdf.text(value, x, 201, { align: "center" });
-    pdf.setFontSize(7);
-    pdf.setTextColor(83, 105, 98);
-    pdf.text(label, x, 213, { align: "center" });
   });
 
   pdf.setFont("helvetica", "bold");
@@ -748,7 +713,7 @@ function drawStoreCover(
   pdf.setTextColor(255, 255, 255);
   pdf.text("STORE SECTION", 16, 264);
   pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(...theme.muted);
+  pdf.setTextColor(242, 242, 242);
   pdf.text(`Page ${pageNumber} of ${pageCount}`, 16, 276);
   drawGenerationStamp(pdf, generatedAtLabel, { darkBackground: true });
 }
@@ -763,9 +728,12 @@ function drawGridHeader(
   pageCount
 ) {
   const theme = storePdfTheme(storeId);
-  pdf.setFillColor(26, 26, 26);
+  pdf.setFillColor(255, 255, 255);
   pdf.rect(0, 0, 210, 28, "F");
-  drawStoreBrand(pdf, logo, 12, 6.5, 36);
+  pdf.setDrawColor(...MAYA_SECONDARY);
+  pdf.setLineWidth(0.6);
+  pdf.line(0, 28, 210, 28);
+  drawStoreBrand(pdf, logo, 12, 6.5, 36, MAYA_PRIMARY);
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(7.5);
@@ -783,31 +751,25 @@ function drawGridHeader(
   );
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(6.5);
-  pdf.setTextColor(...theme.headerMuted);
+  pdf.setTextColor(92, 91, 31);
   pdf.text(`MAYA HERBS WHOLESALE  |  ${pageNumber}/${pageCount}`, 198, 19, { align: "right" });
 }
 
 function drawCategoryCover(
   pdf,
   logo,
-  coverBackground,
-  coverDecoration,
   storeId,
   storeName,
   category,
-  products,
   categoryIndex,
   pageNumber,
   pageCount,
   generatedAtLabel
 ) {
-  const tribes = [...new Set(products.map((product) => product.tribe).filter(Boolean))];
   const theme = storePdfTheme(storeId);
-  const collectionHeadingColor = theme.secondary;
+  const collectionHeadingColor = [255, 255, 255];
   pdf.setFillColor(...theme.primary);
   pdf.rect(0, 0, 210, 297, "F");
-  drawGreenCoverBackground(pdf, coverBackground);
-  drawCoverDecoration(pdf, coverDecoration);
   drawStoreBrand(pdf, logo, 16, 14, 50);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
@@ -825,59 +787,83 @@ function drawCategoryCover(
   pdf.text(truncatePdfLines(pdf, category, 168, 3), 16, 108, { lineHeightFactor: 1.08 });
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-  pdf.setTextColor(...theme.secondarySoft);
+  pdf.setTextColor(242, 242, 242);
   const collectionDescription = category === "Rapé Indigenous"
     ? "Traditional rapé blends organized by their source tribe and the product information available in the wholesale catalog."
     : `${pdfSafeText(storeName)} products presented with their wholesale formats, product identifiers, and catalog descriptions.`;
   pdf.text(truncatePdfLines(pdf, collectionDescription, 145, 4), 16, 139, { lineHeightFactor: 1.45 });
 
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(16, 180, 178, 48, 2.5, 2.5, "F");
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(21);
-  pdf.setTextColor(...theme.primary);
-  pdf.text(String(products.length), 42, 201, { align: "center" });
-  pdf.setFontSize(7);
-  pdf.setTextColor(83, 105, 98);
-  pdf.text("PRODUCTS", 42, 213, { align: "center" });
-  pdf.setDrawColor(220, 229, 226);
-  pdf.line(68, 190, 68, 218);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(7.5);
-  pdf.setTextColor(83, 105, 98);
-  pdf.text(
-    truncatePdfLines(
-      pdf,
-      tribes.length ? `Subcategories: ${tribes.join(", ")}` : `${storeName} collection`,
-      113,
-      4
-    ),
-    78,
-    195,
-    { lineHeightFactor: 1.35 }
-  );
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(255, 255, 255);
   pdf.text("CLICK ANY PRODUCT TO CONTINUE ONLINE", 16, 264);
   pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(...theme.muted);
+  pdf.setTextColor(242, 242, 242);
   pdf.text(`Page ${pageNumber} of ${pageCount}`, 16, 276);
   drawGenerationStamp(pdf, generatedAtLabel, { darkBackground: true });
 }
 
-function gridProductCardLayout(pdf, product) {
-  const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
-  const variations = product.productType === "variable" && Array.isArray(product.options)
-    ? product.options
-    : [];
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(12.5);
-  const descriptionLines = pdf.splitTextToSize(description, 88);
-  const variationRows = Math.ceil(variations.length / 2);
+const GRID_PRODUCT_CARD_HEIGHT = 117;
+const GRID_PRODUCT_CARD_GAP = 6;
+
+function fitPdfText(pdf, text, width, maxHeight, {
+  maxFontSize,
+  minFontSize,
+  lineHeightFactor = 1.1,
+  step = 0.5,
+}) {
+  const safeText = pdfSafeText(text);
+  for (let fontSize = maxFontSize; fontSize >= minFontSize; fontSize -= step) {
+    pdf.setFontSize(fontSize);
+    const lines = pdf.splitTextToSize(safeText, width);
+    const lineHeight = (fontSize * lineHeightFactor) / pdf.internal.scaleFactor;
+    if (lines.length * lineHeight <= maxHeight) {
+      return { lines, fontSize, lineHeight, lineHeightFactor };
+    }
+  }
+
+  pdf.setFontSize(minFontSize);
+  const lines = pdf.splitTextToSize(safeText, width);
   return {
-    descriptionLines,
-    variations,
-    height: Math.max(117, 80 + descriptionLines.length * 5 + (variationRows ? 8 + variationRows * 11 : 0)),
+    lines,
+    fontSize: minFontSize,
+    lineHeight: (minFontSize * lineHeightFactor) / pdf.internal.scaleFactor,
+    lineHeightFactor,
+  };
+}
+
+function gridProductCardLayout(pdf, product, includePrices, user) {
+  const description = plainPdfText(product.description) || "Description not provided in the source catalog.";
+  const contentWidth = 95;
+  const price = includePrices && product.options?.[0]
+    ? optionPriceForUser(product.options[0], user, product.category)
+    : null;
+
+  pdf.setFont("helvetica", "bold");
+  const title = fitPdfText(pdf, product.name, contentWidth, 18, {
+    maxFontSize: 20,
+    minFontSize: 10,
+    lineHeightFactor: 1.04,
+  });
+
+  pdf.setFont("helvetica", "normal");
+  const descriptionLayout = fitPdfText(
+    pdf,
+    description,
+    contentWidth,
+    Number.isFinite(price) ? 39 : 49,
+    {
+      maxFontSize: 11.5,
+      minFontSize: 7,
+      lineHeightFactor: 1.12,
+    }
+  );
+
+  return {
+    contentWidth,
+    description: descriptionLayout,
+    height: GRID_PRODUCT_CARD_HEIGHT,
+    price,
+    title,
   };
 }
 
@@ -885,8 +871,6 @@ function drawGridProductCard(
   pdf,
   product,
   image,
-  includePrices,
-  user,
   x,
   y,
   layout
@@ -894,7 +878,6 @@ function drawGridProductCard(
   const width = 186;
   const height = layout.height;
   const accent = ethnicityColor(product);
-  const accentSoft = mixWithWhite(accent, 0.92);
   const accentBorder = mixWithWhite(accent, 0.72);
   pdf.setFillColor(255, 255, 255);
   pdf.setDrawColor(...accentBorder);
@@ -902,15 +885,15 @@ function drawGridProductCard(
   pdf.roundedRect(x, y, width, height, 1.8, 1.8, "FD");
 
   pdf.setFillColor(239, 244, 242);
-  pdf.roundedRect(x + 8, y + 20, 76, 76, 1.2, 1.2, "F");
+  pdf.roundedRect(x + 8, y + 23, 70, 70, 1.2, 1.2, "F");
   if (image?.dataUrl && image?.format) {
     pdf.addImage(
       image.dataUrl,
       image.format,
       x + 8,
-      y + 20,
-      76,
-      76,
+      y + 23,
+      70,
+      70,
       `catalog-product-${pdfSafeText(product.id || product.sku || product.name)}`,
       "FAST"
     );
@@ -918,89 +901,45 @@ function drawGridProductCard(
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(34);
     pdf.setTextColor(...accent);
-    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 46, y + 65, { align: "center" });
+    pdf.text(String(product.name || "?").charAt(0).toUpperCase(), x + 43, y + 64, { align: "center" });
   }
 
-  const identityX = x + 94;
-  const contentWidth = 88;
+  const identityX = x + 84;
+  const contentWidth = layout.contentWidth;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(7.5);
-  pdf.setTextColor(...accent);
+  pdf.setTextColor(33, 33, 33);
   pdf.text(pdfSafeText(product.tribe || product.category || "COLLECTION").toUpperCase(), identityX, y + 14);
-  pdf.setFontSize(22);
-  pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
-  pdf.text(truncatePdfLines(pdf, product.name, contentWidth, 2), identityX, y + 24, { lineHeightFactor: 1.06 });
+  pdf.setFontSize(layout.title.fontSize);
+  pdf.setTextColor(...MAYA_SECONDARY);
+  pdf.text(layout.title.lines, identityX, y + 22, {
+    lineHeightFactor: layout.title.lineHeightFactor,
+  });
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10.5);
   pdf.setTextColor(33, 33, 33);
-  const price = includePrices && product.options?.[0]
-    ? optionPriceForUser(product.options[0], user, product.category)
-    : null;
   const sku = pdfSafeText(product.sku || "-");
-  pdf.text(sku, identityX, y + 43);
+  pdf.text(sku, identityX, y + 45);
 
   pdf.setDrawColor(220, 229, 226);
-  pdf.line(identityX, y + 50, x + width - 7, y + 50);
+  pdf.line(identityX, y + 52, x + width - 7, y + 52);
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(12.5);
+  pdf.setFontSize(layout.description.fontSize);
   pdf.setTextColor(65, 80, 75);
-  pdf.text(layout.descriptionLines, identityX, y + 61, { lineHeightFactor: 1.15 });
+  const descriptionY = y + 61;
+  pdf.text(layout.description.lines, identityX, descriptionY, {
+    lineHeightFactor: layout.description.lineHeightFactor,
+  });
 
-  const descriptionEndY = y + 61 + layout.descriptionLines.length * 5;
-  if (Number.isFinite(price)) {
-    const priceLabel = `$${price.toFixed(2)}`;
-    const priceY = descriptionEndY + 11;
+  if (Number.isFinite(layout.price)) {
+    const descriptionHeight = layout.description.lines.length * layout.description.lineHeight;
+    const priceLabel = `$${layout.price.toFixed(2)}`;
+    const priceY = descriptionY + descriptionHeight + 7;
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
-    pdf.setTextColor(...DEFAULT_ETHNICITY_COLOR);
+    pdf.setFontSize(17);
+    pdf.setTextColor(...MAYA_SECONDARY);
     pdf.text(priceLabel, identityX, priceY);
   }
-
-  const { variations } = layout;
-  if (variations.length) {
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(...accent);
-    const variationsY = descriptionEndY + (Number.isFinite(price) ? 20 : 6);
-    pdf.text("AVAILABLE VARIATIONS", identityX, variationsY);
-
-    const tableX = identityX;
-    const tableY = variationsY + 3;
-    const columnCount = 2;
-    const columnGap = 2;
-    const rowGap = 2;
-    const cellWidth = (contentWidth - columnGap * (columnCount - 1)) / columnCount;
-    const cellHeight = 9;
-    variations.forEach((option, index) => {
-      const column = index % columnCount;
-      const row = Math.floor(index / columnCount);
-      const cellX = tableX + column * (cellWidth + columnGap);
-      const cellY = tableY + row * (cellHeight + rowGap);
-      const price = optionPriceForUser(option, user, product.category);
-      pdf.setFillColor(...accentSoft);
-      pdf.setDrawColor(...accentBorder);
-      pdf.setLineWidth(0.2);
-      pdf.roundedRect(cellX, cellY, cellWidth, cellHeight, 0.7, 0.7, "FD");
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(includePrices ? 5.7 : 6.3);
-      pdf.setTextColor(...accent);
-      pdf.text(
-        truncatePdfLines(pdf, pdfSafeText(option.name || "Variation"), cellWidth - 3, 1),
-        cellX + cellWidth / 2,
-        includePrices ? cellY + 3.7 : cellY + 5.6,
-        { align: "center" }
-      );
-      if (includePrices && Number.isFinite(price)) {
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(5.7);
-        pdf.setTextColor(65, 80, 75);
-        pdf.text(`$${price.toFixed(2)}`, cellX + cellWidth / 2, cellY + 7, {
-          align: "center",
-        });
-      }
-    });
-  }
-
 }
 
 function drawIndexNavigationButton(
@@ -1074,15 +1013,13 @@ function drawGridPage(pdf, {
     pageCount
   );
   products.forEach((product, index) => {
-    const layout = gridProductCardLayout(pdf, product);
+    const layout = gridProductCardLayout(pdf, product, includePrices, user);
     drawGridProductCard(
       pdf,
       product,
       images[index],
-      includePrices,
-      user,
       12,
-      35 + products.slice(0, index).reduce((offset, item) => offset + gridProductCardLayout(pdf, item).height + 6, 0),
+      35 + index * (GRID_PRODUCT_CARD_HEIGHT + GRID_PRODUCT_CARD_GAP),
       layout
     );
   });
@@ -1094,249 +1031,6 @@ function drawGridPage(pdf, {
     pageCount,
     generatedAtLabel
   );
-}
-
-function buildIndexRows(store) {
-  const rows = [];
-  store.categoryGroups.forEach((group, categoryIndex) => {
-    const gapBefore = categoryIndex === 0 ? 0 : 5;
-    rows.push({
-      type: "category",
-      storeId: store.storeId,
-      label: group.category,
-      gapBefore,
-      height: 10 + gapBefore,
-    });
-    const ethnicityNames = [
-      ...new Set(
-        group.products.map((product) => product.tribe || group.category)
-      ),
-    ].sort((a, b) => a.localeCompare(b));
-    ethnicityNames.forEach((ethnicity) => {
-      if (normalizeEthnicity(ethnicity) !== normalizeEthnicity(group.category)) {
-        rows.push({
-          type: "ethnicity",
-          storeId: store.storeId,
-          label: ethnicity,
-          gapBefore: 3,
-          height: 12,
-        });
-      }
-      group.products
-        .filter((product) => (product.tribe || group.category) === ethnicity)
-        .sort((a, b) =>
-          String(a.name || "").localeCompare(String(b.name || ""))
-        )
-        .forEach((product) =>
-          rows.push({
-            type: "product",
-            storeId: store.storeId,
-            product,
-            height: 8.5,
-          })
-        );
-    });
-  });
-  return rows;
-}
-
-function paginateIndexRows(rows) {
-  const columnHeight = 236;
-  const pages = [];
-  let page = [[], []];
-  let column = 0;
-  let usedHeight = 0;
-  let currentCategory = "";
-  let currentEthnicity = "";
-
-  const advanceColumn = () => {
-    if (column === 0) {
-      column = 1;
-    } else {
-      pages.push(page);
-      page = [[], []];
-      column = 0;
-    }
-    usedHeight = 0;
-  };
-
-  const addRow = (row) => {
-    page[column].push(row);
-    usedHeight += row.height;
-  };
-
-  const continuationRows = (row) => {
-    const repeated = [];
-    if (
-      row.type === "product" &&
-      currentEthnicity &&
-      normalizeEthnicity(currentEthnicity) !== normalizeEthnicity(currentCategory)
-    ) {
-      repeated.push({
-        type: "ethnicity",
-        storeId: row.storeId,
-        label: currentEthnicity,
-        height: 9,
-        continuation: true,
-      });
-    }
-    return repeated;
-  };
-
-  rows.forEach((row, index) => {
-    if (row.type === "category") {
-      currentCategory = row.label;
-      currentEthnicity = "";
-    } else if (row.type === "ethnicity") {
-      currentEthnicity = row.label;
-    } else if (row.type === "product") {
-      currentEthnicity = row.product.tribe || currentCategory;
-    }
-
-    const nextHeight = rows[index + 1]?.height || 0;
-    const keepWithNext = row.type !== "product" ? nextHeight : 0;
-    if (usedHeight + row.height + keepWithNext > columnHeight) {
-      advanceColumn();
-      continuationRows(row).forEach(addRow);
-    }
-    addRow(row);
-  });
-  if (page[0].length || page[1].length) pages.push(page);
-  return pages;
-}
-
-function drawIndexPage(pdf, {
-  columns,
-  ethnicityLinks,
-  logo,
-  productDestinations,
-  storeId,
-  storeName,
-  pageNumber,
-  pageCount,
-  indexPage,
-  indexPageCount,
-  generatedAtLabel,
-}) {
-  const theme = storePdfTheme(storeId);
-  const medicineGreen = ethnicityColor({ tribe: "Medicina Sagrada" });
-  pdf.setFillColor(26, 26, 26);
-  pdf.rect(0, 0, 210, 28, "F");
-  drawStoreBrand(pdf, logo, 12, 6.5, 36);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(10);
-  pdf.setTextColor(...theme.secondary);
-  pdf.text(`${pdfSafeText(storeName).toUpperCase()} INDEX`, 198, 12, {
-    align: "right",
-  });
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(...theme.headerMuted);
-  pdf.text(`PRODUCT DIRECTORY  |  ${indexPage}/${indexPageCount}`, 198, 19, { align: "right" });
-  const indexRowsTop = 38;
-  pdf.setDrawColor(220, 229, 226);
-  pdf.setLineWidth(0.25);
-  pdf.line(103, indexRowsTop, 103, 274);
-
-  columns.forEach((rows, columnIndex) => {
-    const x = columnIndex === 0 ? 12 : 108;
-    const width = 90;
-    let y = indexRowsTop;
-    rows.forEach((row) => {
-      if (row.type === "category") {
-        const categoryY = y + (row.gapBefore || 0);
-        const useMedicineGreen =
-          storeId === "maya-herbs" &&
-          normalizeEthnicity(row.label) ===
-            normalizeEthnicity("Maya Herbs");
-        if (row.gapBefore) {
-          pdf.setDrawColor(211, 224, 220);
-          pdf.setLineWidth(0.2);
-          pdf.line(x, y + 2, x + width, y + 2);
-        }
-        pdf.setFillColor(
-          ...(useMedicineGreen
-            ? mixWithWhite(medicineGreen, 0.86)
-            : theme.primary)
-        );
-        pdf.roundedRect(x, categoryY, width, 9, 1, 1, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(8);
-        pdf.setTextColor(
-          ...(useMedicineGreen ? medicineGreen : [255, 255, 255])
-        );
-        pdf.text(
-          truncatePdfLines(
-            pdf,
-            pdfSafeText(row.label).toUpperCase(),
-            width - 6,
-            1
-          ),
-          x + 3,
-          categoryY + 6
-        );
-      } else if (row.type === "ethnicity") {
-        const ethnicityY = y + (row.gapBefore || 0);
-        const accent = ethnicityColor({ tribe: row.label });
-        const destination = ethnicityLinks.find(
-          (item) => item.storeId === row.storeId && item.label === row.label
-        )?.destination;
-        pdf.setFillColor(...mixWithWhite(accent, 0.86));
-        pdf.roundedRect(x, ethnicityY, width, 8, 1, 1, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(7.3);
-        pdf.setTextColor(...accent);
-        pdf.text(
-          truncatePdfLines(pdf, pdfSafeText(row.label).toUpperCase(), row.continuation ? width - 24 : width - 6, 1),
-          x + 3,
-          ethnicityY + 5.4
-        );
-        if (row.continuation) {
-          pdf.setFontSize(5.2);
-          pdf.text("CONT.", x + width - 3, ethnicityY + 5.4, {
-            align: "right",
-          });
-        }
-        if (destination) {
-          pdf.link(x, ethnicityY, width, 8, {
-            pageNumber: destination.pageNumber,
-            top: destination.top,
-            zoom: 1,
-          });
-        }
-      } else {
-        const accent = ethnicityColor(row.product);
-        pdf.setFillColor(...accent);
-        pdf.rect(x, y, 1.8, row.height, "F");
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(7.4);
-        pdf.setTextColor(45, 62, 57);
-        pdf.text(truncatePdfLines(pdf, row.product.name, 63, 1), x + 4, y + 5.5);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(6.4);
-        pdf.setTextColor(...accent);
-        pdf.text(pdfSafeText(row.product.sku || "-"), x + width - 2, y + 5.5, { align: "right" });
-        const destination = productDestinations.get(row.product);
-        if (destination) {
-          pdf.link(x, y, width, row.height, {
-            pageNumber: destination.pageNumber,
-            top: destination.top,
-            zoom: 1,
-          });
-        }
-      }
-      y += row.height;
-    });
-  });
-
-  pdf.setDrawColor(220, 229, 226);
-  pdf.line(12, 282, 198, 282);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(6);
-  pdf.setTextColor(113, 128, 123);
-  pdf.text(`${pdfSafeText(storeName)} Wholesale`, 12, 288);
-  pdf.text(`Index  |  ${pageNumber}/${pageCount}`, 198, 288, { align: "right" });
-  drawGenerationStamp(pdf, generatedAtLabel);
 }
 
 async function fetchDigitalCatalogProducts({
@@ -1471,12 +1165,6 @@ async function renderDigitalCatalogPdf({
     };
   });
   const categoryGroups = storeGroups.flatMap((store) => store.categoryGroups);
-  const pageCount =
-    1 +
-    categoryGroups.reduce(
-      (total, group) => total + Math.ceil(group.products.length / 2),
-      0
-    );
   const pdf = new jsPDF({
     unit: "mm",
     format: "a4",
@@ -1492,30 +1180,17 @@ async function renderDigitalCatalogPdf({
     creator: "Wholesale Digital Catalog",
   });
 
+  const productPageCount = categoryGroups.reduce(
+    (total, group) => total + Math.ceil(group.products.length / 2),
+    0
+  );
+  const pageCount = 1 + productPageCount;
+
   let logo = null;
   try {
     logo = await loadPdfLogo();
   } catch {
     // A text fallback is drawn when the local brand asset cannot be loaded.
-  }
-
-  let coverBackground = null;
-  try {
-    coverBackground = await fetchPdfAsset("/catalog-cover-background/catalog-cover-background.png", {
-      cache: "no-store",
-    });
-  } catch {
-    // The green covers remain solid until the optional background file is added.
-  }
-
-  let coverDecoration = null;
-  try {
-    coverDecoration = await fetchPdfAsset(
-      "/catalog-cover-decoration/catalog-cover-decoration.png",
-      { cache: "no-store" }
-    );
-  } catch {
-    // The black cover bar remains clean until the optional decoration is added.
   }
 
   let contactIcons = {};
@@ -1550,10 +1225,7 @@ async function renderDigitalCatalogPdf({
   drawPdfCover(
     pdf,
     logo,
-    coverBackground,
-    coverDecoration,
     contactIcons,
-    products,
     filterLabel,
     generatedAtLabel
   );
