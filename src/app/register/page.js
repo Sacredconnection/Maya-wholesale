@@ -96,8 +96,8 @@ export default function RegisterPage() {
   return (
     <div className="site-background-page min-h-screen bg-[#0f0f0f] text-[#f2f2f2] flex flex-col antialiased">
       {/* Top Header */}
-      <div className="theme-dark-zone z-10 w-full border-b border-white/5 bg-[#131313] py-3 sm:py-4">
-        <div className="site-content-shell flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-t border-[#2d2d2d] bg-white text-[#2d2d2d] shadow-[0_8px_24px_rgba(45,45,45,0.08)]">
+        <div className="site-content-shell flex h-20 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/banner/maya-wholesale/logo-maya-wholesale.svg"
@@ -108,22 +108,23 @@ export default function RegisterPage() {
               className="h-14 w-auto opacity-90 transition-opacity hover:opacity-100"
             />
           </Link>
-          <Link href="/" className="text-xs font-mono text-[#f2f2f2] hover:text-white transition-colors flex items-center gap-1 font-bold">
-            <ChevronLeft className="w-4 h-4" /> Back to Home
+          <Link href="/" className="flex items-center gap-1 text-xs font-bold text-[#2d2d2d] transition-colors hover:text-[#cc6633]">
+            <ChevronLeft className="h-4 w-4" /> Back to Home
           </Link>
         </div>
-      </div>
+        <div aria-hidden="true" className="h-1.5 w-full bg-[#999933]" />
+      </header>
 
       {/* Main Container */}
-      <div className="flex-grow flex items-center justify-center py-8 sm:py-10 lg:py-12 px-4 sm:px-6 relative">
+      <div className="relative flex flex-grow items-start justify-center px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#999933]/5 pointer-events-none rounded-full" />
 
-        <div className="w-full max-w-md z-10">
+        <div className="z-10 w-full max-w-md lg:max-w-4xl">
           {!submitted ? (
             <form
               onSubmit={handleSubmit}
               aria-busy={submitting}
-              className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 sm:p-8 shadow-2xl flex flex-col gap-5 sm:gap-6"
+              className="flex flex-col gap-5 rounded-xl border border-white/10 bg-[#1a1a1a] p-5 shadow-2xl sm:gap-6 sm:p-8 lg:p-10"
             >
 
               <div>
@@ -142,7 +143,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-5">
 
                 {/* Name */}
                 <div className="flex flex-col gap-1.5">
@@ -324,7 +325,7 @@ export default function RegisterPage() {
             </form>
           ) : (
             /* Success Screen */
-            <div role="status" className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 sm:p-10 flex flex-col items-center text-center gap-5 sm:gap-6 shadow-2xl animate-fade-in">
+            <div role="status" className="mx-auto flex max-w-md flex-col items-center gap-5 rounded-xl border border-white/10 bg-[#1a1a1a] p-6 text-center shadow-2xl animate-fade-in sm:gap-6 sm:p-10">
               <div className="w-16 h-16 rounded-full bg-[#999933]/10 border border-[#999933]/20 flex items-center justify-center text-[#f2f2f2]">
                 <CheckCircle2 className="w-8 h-8" />
               </div>

@@ -4,7 +4,7 @@ export default function MayaWholesaleBanner() {
   return (
     <section
       aria-labelledby="sacred-snuff-banner-title"
-      className="maya-wholesale-banner theme-dark-zone relative flex min-h-[440px] items-center overflow-hidden border-y border-[#268072]/80 bg-[#171813] bg-cover bg-center py-0 md:min-h-0 md:py-14 lg:py-20"
+      className="maya-wholesale-banner theme-dark-zone relative mb-12 flex min-h-[440px] items-center overflow-hidden border-y border-[#268072]/80 bg-[#171813] bg-cover bg-center py-0 md:min-h-0 md:py-14 lg:mb-16 lg:py-20"
     >
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#131313]/78 via-[#131313]/46 to-[#131313]/12 md:bg-gradient-to-r md:from-[#131313]/76 md:via-[#131313]/48 md:to-[#131313]/8"
@@ -44,7 +44,7 @@ export default function MayaWholesaleBanner() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Visit Sacred Snuff in a new tab"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#268072] px-6 py-3 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-black/20 transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-[#319888] hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e0c38b] motion-reduce:transform-none motion-reduce:transition-none md:mt-6"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm bg-[#268072] px-6 py-3 text-center text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-black/20 transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-[#319888] hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e0c38b] motion-reduce:transform-none motion-reduce:transition-none md:mt-6"
           >
             Visit Sacred Snuff
           </a>

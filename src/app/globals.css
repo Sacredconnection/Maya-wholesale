@@ -455,6 +455,27 @@ button, input, select, textarea {
   color: #cc6633 !important;
 }
 
+/* Desktop outline actions share one neutral visual treatment. */
+.site-header :is(
+  .header-login-button,
+  .header-desktop-outline-button,
+  .header-cart-button.header-action-button
+) {
+  border: 1px solid #2d2d2d !important;
+  background-color: #ffffff !important;
+  color: #2d2d2d !important;
+}
+
+.site-header :is(
+  .header-login-button,
+  .header-desktop-outline-button,
+  .header-cart-button.header-action-button
+):hover {
+  border-color: #2d2d2d !important;
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-header .header-action-button,
   .site-header .header-action-button:hover {
@@ -854,10 +875,9 @@ html[data-theme="light"] :is(
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.4rem;
+  justify-content: center;
   margin-top: 1.5rem;
-  padding: 0.78rem 0.85rem 0.78rem 1rem;
+  padding: 0.78rem 1rem;
   border: 1px solid transparent;
   border-radius: var(--radius-DEFAULT);
   background: #cc6633;
@@ -896,20 +916,10 @@ html[data-theme="light"] :is(
   }
 }
 
-.botanical-category-button svg {
-  width: 0.85rem;
-  height: 0.85rem;
-  transition: transform 180ms ease;
-}
-
 .botanical-category-button:hover {
   transform: translateY(-2px);
   background: #f4f3e8;
   color: #2d2d2d !important;
-}
-
-.botanical-category-button:hover svg {
-  transform: translate(0.15rem, -0.15rem);
 }
 
 .botanical-category-button:active {
@@ -946,10 +956,6 @@ html[data-theme="light"] .ngo-logo-dark {
 
 html[data-theme="light"] .ngo-logo-light {
   display: block;
-}
-
-.ngo-cta-arrow {
-  color: #ffffff !important;
 }
 
 html[data-theme="light"] .ngo-section-watermark {
