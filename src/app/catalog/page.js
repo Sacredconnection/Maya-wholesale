@@ -79,7 +79,7 @@ const getPaginationItems = (currentPage, totalPages) => {
 };
 
 const catalogActionClass =
-  "catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-10 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#63311A] disabled:bg-[#984C27] disabled:opacity-60";
+  "catalog-primary-action inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-sm border border-[#984C27] bg-[#984C27] py-3 pl-4 pr-10 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#63311A] disabled:bg-[#984C27] disabled:opacity-60";
 
 function CatalogActionInfo({ id, label, children }) {
   return (
@@ -484,9 +484,9 @@ export default function CatalogPage() {
             <div className="relative">
               <button type="button" disabled={pdfBusy} onClick={downloadPdf} className={catalogActionClass}>
                 {pdfBusy ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin text-[#E5E791]" aria-hidden="true" />
+                  <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-[#E5E791]" aria-hidden="true" />
                 ) : (
-                  <Download className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
+                  <Download className="h-4 w-4 shrink-0 text-[#E5E791]" aria-hidden="true" />
                 )}
                 {pdfBusy ? "Generating PDF" : "PDF Catalog"}
               </button>
@@ -502,7 +502,7 @@ export default function CatalogPage() {
                 onClick={exportExcel}
                 className={catalogActionClass}
               >
-                <FileSpreadsheet className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+                <FileSpreadsheet className={`h-4 w-4 shrink-0 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
                 Export Order Excel
               </button>
               <CatalogActionInfo id="export-order-info" label="Export Order Excel">
@@ -517,7 +517,7 @@ export default function CatalogPage() {
                 onClick={() => importInputRef.current?.click()}
                 className={catalogActionClass}
               >
-                <Upload className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+                <Upload className={`h-4 w-4 shrink-0 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
                 Import Order Excel
               </button>
               <CatalogActionInfo id="import-order-info" label="Import Order Excel">
@@ -527,7 +527,7 @@ export default function CatalogPage() {
 
             <div className="relative">
               <button type="button" onClick={() => setIsCartOpen(true)} className={catalogActionClass}>
-                <ShoppingBag className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
+                <ShoppingBag className="h-4 w-4 shrink-0 text-[#E5E791]" aria-hidden="true" />
                 Order Sheet
               </button>
               {cartTotalItems > 0 && (
