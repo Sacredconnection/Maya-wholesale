@@ -1,11 +1,11 @@
-const POUCH_WEIGHTS_GRAMS = new Set([100, 250]);
-
 export function productImageForOption(product, option) {
   const weightGrams = Number(option?.weightGrams);
+  const primaryImage = product?.image || null;
 
-  if (POUCH_WEIGHTS_GRAMS.has(weightGrams) && option?.image) {
-    return option.image;
-  }
+  if (!Number.isFinite(weightGrams) || weightGrams === 1000) return primaryImage;
 
-  return product?.image || null;
+  const variationImage = option?.image;
+  if (variationImage && variationImage !== primaryImage) return variationImage;
+
+  return (product?.images || []).find((image) => image && image !== primaryImage) || primaryImage;
 }

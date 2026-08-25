@@ -10,6 +10,7 @@ import { buildCategoryContext, isApprovedWholesaleCustomer, mapProductForRole } 
 import { securityError } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
 import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
+import { getRetailGalleryBySku, mergeProductGallery } from "@/lib/retail-gallery";
 
 function parseProductIdentifier(identifier) {
   if (typeof identifier !== "string" || identifier.length > 240) return null;
@@ -49,21 +50,26 @@ export async function GET(request, { params }) {
     }
     if (!wcProduct) return Response.json({ error: "Product not found." }, { status: 404 });
 
-    const [variations, categories] = await Promise.all([
+    const [variations, categories, retailImages] = await Promise.all([
       wcProduct.type === "variable"
         ? getProductVariations(wcProduct.id, identity.store.id)
         : [],
       getCategories(identity.store.id),
+      getRetailGalleryBySku(wcProduct.sku).catch(() => []),
     ]);
+    const mappedProduct = mapProductForRole(
+      wcProduct,
+      variations,
+      buildCategoryContext(categories),
+      localDevUser?.role || customer.role,
+      identity.store
+    );
     return Response.json(
       {
-        product: mapProductForRole(
-          wcProduct,
-          variations,
-          buildCategoryContext(categories),
-          localDevUser?.role || customer.role,
-          identity.store
-        ),
+        product: {
+          ...mappedProduct,
+          images: mergeProductGallery(mappedProduct.images, retailImages),
+        },
       },
       { headers: { "Cache-Control": "private, no-store" } }
     );

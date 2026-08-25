@@ -2,6 +2,7 @@
 const isDevelopment = process.env.NODE_ENV === "development";
 const commerceOrigins = [
   process.env.WOOCOMMERCE_URL || "https://wholesale.mayaherbs.com",
+  process.env.RETAIL_WOOCOMMERCE_URL || "https://mayaherbs.com",
 ]
   .filter(Boolean)
   .flatMap((value) => {

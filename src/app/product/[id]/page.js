@@ -55,6 +55,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const relatedCarouselRef = useRef(null);
@@ -62,7 +63,10 @@ export default function ProductDetailPage() {
   const [addedAt, setAddedAt] = useState(0);
 
   useEffect(() => {
-    if (!catalogProduct || catalogProduct.optionsLoaded) return undefined;
+    if (
+      !catalogProduct ||
+      (catalogProduct.optionsLoaded && catalogProduct.images?.length > 1)
+    ) return undefined;
 
     let cancelled = false;
 
@@ -199,7 +203,12 @@ export default function ProductDetailPage() {
   }
 
   const selectedOption = product.options[selectedOptIdx];
-  const selectedProductImage = productImageForOption(product, selectedOption);
+  const productGallery = [...new Set([product.image, ...(product.images || [])].filter(Boolean))];
+  const automaticProductImage = productImageForOption(product, selectedOption);
+  const selectedProductImage =
+    selectedGalleryImage && productGallery.includes(selectedGalleryImage)
+      ? selectedGalleryImage
+      : automaticProductImage;
   const productDescription = product.description || "Wholesale botanical product sourced through equitable fair-trade agreements with Amazonian community associations and prepared using established local production methods.";
   const hasLongDescription = productDescription.length > 280;
 
@@ -289,6 +298,35 @@ export default function ProductDetailPage() {
             )}
           </div>
 
+          {productGallery.length > 1 && (
+            <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5" aria-label="Product image gallery">
+              {productGallery.map((image, index) => (
+                <button
+                  key={image}
+                  type="button"
+                  onClick={() => {
+                    setSelectedGalleryImage(image);
+                    setImgError(false);
+                  }}
+                  aria-label={`View image ${index + 1} of ${product.name}`}
+                  aria-pressed={selectedProductImage === image}
+                  className={`aspect-square overflow-hidden rounded-md border bg-white p-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933] ${
+                    selectedProductImage === image
+                      ? "border-[#999933] ring-2 ring-[#999933]/25"
+                      : "border-white/15 hover:border-[#999933]/60"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
           </div>
 
           {/* Right Column: Content and Options */}
@@ -322,12 +360,11 @@ export default function ProductDetailPage() {
             {/* Price display */}
             <div className="flex flex-col items-start justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5">
               <div>
-                <span className="text-[10px] font-mono text-white/45 uppercase block">Est. B2B Unit Cost</span>
-                <div className="flex items-baseline gap-2 mt-1">
+                <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-[#f2f2f2] font-headline-lg">
                     ${finalPrice.toFixed(2)}
                   </span>
-                  {isLoggedIn && user && (
+                  {discountPercentage > 0 && (
                     <span className="text-xs font-mono text-white/40 line-through">
                       ${basePrice.toFixed(2)}
                     </span>
@@ -335,17 +372,10 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {isLoggedIn && user ? (
+              {discountPercentage > 0 && (
                 <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/25 px-2.5 py-1 rounded-sm uppercase tracking-wider">
                   Partner {user.discountRate}% Off
                 </span>
-              ) : (
-                <button
-                  onClick={() => setIsLoginOpen(true)}
-                  className="text-[10px] font-mono text-[#f2f2f2] hover:text-white underline bg-transparent border-0 cursor-pointer"
-                >
-                  Log in for partner discounts
-                </button>
               )}
             </div>
 
@@ -387,7 +417,11 @@ export default function ProductDetailPage() {
                   <select
                     value={selectedOptIdx}
                     onChange={(event) => {
-                      setSelectedOptIdx(Number.parseInt(event.target.value, 10));
+                      const nextOptionIndex = Number.parseInt(event.target.value, 10);
+                      setSelectedOptIdx(nextOptionIndex);
+                      setSelectedGalleryImage(
+                        productImageForOption(product, product.options[nextOptionIndex])
+                      );
                       setImgError(false);
                       setAddedAt(0);
                       setQuantity(1);
