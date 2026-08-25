@@ -3,8 +3,8 @@ import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
 
 function AddressBlock({ title, lines, icon: Icon }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/15 p-4">
-      <div className="mb-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-white/45">
+    <div className="rounded-lg border border-white/15 bg-[#262019] p-4">
+      <div className="mb-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-white/60">
         <Icon className="h-3.5 w-3.5 text-[#f2f2f2]" aria-hidden="true" />
         {title}
       </div>
@@ -36,12 +36,12 @@ export default function BankTransferDetails({ showTitle = true }) {
         </div>
       )}
 
-      <div className="flex items-start gap-3 rounded-lg border border-[#f2b84b]/55 bg-[#f2b84b]/12 px-4 py-3 shadow-[0_0_24px_rgba(242,184,75,0.08)]">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f2b84b]/15 text-[#ffd36b]">
+      <div className="flex items-start gap-3 rounded-lg border border-[#D9962B] bg-[#4C330F] px-4 py-3 shadow-[0_0_24px_rgba(217,150,43,0.08)]">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#6F4C16] text-[#E5E791]">
           <Hash className="h-4 w-4" aria-hidden="true" />
         </span>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#ffd36b]">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#E5E791]">
             Payment reference required
           </p>
           <p className="mt-1 text-sm font-black leading-snug text-white">
@@ -50,21 +50,21 @@ export default function BankTransferDetails({ showTitle = true }) {
         </div>
       </div>
 
-      <dl className="grid gap-3 rounded-lg border border-white/10 bg-[#131313] p-4 text-xs sm:grid-cols-3">
+      <dl className="grid gap-3 rounded-lg border border-white/15 bg-[#262019] p-4 text-xs sm:grid-cols-3">
         <div>
-          <dt className="text-[9px] font-black uppercase tracking-wider text-white/40">
+          <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
             Account Name
           </dt>
           <dd className="mt-1 font-bold text-white">{method.accountName}</dd>
         </div>
         <div>
-          <dt className="text-[9px] font-black uppercase tracking-wider text-white/40">
+          <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
             Account Details
           </dt>
           <dd className="mt-1 font-mono font-bold text-white">{method.accountDetails}</dd>
         </div>
         <div>
-          <dt className="text-[9px] font-black uppercase tracking-wider text-white/40">
+          <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
             Bank Name
           </dt>
           <dd className="mt-1 font-bold text-white">{method.bankName}</dd>

@@ -4,7 +4,7 @@ import { LockKeyhole } from "lucide-react";
 
 export default function CheckoutHeader() {
   return (
-    <header className="theme-dark-zone sticky top-0 z-40 border-b border-white/10 bg-[#171717]/95">
+    <header className="theme-dark-zone sticky top-0 z-40 border-b border-white/15 bg-[#262019]/95">
       <div className="mx-auto flex min-h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:min-h-[4.5rem] sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-4">
           <Image
@@ -17,16 +17,16 @@ export default function CheckoutHeader() {
             className="h-9 w-auto sm:h-10"
           />
           <div className="hidden items-center gap-2 border-l border-white/10 pl-4 text-xs font-bold text-white/65 sm:flex">
-            <LockKeyhole className="h-4 w-4 text-[#d8c58f]" aria-hidden="true" />
+            <LockKeyhole className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
             Secure checkout
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <span className="hidden text-xs text-white/40 md:inline">Need help?</span>
+          <span className="hidden text-xs text-white/60 md:inline">Need help?</span>
           <Link
             href="/contact"
-            className="text-xs font-bold text-[#d8c58f] transition-colors hover:text-white"
+            className="rounded-sm text-xs font-bold text-[#E5E791] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E5E791]"
           >
             Contact us
           </Link>

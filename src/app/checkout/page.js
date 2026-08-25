@@ -29,6 +29,7 @@ import {
   BUNQ_CARD_PAYMENT,
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
+import styles from "./checkout.module.css";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -79,12 +80,12 @@ const addressLine = (address) =>
 function Field({ id, label, className = "", ...props }) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={id} className="text-[10px] font-bold uppercase tracking-wider text-white/55">
+      <label htmlFor={id} className="text-[10px] font-bold uppercase tracking-wider text-white/60">
         {label}
       </label>
       <input
         id={id}
-        className="w-full rounded-sm border border-white/10 bg-[#131313] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-sm border border-[#727349] bg-[#262019] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/60 focus:border-[#E5E791] focus:ring-2 focus:ring-[#E5E791]/25 disabled:cursor-not-allowed disabled:border-[#727349] disabled:bg-[#362E24] disabled:text-[#BFC079]"
         {...props}
       />
     </div>
@@ -314,7 +315,7 @@ function AddressFields({ prefix, value, onChange }) {
         required
       />
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={`${prefix}-country`} className="text-[10px] font-bold uppercase tracking-wider text-white/55">
+        <label htmlFor={`${prefix}-country`} className="text-[10px] font-bold uppercase tracking-wider text-white/60">
           Country / Region
         </label>
         <div className="relative">
@@ -324,7 +325,7 @@ function AddressFields({ prefix, value, onChange }) {
             autoComplete={`${prefix} country`}
             value={value.country}
             onChange={set("country")}
-            className="w-full appearance-none rounded-sm border border-white/10 bg-[#131313] px-4 py-3 pr-10 text-sm text-white outline-none transition-colors focus:border-[#f2f2f2]"
+            className="w-full appearance-none rounded-sm border border-[#727349] bg-[#262019] px-4 py-3 pr-10 text-sm text-white outline-none transition-colors focus:border-[#E5E791] focus:ring-2 focus:ring-[#E5E791]/25"
             required
           >
             <option value="" disabled>Select a country</option>
@@ -578,14 +579,14 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div id="top" className="site-background-page min-h-screen bg-[#25362D] text-[#f2f2f2]">
+    <div id="top" className={`${styles.page} theme-dark-zone site-background-page min-h-screen`}>
       {isSubmitting && <OrderSubmissionOverlay stage={submissionStage} />}
       <CheckoutHeader />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <Link href="/catalog" className="mb-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold text-white/45 transition-colors hover:text-white">
+            <Link href="/catalog" className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-sm text-xs font-bold text-white/60 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E5E791]">
               <ArrowLeft className="h-3.5 w-3.5" />
               Return to catalog
             </Link>
@@ -637,19 +638,19 @@ export default function CheckoutPage() {
         </ol>
 
         {cart.length === 0 ? (
-          <section className="mx-auto flex max-w-xl flex-col items-center rounded-xl border border-white/10 bg-[#1a1a1a] px-6 py-14 text-center shadow-2xl">
+          <section className="mx-auto flex max-w-xl flex-col items-center rounded-xl border border-white/15 bg-[#362E24] px-6 py-14 text-center shadow-2xl">
             <ShoppingBag className="h-12 w-12 text-white/25" />
             <h2 className="mt-5 text-xl font-bold text-white">Your cart is empty</h2>
             <p className="mt-2 text-sm text-white/50">Add products from the wholesale catalog before starting checkout.</p>
-            <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#cc6633] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white">
+            <Link href="/catalog" className="mt-6 inline-flex items-center gap-2 rounded-sm bg-[#984C27] px-6 py-4 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E5E791]">
               Browse catalog
             </Link>
           </section>
         ) : (
           <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_21.5rem]">
-            <section className="rounded-xl border border-white/10 bg-[#1a1a1a] p-5 shadow-xl shadow-black/15 sm:p-7">
+            <section className="rounded-xl border border-white/15 bg-[#362E24] p-5 shadow-xl shadow-black/15 sm:p-7">
               {error && (
-                <div role="alert" className="mb-6 flex items-start gap-3 rounded-sm border border-[#ffb4ab]/25 bg-[#93000a]/20 px-4 py-3 text-xs leading-relaxed text-[#ffb4ab]">
+                <div role="alert" className="mb-6 flex items-start gap-3 rounded-sm border border-[#9A3232] bg-[#4C1919] px-4 py-3 text-xs leading-relaxed text-white">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                   {error}
                 </div>
@@ -685,7 +686,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <AddressFields prefix="shipping" value={shippingAddress} onChange={setShippingAddress} />
-                  <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-white/10 bg-[#131313] p-4">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-[#727349] bg-[#262019] p-4 focus-within:border-[#E5E791] focus-within:ring-2 focus-within:ring-[#E5E791]/25">
                     <input
                       type="checkbox"
                       checked={billingMatchesShipping}
@@ -719,7 +720,7 @@ export default function CheckoutPage() {
                     <div className="rounded-lg border border-white/10 bg-[#131313] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2]">Contact</h3>
-                        <button type="button" onClick={() => setStep(0)} className="border-0 bg-transparent text-[10px] font-bold uppercase text-white/45 hover:text-white">Edit</button>
+                        <button type="button" onClick={() => setStep(0)} className="rounded-sm border-0 bg-transparent text-[10px] font-bold uppercase text-[#E5E791] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]">Edit</button>
                       </div>
                       <p className="text-sm font-bold text-white">{contact.firstName} {contact.lastName}</p>
                       {contact.company && <p className="mt-1 text-xs text-white/55">{contact.company}</p>}
@@ -728,22 +729,22 @@ export default function CheckoutPage() {
                     <div className="rounded-lg border border-white/10 bg-[#131313] p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2]">Delivery</h3>
-                        <button type="button" onClick={() => setStep(1)} className="border-0 bg-transparent text-[10px] font-bold uppercase text-white/45 hover:text-white">Edit</button>
+                        <button type="button" onClick={() => setStep(1)} className="rounded-sm border-0 bg-transparent text-[10px] font-bold uppercase text-[#E5E791] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]">Edit</button>
                       </div>
                       <p className="text-xs leading-relaxed text-white/65">{addressLine(shippingAddress)}</p>
                       {!billingMatchesShipping && <p className="mt-3 border-t border-white/5 pt-3 text-[10px] text-white/40">Separate billing address provided.</p>}
                     </div>
                   </div>
 
-                  <fieldset className="rounded-xl border border-[#999933]/35 bg-[#242f27] p-4 sm:p-5">
+                  <fieldset className="rounded-xl border border-[#BFC079] bg-[#473D2E] p-4 sm:p-5">
                     <legend className="px-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f2f2f2]">
                       Payment method
                     </legend>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                      <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
                         paymentMethod === MANUAL_BANK_TRANSFER.id
-                          ? "border-[#f2f2f2]/45 bg-[#999933]/12"
-                          : "border-white/10 bg-[#131313] hover:border-white/20"
+                          ? "border-[#E5E791] bg-[#474618]"
+                          : "border-[#999A61] bg-[#262019] hover:border-[#E5E791]"
                       }`}>
                         <input
                           type="radio"
@@ -770,14 +771,16 @@ export default function CheckoutPage() {
                         </span>
                       </label>
 
-                      <label className={`flex items-start gap-3 rounded-lg border p-4 transition-colors ${
+                      <label className={`flex items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
                         cardPaymentStatus.available
                           ? "cursor-pointer"
-                          : "cursor-not-allowed opacity-55"
+                          : "cursor-not-allowed"
                       } ${
                         paymentMethod === BUNQ_CARD_PAYMENT.id
-                          ? "border-[#f2f2f2]/45 bg-[#999933]/12"
-                          : "border-white/10 bg-[#131313]"
+                          ? "border-[#E5E791] bg-[#474618]"
+                          : cardPaymentStatus.available
+                            ? "border-[#999A61] bg-[#262019] hover:border-[#E5E791]"
+                            : "border-[#727349] bg-[#262019] text-white/65"
                       }`}>
                         <input
                           type="radio"
@@ -803,7 +806,7 @@ export default function CheckoutPage() {
                             Securely via {BUNQ_CARD_PAYMENT.provider}
                           </span>
                           {!cardPaymentStatus.available && (
-                            <span className="mt-2 block text-[10px] leading-relaxed text-[#ffd36b]">
+                            <span className="mt-2 block text-[10px] font-bold leading-relaxed text-[#E5E791]">
                               {cardPaymentStatus.loading
                                 ? "Checking availability..."
                                 : cardPaymentStatus.reason}
@@ -846,10 +849,10 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
                     confirmed
-                      ? "border-[#f2f2f2]/45 bg-[#999933]/10"
-                      : "border-white/10 bg-[#131313]"
+                      ? "border-[#E5E791] bg-[#474618]"
+                      : "border-[#999A61] bg-[#262019]"
                   }`}>
                     <input
                       type="checkbox"
@@ -878,7 +881,7 @@ export default function CheckoutPage() {
                       setStep((current) => current - 1);
                     }}
                     disabled={isSubmitting}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-6 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/10 disabled:opacity-50"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border border-white/20 bg-white/5 px-6 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#675943] disabled:bg-[#262019] disabled:text-[#BFC079]"
                   >
                     <ArrowLeft className="h-4 w-4" /> Back
                   </button>
@@ -889,7 +892,7 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={goForward}
-                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#cc6633]/15 transition-colors hover:bg-[#b6532a]"
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#984C27] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-black/20 transition-colors hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
                     >
                       {step === 0 ? "Continue to delivery" : "Review order"}
                     </button>
@@ -900,7 +903,7 @@ export default function CheckoutPage() {
                         onClick={submitOrder}
                         disabled={isSubmitting || !confirmed}
                         aria-busy={isSubmitting}
-                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#cc6633] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-[#cc6633]/15 transition-colors hover:bg-[#b6532a] disabled:cursor-not-allowed disabled:opacity-45"
+                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#984C27] px-7 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-black/20 transition-colors hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:bg-[#63311A] disabled:text-[#E5E791] disabled:shadow-none"
                       >
                         {isSubmitting ? (
                           <>Submitting order <Loader2 className="h-4 w-4 animate-spin" /></>
@@ -910,7 +913,7 @@ export default function CheckoutPage() {
                           <>Submit order request <PackageCheck className="h-4 w-4" /></>
                         )}
                       </button>
-                      <p className="flex items-center justify-center gap-1.5 text-[10px] text-white/35">
+                      <p className="flex items-center justify-center gap-1.5 text-[10px] text-white/60">
                         <LockKeyhole className="h-3 w-3 text-[#f2f2f2]" />
                         {paymentMethod === BUNQ_CARD_PAYMENT.id
                           ? "Card details are handled only by the secure payment provider"
@@ -922,7 +925,7 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            <aside className="rounded-xl border border-white/10 bg-[#171717] shadow-xl shadow-black/15 lg:sticky lg:top-24">
+            <aside className="rounded-xl border border-white/15 bg-[#362E24] shadow-xl shadow-black/15 lg:sticky lg:top-24">
               <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
                 <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" />
                 <h2 className="text-sm font-bold text-white">Order summary</h2>
@@ -930,7 +933,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setIsCartOpen(true)}
-                  className="border-0 bg-transparent text-[10px] font-bold uppercase tracking-wider text-[#f2f2f2] transition-colors hover:text-white"
+                  className="rounded-sm border-0 bg-transparent text-[10px] font-bold uppercase tracking-wider text-[#E5E791] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
                 >
                   Edit
                 </button>
@@ -963,7 +966,7 @@ export default function CheckoutPage() {
                   <span className="font-bold uppercase tracking-wider text-white">Estimated total</span>
                   <span className="text-2xl font-black text-[#f2f2f2]">${finalTotal.toFixed(2)}</span>
                 </div>
-                <div className="mt-3 flex items-start gap-2 rounded-sm bg-white/[0.03] px-3 py-2.5 text-[10px] leading-relaxed text-white/40">
+                <div className="mt-3 flex items-start gap-2 rounded-sm border border-white/10 bg-[#262019] px-3 py-2.5 text-[10px] leading-relaxed text-white/60">
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
                   {paymentMethod === BUNQ_CARD_PAYMENT.id
                     ? `Secure card payment via ${BUNQ_CARD_PAYMENT.provider}.`

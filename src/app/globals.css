@@ -1723,3 +1723,17 @@ html[data-theme="dark"] :is(
 ) {
   color: #f7f6ef !important;
 }
+
+/* Small white action labels need the darker documented terracotta variant. */
+[class~="bg-[#cc6633]"][class~="text-white"] {
+  background-color: #984c27 !important;
+}
+
+[class~="hover:bg-[#b6532a]"]:hover {
+  background-color: #7d3e20 !important;
+}
+
+html[data-theme="light"] [class~="text-[#cc6633]"],
+html[data-theme="light"] [class~="hover:text-[#cc6633]"]:hover {
+  color: #984c27 !important;
+}
