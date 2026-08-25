@@ -586,7 +586,7 @@ export default function CheckoutPage() {
 
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
+          <div className="flex flex-col items-start">
             <Link href="/catalog" className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-sm text-xs font-bold text-white/60 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E5E791]">
               <ArrowLeft className="h-3.5 w-3.5" />
               Return to catalog

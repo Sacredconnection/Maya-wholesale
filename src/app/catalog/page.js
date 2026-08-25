@@ -439,14 +439,11 @@ export default function CatalogPage() {
       <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
 
         {/* Catalog hero and primary actions, based on the approved B2B reference. */}
-        <section className="theme-dark-zone grid items-end gap-7 border-b border-white/15 pb-7 sm:pb-8 xl:grid-cols-[minmax(17rem,22rem)_minmax(0,1fr)] xl:gap-10">
+        <section className="grid items-center gap-7 border-b border-white/15 pb-7 sm:pb-8 xl:grid-cols-[minmax(21rem,24rem)_minmax(0,1fr)] xl:gap-10">
           <div className="max-w-md">
-            <span className="mb-3 inline-flex items-center rounded-full border border-[#128178] bg-[#093D38] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white">
-              B2B Portal
-            </span>
-            <h1 className="type-page-title font-headline-lg text-white">
+            <h1 className="font-headline-lg text-[clamp(2rem,3.2vw,3rem)] font-black leading-[1.02] tracking-[-0.025em] text-white">
               <span className="block">Wholesale</span>
-              <span className="block">Product Catalog</span>
+              <span className="block sm:whitespace-nowrap">Product Catalog</span>
             </h1>
             <p className="mt-3 max-w-sm font-body-md text-base leading-relaxed text-white/70">
               Explore our current wholesale assortment. Approved partners can view their pricing and build an order.
@@ -459,7 +456,7 @@ export default function CatalogPage() {
               type="button"
               disabled={pdfBusy}
               onClick={downloadPdf}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-wait disabled:bg-[#63311A] disabled:text-[#E5E791]"
+              className="catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-wait disabled:bg-[#63311A] disabled:!text-[#E5E791]"
             >
               {pdfBusy ? (
                 <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -472,7 +469,7 @@ export default function CatalogPage() {
               type="button"
               disabled={excelBusy || productsLoading || compoundFilteredProducts.length === 0}
               onClick={exportExcel}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:text-white/60"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:opacity-70"
             >
               <FileSpreadsheet className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
               Export Order Excel
@@ -481,7 +478,7 @@ export default function CatalogPage() {
               type="button"
               disabled={excelBusy}
               onClick={() => importInputRef.current?.click()}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#128178] bg-[#093D38] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-[#0C544E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:text-white/60"
+              className="catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#128178] bg-[#093D38] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition-colors hover:border-[#E5E791] hover:bg-[#0C544E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:opacity-70"
             >
               <Upload className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
               Import Order Excel
@@ -489,12 +486,12 @@ export default function CatalogPage() {
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="relative inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-[#262019] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition-colors hover:border-[#BFC079] hover:bg-[#362E24] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+              className="catalog-primary-action relative inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-[#262019] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#BFC079] hover:bg-[#362E24] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
             >
               <ShoppingBag className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
               Order Sheet
               {cartTotalItems > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#984C27] px-1 text-[10px] font-bold text-white">
+                <span className="catalog-primary-action absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#984C27] px-1 text-[10px] font-bold">
                   {cartTotalItems}
                 </span>
               )}

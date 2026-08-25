@@ -791,6 +791,11 @@ html[data-theme="light"] .catalog-format-tag {
   color: #27322f !important;
 }
 
+/* Dark catalog actions keep their labels legible in both selectable themes. */
+.catalog-primary-action {
+  color: #ffffff !important;
+}
+
 /* Catalog products use distinct card surfaces at every breakpoint. */
 html[data-theme="light"] .catalog-product-row {
   background-color: #ffffff !important;
