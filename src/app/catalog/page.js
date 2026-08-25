@@ -4,6 +4,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
@@ -104,6 +105,7 @@ function CatalogActionInfo({ id, label, children }) {
 }
 
 export default function CatalogPage() {
+  const router = useRouter();
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
   const { setIsCartOpen, addSelectionsToCart, cartTotalItems } = useCart();
@@ -111,6 +113,8 @@ export default function CatalogPage() {
   const [excelBusy, setExcelBusy] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [selectedProductImages, setSelectedProductImages] = useState({});
+  const [importItems, setImportItems] = useState([]);
+  const [isImportReviewOpen, setIsImportReviewOpen] = useState(false);
   const importInputRef = useRef(null);
 
   // Filter States
@@ -449,12 +453,31 @@ export default function CatalogPage() {
       const selections = rows.flatMap(({ storeId, sku, quantity }) => {
         const product = products.find((item) => String(item.storeId || "maya-herbs") === storeId && item.options?.some((option) => option.sku === sku));
         const optionIndex = product?.options?.findIndex((option) => option.sku === sku) ?? -1;
-        return product && optionIndex >= 0 ? [{ product, optionIndex, quantity }] : [];
+        return product && optionIndex >= 0 && product.options[optionIndex].inStock !== false
+          ? [{ product, optionIndex, quantity }]
+          : [];
       });
       if (!selections.length) throw new Error("No current products were found in this workbook.");
-      if (window.confirm(`Add ${selections.length} product lines from Excel to the cart?`)) { addSelectionsToCart(selections); setIsCartOpen(true); }
+      setImportItems(selections);
+      setIsImportReviewOpen(true);
     } catch (error) { window.alert(error.message || "The Excel file could not be imported."); }
     finally { setExcelBusy(false); }
+  };
+
+  const completeExcelImport = (destination) => {
+    addSelectionsToCart(importItems);
+    setImportItems([]);
+    setIsImportReviewOpen(false);
+
+    if (destination === "checkout") {
+      setIsCartOpen(false);
+      router.push("/checkout");
+    }
+  };
+
+  const cancelExcelImport = () => {
+    setImportItems([]);
+    setIsImportReviewOpen(false);
   };
 
   // Catalog is partner-only: block until authenticated
@@ -511,7 +534,7 @@ export default function CatalogPage() {
                 Export Order Excel
               </button>
               <CatalogActionInfo id="export-order-info" label="Export Order Excel">
-                Export the filtered catalog to an Excel order file for offline editing.
+                Download the filtered catalog as an Excel order file. Enter quantities in the file, then import it here to create your order.
               </CatalogActionInfo>
             </div>
 
@@ -526,7 +549,7 @@ export default function CatalogPage() {
                 Import Order Excel
               </button>
               <CatalogActionInfo id="import-order-info" label="Import Order Excel">
-                Upload a completed Excel order file to restore its quantities to your order sheet.
+                Upload a completed Excel order file to review its products, options and quantities before creating your order.
               </CatalogActionInfo>
             </div>
 
@@ -802,6 +825,91 @@ export default function CatalogPage() {
       </main>
 
       {/* Shared Modals */}
+      {isImportReviewOpen && (
+        <div
+          className="fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="excel-import-review-title"
+        >
+          <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#999933]/45 bg-[#262019] shadow-2xl shadow-black/50">
+            <div className="flex items-start justify-between gap-6 border-b border-white/10 p-5 sm:p-7">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E5E791]">
+                  Excel order · review
+                </span>
+                <h2 id="excel-import-review-title" className="mt-2 text-2xl font-black leading-tight text-white sm:text-3xl">
+                  Confirm your imported products
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
+                  These products were matched with the current Maya catalog. Review each option and quantity before adding them to your order.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={cancelExcelImport}
+                aria-label="Cancel Excel import"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="max-h-[50vh] overflow-y-auto p-4 sm:p-6">
+              <div className="divide-y divide-white/10 overflow-hidden rounded-lg border border-white/10 bg-black/10">
+                {importItems.map(({ product, optionIndex, quantity }) => {
+                  const option = product.options[optionIndex];
+                  const image = productImageForOption(product, option);
+
+                  return (
+                    <div key={`${product.id}:${option.sku}`} className="flex items-center gap-4 p-4">
+                      <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-md border border-white/10 bg-white">
+                        {image ? (
+                          <img src={image} alt="" className="h-full w-full object-contain" />
+                        ) : (
+                          <PackageOpen className="h-6 w-6 text-[#675943]" aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold leading-snug text-white">{product.name}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-white/55">
+                          {option.name} <span aria-hidden="true">·</span> SKU {option.sku}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-white/45">Quantity</span>
+                        <span className="mt-1 block text-lg font-black text-[#E5E791]">{quantity}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 bg-black/10 p-4 sm:p-6">
+              <p className="mb-4 text-xs leading-relaxed text-white/50">
+                Confirming will add {importItems.length} {importItems.length === 1 ? "product line" : "product lines"} to your order sheet.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => completeExcelImport("catalog")}
+                  className="min-h-12 rounded-sm border border-[#999933] bg-transparent px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition-colors hover:bg-[#999933]/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+                >
+                  Continue shopping
+                </button>
+                <button
+                  type="button"
+                  onClick={() => completeExcelImport("checkout")}
+                  className="min-h-12 rounded-sm border border-[#984C27] bg-[#984C27] px-5 py-3 text-xs font-black uppercase tracking-wider text-white transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+                >
+                  Go to checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
