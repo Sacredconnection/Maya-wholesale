@@ -3,7 +3,7 @@ import { MANUAL_BANK_TRANSFER } from "@/lib/payment-methods";
 
 function AddressBlock({ title, lines, icon: Icon }) {
   return (
-    <div className="rounded-lg border border-white/15 bg-[#262019] p-4">
+    <div className="brand-contrast-zone rounded-lg border border-white/15 bg-[#262019] p-4">
       <div className="mb-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-white/60">
         <Icon className="h-3.5 w-3.5 text-[#f2f2f2]" aria-hidden="true" />
         {title}
@@ -24,22 +24,22 @@ export default function BankTransferDetails({ showTitle = true, orderReference =
     : method.referenceInstruction;
 
   return (
-    <div className="brand-contrast-zone flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {showTitle && (
         <div className="flex items-start gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#f2f2f2]/30 bg-[#999933]/15 text-[#f2f2f2]">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#999933]/35 bg-[#999933]/15 text-[#707026]">
             <Landmark className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <h3 className="text-sm font-black text-white">{method.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-white/60">
+            <h3 className="text-sm font-black text-[#342F25]">{method.title}</h3>
+            <p className="mt-1 text-xs leading-relaxed text-[#615B50]">
               {method.description}
             </p>
           </div>
         </div>
       )}
 
-      <div className="flex items-start gap-3 rounded-lg border border-[#D9962B] bg-[#4C330F] px-4 py-3 shadow-[0_0_24px_rgba(217,150,43,0.08)]">
+      <div className="brand-contrast-zone flex items-start gap-3 rounded-lg border border-[#D9962B] bg-[#4C330F] px-4 py-3 shadow-[0_0_24px_rgba(217,150,43,0.08)]">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#6F4C16] text-[#E5E791]">
           <Hash className="h-4 w-4" aria-hidden="true" />
         </span>
@@ -53,7 +53,7 @@ export default function BankTransferDetails({ showTitle = true, orderReference =
         </div>
       </div>
 
-      <dl className="grid gap-3 rounded-lg border border-white/15 bg-[#262019] p-4 text-xs sm:grid-cols-3">
+      <dl className="brand-contrast-zone grid gap-3 rounded-lg border border-white/15 bg-[#262019] p-4 text-xs sm:grid-cols-3">
         <div>
           <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
             Account Name
