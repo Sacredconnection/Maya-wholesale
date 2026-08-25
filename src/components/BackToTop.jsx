@@ -24,7 +24,7 @@ export default function BackToTop() {
       onClick={scrollToTop}
       aria-label="Back to top"
       title="Back to top"
-      className={`theme-dark-zone fixed bottom-5 right-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-[#f2f2f2]/40 bg-[#173c35] text-[#f2f2f2] shadow-xl shadow-black/30 transition-all duration-300 hover:-translate-y-1 hover:border-[#f2f2f2] hover:bg-[#1e4b43] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2] sm:bottom-7 sm:right-7 ${
+      className={`brand-contrast-zone fixed bottom-5 right-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-[#f2f2f2]/40 bg-[#173c35] text-[#f2f2f2] shadow-xl shadow-black/30 transition-all duration-300 hover:-translate-y-1 hover:border-[#f2f2f2] hover:bg-[#1e4b43] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f2f2f2] sm:bottom-7 sm:right-7 ${
         isVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       }`}
     >

@@ -3,7 +3,6 @@
   color: #f7f6ef;
 }
 
-:global(html[data-theme="light"]) body .page:global(.site-background-page),
-:global(html[data-theme="dark"]) body .page:global(.site-background-page) {
+:global(body) .page:global(.site-background-page) {
   background-color: #262019 !important;
 }

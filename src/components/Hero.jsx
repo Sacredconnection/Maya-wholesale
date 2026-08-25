@@ -82,7 +82,7 @@ export default function Hero() {
   return (
     <div
       ref={heroRef}
-      className="site-hero theme-dark-zone relative flex w-full flex-col overflow-hidden bg-[#25362D]"
+      className="site-hero brand-contrast-zone relative flex w-full flex-col overflow-hidden bg-[#25362D]"
       onMouseEnter={() => setIsPointerPaused(true)}
       onMouseLeave={() => setIsPointerPaused(false)}
       onFocusCapture={() => setIsFocusPaused(true)}

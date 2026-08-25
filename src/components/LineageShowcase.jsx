@@ -209,7 +209,7 @@ export default function LineageShowcase() {
   }, []);
 
   return (
-    <section id="tribes" aria-labelledby="lineage-title" className="theme-dark-zone lineage-showcase relative isolate flex flex-col gap-8 sm:gap-10 lg:gap-12 py-10 sm:py-12 border-t border-white/10 scroll-mt-24 w-full before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:bg-[#131313]">
+    <section id="tribes" aria-labelledby="lineage-title" className="brand-contrast-zone lineage-showcase relative isolate flex flex-col gap-8 sm:gap-10 lg:gap-12 py-10 sm:py-12 border-t border-white/10 scroll-mt-24 w-full before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:bg-[#131313]">
 
       {/* Header and Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 w-full">

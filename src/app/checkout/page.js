@@ -580,7 +580,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div id="top" className={`${styles.page} theme-dark-zone site-background-page min-h-screen`}>
+    <div id="top" className={`${styles.page} brand-contrast-zone site-background-page min-h-screen`}>
       {isSubmitting && <OrderSubmissionOverlay stage={submissionStage} />}
       <CheckoutHeader />
 
@@ -846,7 +846,7 @@ export default function CheckoutPage() {
                       <h3 className="text-xs font-bold text-white">What happens next?</h3>
                       <p className="mt-1 text-xs leading-relaxed text-white/55">
                         {paymentMethod === MANUAL_BANK_TRANSFER.id
-                          ? "After submitting, use your Order Number as the bank transfer reference. Your order ships after the funds clear and freight is confirmed."
+                          ? "After submitting, your Order Number will be generated and shown on the confirmation page. Use it as the bank transfer reference. Your order ships after the funds clear and freight is confirmed."
                           : "After submitting, you will be redirected to the secure card payment page. The order is prepared after payment is confirmed."}
                       </p>
                     </div>
@@ -973,7 +973,7 @@ export default function CheckoutPage() {
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
                   {paymentMethod === BUNQ_CARD_PAYMENT.id
                     ? `Secure card payment via ${BUNQ_CARD_PAYMENT.provider}.`
-                    : "Manual bank transfer. Use the Order Number as the payment reference."}
+                    : "Manual bank transfer. Your Order Number is generated after submission and must be used as the payment reference."}
                 </div>
               </div>
             </aside>

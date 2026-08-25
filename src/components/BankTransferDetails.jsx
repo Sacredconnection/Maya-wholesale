@@ -17,11 +17,14 @@ function AddressBlock({ title, lines, icon: Icon }) {
   );
 }
 
-export default function BankTransferDetails({ showTitle = true }) {
+export default function BankTransferDetails({ showTitle = true, orderReference = "" }) {
   const method = MANUAL_BANK_TRANSFER;
+  const referenceInstruction = orderReference
+    ? `Use ${orderReference} as the payment reference.`
+    : method.referenceInstruction;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="brand-contrast-zone flex flex-col gap-4">
       {showTitle && (
         <div className="flex items-start gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#f2f2f2]/30 bg-[#999933]/15 text-[#f2f2f2]">
@@ -45,7 +48,7 @@ export default function BankTransferDetails({ showTitle = true }) {
             Payment reference required
           </p>
           <p className="mt-1 text-sm font-black leading-snug text-white">
-            {method.referenceInstruction}
+            {referenceInstruction}
           </p>
         </div>
       </div>

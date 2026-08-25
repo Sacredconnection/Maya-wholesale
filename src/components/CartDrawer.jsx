@@ -84,7 +84,7 @@ export default function CartDrawer() {
             aria-modal="true"
             aria-labelledby="cart-drawer-title"
             tabIndex={-1}
-            className="theme-dark-zone absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#999A61] bg-[#362E24] shadow-2xl animate-fade-in-left"
+            className="brand-contrast-zone absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#999A61] bg-[#362E24] shadow-2xl animate-fade-in-left"
           >
             <div className="flex items-center justify-between border-b border-[#727349] bg-[#262019] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex items-center gap-3">

@@ -4,7 +4,7 @@ export default function MayaWholesaleBanner() {
   return (
     <section
       aria-labelledby="sacred-snuff-banner-title"
-      className="maya-wholesale-banner theme-dark-zone relative mb-12 flex min-h-[440px] items-center overflow-hidden border-y border-[#268072]/80 bg-[#171813] bg-cover bg-center py-0 md:min-h-0 md:py-14 lg:mb-16 lg:py-20"
+      className="maya-wholesale-banner brand-contrast-zone relative mb-12 flex min-h-[440px] items-center overflow-hidden border-y border-[#268072]/80 bg-[#171813] bg-cover bg-center py-0 md:min-h-0 md:py-14 lg:mb-16 lg:py-20"
     >
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#131313]/78 via-[#131313]/46 to-[#131313]/12 md:bg-gradient-to-r md:from-[#131313]/76 md:via-[#131313]/48 md:to-[#131313]/8"

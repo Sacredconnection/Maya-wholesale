@@ -4,7 +4,7 @@ import { LockKeyhole } from "lucide-react";
 
 export default function CheckoutHeader() {
   return (
-    <header className="theme-dark-zone sticky top-0 z-40 border-b border-white/15 bg-[#262019]/95">
+    <header className="brand-contrast-zone sticky top-0 z-40 border-b border-white/15 bg-[#262019]/95">
       <div className="mx-auto flex min-h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:min-h-[4.5rem] sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-4">
           <Link

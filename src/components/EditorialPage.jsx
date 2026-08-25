@@ -62,7 +62,7 @@ export default function EditorialPage({
     <PublicPageShell>
       <main>
         <header
-          className="editorial-hero theme-dark-zone relative isolate overflow-hidden"
+          className="editorial-hero brand-contrast-zone relative isolate overflow-hidden"
           style={bannerStyle}
         >
           <div className="site-content-shell relative py-14 sm:py-20 lg:py-24">

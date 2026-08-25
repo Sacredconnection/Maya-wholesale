@@ -4,7 +4,7 @@ export const MANUAL_BANK_TRANSFER = Object.freeze({
   description:
     "Make your payment directly into our bank account. Your order will be shipped as soon as the funds have cleared in our account.",
   referenceInstruction:
-    "Please use your Order Number as the payment reference.",
+    "Your Order Number will be generated after you submit the order. Use it as the payment reference.",
   accountName: "Maya World Trading B.V.",
   accountDetails: "NL79 TRIO 0391 0734 19",
   bankName: "Triodos Bank",

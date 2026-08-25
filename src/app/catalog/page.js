@@ -827,7 +827,7 @@ export default function CatalogPage() {
       {/* Shared Modals */}
       {isImportReviewOpen && (
         <div
-          className="theme-dark-zone fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
+          className="brand-contrast-zone fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="excel-import-review-title"

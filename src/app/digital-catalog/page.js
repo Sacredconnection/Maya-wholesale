@@ -391,7 +391,7 @@ export default function CatalogPage() {
 
       {(exporting === "pdf" || exporting === "preview") && (
         <div
-          className={`theme-dark-zone fixed inset-0 z-[140] flex items-center justify-center bg-[#242f27]/95 px-5 ${
+          className={`brand-contrast-zone fixed inset-0 z-[140] flex items-center justify-center bg-[#242f27]/95 px-5 ${
             exporting === "pdf" ? "xl:hidden" : ""
           }`}
           role="status"
