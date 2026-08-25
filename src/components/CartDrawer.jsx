@@ -8,7 +8,6 @@ import { Minus, Package, Plus, ShoppingBag, X } from "lucide-react";
 import { useAuth } from "./AuthContext";
 import { useCart } from "./CartContext";
 import LoginModal from "./LoginModal";
-import ProductRecommendations from "./ProductRecommendations";
 import {
   NEW_CUSTOMER_ROLE,
   progressivePerGramRate,
@@ -185,16 +184,6 @@ export default function CartDrawer() {
                         </div>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="border-y border-[#999A61] bg-[#473D2E] px-5 py-6 sm:px-8">
-                    <ProductRecommendations
-                      eyebrow="Optional add-ons"
-                      title="You may also like"
-                      description="These suggestions are separate from your current order and are added only when you select Add."
-                      variant="drawer"
-                      limit={2}
-                    />
                   </div>
                 </div>
               ) : (

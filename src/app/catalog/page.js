@@ -20,14 +20,19 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Download,
   FileSpreadsheet,
+  LoaderCircle,
   PackageOpen,
   Upload,
 } from "lucide-react";
 
 import { useProducts } from "@/components/ProductsContext";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
-import { exportCatalogExcel } from "@/lib/catalog-export";
+import {
+  downloadDigitalCatalogPdf,
+  exportCatalogExcel,
+} from "@/lib/catalog-export";
 import { readCatalogOrderWorkbook } from "@/lib/catalog-order-workbook";
 
 // Normalize string for accent-insensitive comparison
@@ -73,11 +78,10 @@ const getPaginationItems = (currentPage, totalPages) => {
 export default function CatalogPage() {
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
-  const { setIsCartOpen, addSelectionsToCart, cartSubtotal, cartTotalItems } = useCart();
-  const cartTotal =
-    cartSubtotal * (1 - Number(user?.discountRate || 0) / 100);
+  const { setIsCartOpen, addSelectionsToCart, cartTotalItems } = useCart();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [excelBusy, setExcelBusy] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
   const importInputRef = useRef(null);
 
   // Filter States
@@ -390,6 +394,18 @@ export default function CatalogPage() {
     finally { setExcelBusy(false); }
   };
 
+  const downloadPdf = async () => {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      await downloadDigitalCatalogPdf({ includePrices: true, user });
+    } catch (error) {
+      window.alert(error.message || "The PDF catalog could not be generated.");
+    } finally {
+      setPdfBusy(false);
+    }
+  };
+
   const importExcel = async (event) => {
     const file = event.target.files?.[0]; event.target.value = "";
     if (!file) return;
@@ -422,53 +438,69 @@ export default function CatalogPage() {
       {/* Main Container */}
       <main className="site-content-shell flex flex-grow flex-col gap-10 py-10 sm:gap-12 sm:py-12">
 
-        {/* Page Title Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/10 pb-6 sm:pb-8 gap-4 sm:gap-6">
-          <div>
+        {/* Catalog hero and primary actions, based on the approved B2B reference. */}
+        <section className="theme-dark-zone grid items-end gap-7 border-b border-white/15 pb-7 sm:pb-8 xl:grid-cols-[minmax(17rem,22rem)_minmax(0,1fr)] xl:gap-10">
+          <div className="max-w-md">
+            <span className="mb-3 inline-flex items-center rounded-full border border-[#128178] bg-[#093D38] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white">
+              B2B Portal
+            </span>
             <h1 className="type-page-title font-headline-lg text-white">
-              Wholesale Product Catalog
+              <span className="block">Wholesale</span>
+              <span className="block">Product Catalog</span>
             </h1>
-            <p className="font-body-md text-base text-white/60 max-w-2xl mt-2 leading-relaxed">
-              Verify pricing options, add products to your cart, and submit the order for review by our wholesale team.
+            <p className="mt-3 max-w-sm font-body-md text-base leading-relaxed text-white/70">
+              Explore our current wholesale assortment. Approved partners can view their pricing and build an order.
             </p>
           </div>
 
-          {/* Header Action Buttons */}
-          <div className="flex w-full shrink-0 flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <input ref={importInputRef} type="file" accept=".xlsx" className="sr-only" onChange={importExcel} />
             <button
               type="button"
-              disabled={excelBusy}
-              onClick={() => importInputRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-sm border border-[#999933]/35 bg-[#999933]/10 px-5 py-3.5 text-xs font-black uppercase tracking-[0.1em] text-white no-underline transition-colors hover:border-[#999933]/70 hover:bg-[#999933]/20 sm:w-auto"
+              disabled={pdfBusy}
+              onClick={downloadPdf}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-wait disabled:bg-[#63311A] disabled:text-[#E5E791]"
             >
-              <Upload className={`h-4 w-4 ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
-              Import Excel
+              {pdfBusy ? (
+                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Download className="h-4 w-4" aria-hidden="true" />
+              )}
+              {pdfBusy ? "Generating PDF" : "PDF Catalog"}
             </button>
             <button
               type="button"
               disabled={excelBusy || productsLoading || compoundFilteredProducts.length === 0}
               onClick={exportExcel}
-              className="flex w-full items-center justify-center gap-2 rounded-sm border border-white/10 bg-white/5 px-5 py-3.5 text-xs font-black uppercase tracking-[0.1em] text-white no-underline transition-colors hover:border-[#999933]/60 hover:bg-white/10 sm:w-auto"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:text-white/60"
             >
-              <FileSpreadsheet className={`h-4 w-4 ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
-              Export Excel
+              <FileSpreadsheet className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+              Export Order Excel
             </button>
-            {/* Quick Cart Summary Button */}
             <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative flex w-full grow items-center justify-center gap-3 rounded-sm border border-white/10 bg-[#1a1a1a] px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-all duration-300 hover:border-white/20 hover:bg-white/5 sm:w-auto sm:grow-0"
+              type="button"
+              disabled={excelBusy}
+              onClick={() => importInputRef.current?.click()}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#128178] bg-[#093D38] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-[#0C544E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:text-white/60"
             >
-              <ShoppingBag className="w-4 h-4 text-[#f2f2f2]" />
-              Cart · ${cartTotal.toFixed(2)}
+              <Upload className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+              Import Order Excel
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsCartOpen(true)}
+              className="relative inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-[#262019] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition-colors hover:border-[#BFC079] hover:bg-[#362E24] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+            >
+              <ShoppingBag className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
+              Order Sheet
               {cartTotalItems > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#cc6633] text-[10px] font-bold text-white absolute -top-2 -right-2 animate-pulse">
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#984C27] px-1 text-[10px] font-bold text-white">
                   {cartTotalItems}
                 </span>
               )}
             </button>
           </div>
-        </div>
+        </section>
 
         <FilterSidebar
           filters={{ search, category, subcategory, childCategory, attributes: attributeFilters }}
