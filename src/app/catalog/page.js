@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Download,
   FileSpreadsheet,
+  Info,
   LoaderCircle,
   PackageOpen,
   Upload,
@@ -76,6 +77,32 @@ const getPaginationItems = (currentPage, totalPages) => {
   items.push(totalPages);
   return items;
 };
+
+const catalogActionClass =
+  "catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-10 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#63311A] disabled:bg-[#984C27] disabled:opacity-60";
+
+function CatalogActionInfo({ id, label, children }) {
+  return (
+    <span className="group/info absolute right-2 top-1/2 z-20 -translate-y-1/2">
+      <button
+        type="button"
+        aria-label={`${label} information`}
+        aria-describedby={id}
+        className="catalog-primary-action grid h-6 w-6 cursor-help place-items-center rounded-full border border-white/35 bg-[#63311A]/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+      >
+        <Info className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+      <span
+        id={id}
+        role="tooltip"
+        className="catalog-primary-action pointer-events-none absolute bottom-[calc(100%+0.65rem)] right-0 z-30 w-64 rounded-md border border-[#999A61] bg-[#262019] px-3 py-2.5 text-left text-[11px] font-medium normal-case leading-relaxed tracking-normal opacity-0 shadow-xl shadow-black/25 transition-opacity group-hover/info:opacity-100 group-focus-within/info:opacity-100"
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
+
 export default function CatalogPage() {
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
@@ -454,50 +481,64 @@ export default function CatalogPage() {
 
           <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <input ref={importInputRef} type="file" accept=".xlsx" className="sr-only" onChange={importExcel} />
-            <button
-              type="button"
-              disabled={pdfBusy}
-              onClick={downloadPdf}
-              className="catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#984C27] bg-[#984C27] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#7D3E20] hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-wait disabled:bg-[#63311A] disabled:!text-[#E5E791]"
-            >
-              {pdfBusy ? (
-                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Download className="h-4 w-4" aria-hidden="true" />
-              )}
-              {pdfBusy ? "Generating PDF" : "PDF Catalog"}
-            </button>
-            <button
-              type="button"
-              disabled={excelBusy || productsLoading || compoundFilteredProducts.length === 0}
-              onClick={exportExcel}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:border-[#E5E791] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:opacity-70"
-            >
-              <FileSpreadsheet className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
-              Export Order Excel
-            </button>
-            <button
-              type="button"
-              disabled={excelBusy}
-              onClick={() => importInputRef.current?.click()}
-              className="catalog-primary-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#128178] bg-[#093D38] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] transition-colors hover:border-[#E5E791] hover:bg-[#0C544E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:border-[#727349] disabled:opacity-70"
-            >
-              <Upload className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
-              Import Order Excel
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsCartOpen(true)}
-              className="catalog-primary-action relative inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[#999A61] bg-[#262019] px-4 py-3 text-xs font-black uppercase tracking-[0.08em] shadow-lg shadow-black/20 transition-colors hover:border-[#BFC079] hover:bg-[#362E24] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
-            >
-              <ShoppingBag className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
-              Order Sheet
+            <div className="relative">
+              <button type="button" disabled={pdfBusy} onClick={downloadPdf} className={catalogActionClass}>
+                {pdfBusy ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin text-[#E5E791]" aria-hidden="true" />
+                ) : (
+                  <Download className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
+                )}
+                {pdfBusy ? "Generating PDF" : "PDF Catalog"}
+              </button>
+              <CatalogActionInfo id="pdf-catalog-info" label="PDF Catalog">
+                Download a printable PDF with the current wholesale assortment.
+              </CatalogActionInfo>
+            </div>
+
+            <div className="relative">
+              <button
+                type="button"
+                disabled={excelBusy || productsLoading || compoundFilteredProducts.length === 0}
+                onClick={exportExcel}
+                className={catalogActionClass}
+              >
+                <FileSpreadsheet className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+                Export Order Excel
+              </button>
+              <CatalogActionInfo id="export-order-info" label="Export Order Excel">
+                Export the filtered catalog to an Excel order file for offline editing.
+              </CatalogActionInfo>
+            </div>
+
+            <div className="relative">
+              <button
+                type="button"
+                disabled={excelBusy}
+                onClick={() => importInputRef.current?.click()}
+                className={catalogActionClass}
+              >
+                <Upload className={`h-4 w-4 text-[#E5E791] ${excelBusy ? "animate-pulse" : ""}`} aria-hidden="true" />
+                Import Order Excel
+              </button>
+              <CatalogActionInfo id="import-order-info" label="Import Order Excel">
+                Upload a completed Excel order file to restore its quantities to your order sheet.
+              </CatalogActionInfo>
+            </div>
+
+            <div className="relative">
+              <button type="button" onClick={() => setIsCartOpen(true)} className={catalogActionClass}>
+                <ShoppingBag className="h-4 w-4 text-[#E5E791]" aria-hidden="true" />
+                Order Sheet
+              </button>
               {cartTotalItems > 0 && (
-                <span className="catalog-primary-action absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#984C27] px-1 text-[10px] font-bold">
+                <span className="catalog-primary-action absolute -right-2 -top-2 z-30 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#093D38] px-1 text-[10px] font-bold">
                   {cartTotalItems}
                 </span>
               )}
-            </button>
+              <CatalogActionInfo id="order-sheet-info" label="Order Sheet">
+                Review selected products, adjust quantities and continue to checkout.
+              </CatalogActionInfo>
+            </div>
           </div>
         </section>
 
