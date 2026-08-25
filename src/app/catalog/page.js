@@ -349,9 +349,14 @@ export default function CatalogPage() {
             });
           });
 
+        const normalizedAttributeKey = normalizeStr(key).replace(/\s+/g, "-");
+        const isPlantForm = ["plant-form", "plantform", "product-form"].includes(
+          normalizedAttributeKey
+        );
+
         return {
           key,
-          name,
+          name: isPlantForm ? "Plant Form" : name,
           options: [...counts.values()].sort((a, b) =>
             normalizeStr(a.value).localeCompare(normalizeStr(b.value))
           ),
@@ -359,7 +364,7 @@ export default function CatalogPage() {
       })
       .filter(
         (attribute) =>
-          ["effects", "effect", "plant-part", "plantpart"].includes(
+          ["effects", "effect", "plant-form", "plantform", "product-form"].includes(
             normalizeStr(attribute.key).replace(/\s+/g, "-")
           ) &&
           (attribute.options.length > 0 || selectedAttributes[attribute.key])

@@ -221,12 +221,6 @@ export default function CartDrawer() {
                     <span className="font-bold">${rate.toFixed(2)}/g</span>
                   </div>
                 ))}
-                {isLoggedIn && user && (
-                  <div className="mt-1 flex items-center justify-between font-mono text-xs text-[#f2f2f2]">
-                    <span>B2B DISCOUNT ({user.discountRate}%)</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
-                  </div>
-                )}
                 <div className="my-2 h-px bg-white/5" />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold uppercase tracking-widest text-white">
