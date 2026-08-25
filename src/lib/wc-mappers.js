@@ -111,6 +111,7 @@ export function mapVariationToOption(variation) {
     rolePrices: roleBasedPrices(variation.meta_data),
     sku: variation.sku || String(variation.id),
     weightGrams: extractWeightGrams(name, variation.weight),
+    image: variation.image?.src || null,
     wcVariationId: variation.id,
     inStock: variation.stock_status !== "outofstock",
     stockQuantity:
@@ -142,6 +143,7 @@ const mapStoreVariationToOption = (variation) => {
     rolePrices: {},
     sku: variation.sku || String(variation.id),
     weightGrams: extractWeightGrams(name, null),
+    image: variation.images?.[0]?.src || variation.image?.src || null,
     wcVariationId: variation.id,
     inStock: variation.is_in_stock !== false,
     stockQuantity: null,
@@ -312,6 +314,7 @@ export function mapProduct(
             rolePrices: roleBasedPrices(product.meta_data),
             sku: product.sku || String(product.id),
             weightGrams: extractWeightGrams(product.name, product.weight),
+            image: null,
             wcVariationId: null,
             inStock: product.stock_status !== "outofstock",
             stockQuantity:
@@ -394,6 +397,7 @@ export function mapStoreProduct(
             rolePrices: {},
             sku: product.sku || String(product.id),
             weightGrams: extractWeightGrams(product.name, null),
+            image: null,
             wcVariationId: null,
             inStock: product.is_in_stock !== false,
             stockQuantity: null,

@@ -10,6 +10,7 @@ import { optionPriceForUser } from "@/lib/pricing";
 export default function ProductPurchaseControls({
   product,
   onAdded,
+  onOptionChange,
   buttonLabel = "Add",
   compact = false,
 }) {
@@ -86,9 +87,11 @@ export default function ProductPurchaseControls({
         <select
           value={selectedOptionIndex}
           onChange={(event) => {
-            setSelectedOptionIndex(Number(event.target.value));
+            const nextOptionIndex = Number(event.target.value);
+            setSelectedOptionIndex(nextOptionIndex);
             setAddedAt(0);
             setQuantity(1);
+            onOptionChange?.(activeProduct, activeProduct.options[nextOptionIndex]);
           }}
           disabled={!activeProduct || Boolean(error)}
           aria-label={`Select an option for ${product.name}`}

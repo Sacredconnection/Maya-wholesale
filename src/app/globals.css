@@ -876,29 +876,6 @@ html[data-theme="light"] :is(
   color: #ffffff !important;
 }
 
-.botanical-category-button {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1.5rem;
-  padding: 0.78rem 1rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-DEFAULT);
-  background: #cc6633;
-  color: #ffffff !important;
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
-}
-
 .trust-header-arrival {
   opacity: 0;
   transform: translate3d(0, 3.5rem, 0);
@@ -919,25 +896,6 @@ html[data-theme="light"] :is(
     transform: none;
     transition: none;
   }
-}
-
-.botanical-category-button:hover {
-  transform: translateY(-2px);
-  background: #f4f3e8;
-  color: #2d2d2d !important;
-}
-
-.botanical-category-button:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.botanical-category-button:focus-visible {
-  outline: 3px solid #cc6633;
-  outline-offset: 4px;
-}
-
-html[data-theme="light"] .botanical-category-button:hover {
-  color: #2d2d2d !important;
 }
 
 /* The NGO partnership card follows the selected theme. */

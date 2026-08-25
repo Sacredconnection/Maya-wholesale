@@ -29,6 +29,7 @@ import {
 
 import { useProducts } from "@/components/ProductsContext";
 import { getEthnicityColor } from "@/lib/ethnicity-colors";
+import { productImageForOption } from "@/lib/product-images";
 import {
   downloadDigitalCatalogPdf,
   exportCatalogExcel,
@@ -82,6 +83,7 @@ export default function CatalogPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [excelBusy, setExcelBusy] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [selectedProductImages, setSelectedProductImages] = useState({});
   const importInputRef = useRef(null);
 
   // Filter States
@@ -604,10 +606,10 @@ export default function CatalogPage() {
                     {/* Image Column — product thumbnail, tribe-letter fallback */}
                     <div className="col-span-1 flex items-center">
                       <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="block">
-                        {product.image ? (
+                        {(selectedProductImages[product.id] || product.image) ? (
                           <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 bg-[#131313] shadow-md transition-all duration-300 hover:border-[#999933]/45 hover:shadow-lg">
                             <img
-                              src={product.image}
+                              src={selectedProductImages[product.id] || product.image}
                               alt={product.name}
                               loading="lazy"
                               className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
@@ -657,7 +659,16 @@ export default function CatalogPage() {
                     </div>
 
                     <div className="col-span-2 border-t border-white/10 pt-4">
-                      <ProductPurchaseControls product={product} />
+                      <ProductPurchaseControls
+                        product={product}
+                        onOptionChange={(activeProduct, option) => {
+                          const nextImage = productImageForOption(activeProduct, option);
+                          setSelectedProductImages((currentImages) => {
+                            if (currentImages[product.id] === nextImage) return currentImages;
+                            return { ...currentImages, [product.id]: nextImage };
+                          });
+                        }}
+                      />
                     </div>
 
                   </div>

@@ -11,6 +11,7 @@ import LoginModal from "@/components/LoginModal";
 import AuthGate from "@/components/AuthGate";
 import { useProducts } from "@/components/ProductsContext";
 import { optionPriceForUser } from "@/lib/pricing";
+import { productImageForOption } from "@/lib/product-images";
 import { useCart } from "@/components/CartContext";
 import { useAuth } from "@/components/AuthContext";
 import ShelfToggleButton from "@/components/ShelfToggleButton";
@@ -198,6 +199,7 @@ export default function ProductDetailPage() {
   }
 
   const selectedOption = product.options[selectedOptIdx];
+  const selectedProductImage = productImageForOption(product, selectedOption);
   const productDescription = product.description || "Wholesale botanical product sourced through equitable fair-trade agreements with Amazonian community associations and prepared using established local production methods.";
   const hasLongDescription = productDescription.length > 280;
 
@@ -263,7 +265,7 @@ export default function ProductDetailPage() {
             {!imgError ? (
               <div className="w-full h-full overflow-hidden rounded-lg bg-white relative z-10">
                 <img
-                  src={product.image || `/products/${product.photoFolder}/${product.photo}.jpg`}
+                  src={selectedProductImage || `/products/${product.photoFolder}/${product.photo}.jpg`}
                   alt={product.name}
                   onError={() => setImgError(true)}
                   className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
@@ -386,6 +388,7 @@ export default function ProductDetailPage() {
                     value={selectedOptIdx}
                     onChange={(event) => {
                       setSelectedOptIdx(Number.parseInt(event.target.value, 10));
+                      setImgError(false);
                       setAddedAt(0);
                       setQuantity(1);
                     }}

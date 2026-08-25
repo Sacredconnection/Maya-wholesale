@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 
 const CATEGORIES = [
@@ -57,8 +56,8 @@ export default function BotanicalCategories() {
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {CATEGORIES.map(({ name, description, image, imageAlt }) => (
-          <div key={name}>
-            <article className="group relative flex h-full min-h-[26rem] flex-col overflow-hidden rounded-xl border border-[#999933] bg-white shadow-[0_6px_20px_rgba(45,45,45,0.06)] transition-[transform,box-shadow] duration-700 ease-in-out will-change-transform after:pointer-events-none after:absolute after:inset-0 after:z-10 after:rounded-xl after:border after:border-transparent after:content-[''] after:transition-colors after:duration-700 after:ease-in-out hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(75,80,30,0.10)] hover:after:border-[#999933] focus-within:-translate-y-0.5 focus-within:shadow-[0_12px_30px_rgba(75,80,30,0.10)] focus-within:after:border-[#999933] motion-reduce:transform-none motion-reduce:transition-none motion-reduce:after:transition-none">
+          <div key={name} className="group h-full">
+            <article className="relative flex h-full min-h-[26rem] flex-col overflow-hidden rounded-xl border border-[#999933] bg-white shadow-[0_6px_20px_rgba(45,45,45,0.06)] transition-[transform,box-shadow] duration-700 ease-in-out will-change-transform after:pointer-events-none after:absolute after:inset-0 after:z-10 after:rounded-xl after:border after:border-transparent after:content-[''] after:transition-colors after:duration-700 after:ease-in-out group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_30px_rgba(75,80,30,0.10)] group-hover:after:border-[#999933] motion-reduce:transform-none motion-reduce:transition-none motion-reduce:after:transition-none">
               <div className="relative aspect-[16/10] w-full shrink-0 bg-[#E8E7DF]" aria-hidden={!image}>
                 {image ? (
                   <Image
@@ -89,13 +88,6 @@ export default function BotanicalCategories() {
                 <p className="mt-2 text-sm leading-6 text-[#2D2D2D]/70">
                   {description}
                 </p>
-                <Link
-                  href={{ pathname: "/catalog", query: { category: name } }}
-                  className="botanical-category-button relative z-20"
-                  aria-label={`View ${name} products`}
-                >
-                  View products
-                </Link>
               </div>
             </article>
           </div>

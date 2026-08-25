@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { cartUnitPrice, optionPriceForUser } from "@/lib/pricing";
+import { productImageForOption } from "@/lib/product-images";
 
 const CartContext = createContext();
 const MAYA_STORE_ID = "maya-herbs";
@@ -82,7 +83,7 @@ export function CartProvider({ children }) {
       quantity: availableQuantity == null ? quantity : Math.min(quantity, availableQuantity),
       stockQuantity: availableQuantity,
       inStock: true,
-      image: product.image,
+      image: productImageForOption(product, selectedOption),
       wcProductId: product.wcId || null,
       wcVariationId: selectedOption.wcVariationId || null,
     };

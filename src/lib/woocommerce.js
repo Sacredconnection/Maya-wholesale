@@ -302,7 +302,7 @@ export async function getProductVariations(
   const tags = [getWooCommerceCatalogCacheTag(storeId)];
   const variationParams = {
     per_page: 100,
-    _fields: "id,name,sku,price,weight,purchasable,attributes,meta_data,stock_status,stock_quantity",
+    _fields: "id,name,sku,price,weight,image,purchasable,attributes,meta_data,stock_status,stock_quantity",
   };
   const { data: firstPage, headers } = await wcFetch(
     storeId,
