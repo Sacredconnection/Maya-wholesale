@@ -827,7 +827,7 @@ export default function CatalogPage() {
       {/* Shared Modals */}
       {isImportReviewOpen && (
         <div
-          className="fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
+          className="theme-dark-zone fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="excel-import-review-title"
@@ -841,7 +841,7 @@ export default function CatalogPage() {
                 <h2 id="excel-import-review-title" className="mt-2 text-2xl font-black leading-tight text-white sm:text-3xl">
                   Confirm your imported products
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/75">
                   These products were matched with the current Maya catalog. Review each option and quantity before adding them to your order.
                 </p>
               </div>
@@ -849,14 +849,14 @@ export default function CatalogPage() {
                 type="button"
                 onClick={cancelExcelImport}
                 aria-label="Cancel Excel import"
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/30 hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
 
             <div className="max-h-[50vh] overflow-y-auto p-4 sm:p-6">
-              <div className="divide-y divide-white/10 overflow-hidden rounded-lg border border-white/10 bg-black/10">
+              <div className="divide-y divide-white/10 overflow-hidden rounded-lg border border-[#727349] bg-[#362E24]">
                 {importItems.map(({ product, optionIndex, quantity }) => {
                   const option = product.options[optionIndex];
                   const image = productImageForOption(product, option);
@@ -872,12 +872,12 @@ export default function CatalogPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold leading-snug text-white">{product.name}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-white/55">
+                        <p className="mt-1 text-xs leading-relaxed text-white/70">
                           {option.name} <span aria-hidden="true">·</span> SKU {option.sku}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-white/45">Quantity</span>
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-white/70">Quantity</span>
                         <span className="mt-1 block text-lg font-black text-[#E5E791]">{quantity}</span>
                       </div>
                     </div>
@@ -887,7 +887,7 @@ export default function CatalogPage() {
             </div>
 
             <div className="border-t border-white/10 bg-black/10 p-4 sm:p-6">
-              <p className="mb-4 text-xs leading-relaxed text-white/50">
+              <p className="mb-4 text-xs leading-relaxed text-white/70">
                 Confirming will add {importItems.length} {importItems.length === 1 ? "product line" : "product lines"} to your order sheet.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
