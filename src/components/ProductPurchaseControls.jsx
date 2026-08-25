@@ -80,7 +80,7 @@ export default function ProductPurchaseControls({
   return (
     <div className={`flex w-full flex-col ${compact ? "gap-2.5" : "gap-3"}`}>
       <label className={`${activeProduct && !showOptionSelector ? "hidden" : "flex"} flex-col gap-1.5`}>
-        <span className="text-[9px] font-bold uppercase tracking-wider text-white/40">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-white/60">
           Product option
         </span>
         <select
@@ -92,7 +92,7 @@ export default function ProductPurchaseControls({
           }}
           disabled={!activeProduct || Boolean(error)}
           aria-label={`Select an option for ${product.name}`}
-          className={`w-full rounded-sm border border-white/10 bg-[#131313] text-white outline-none transition-colors focus:border-[#999933] disabled:cursor-wait disabled:opacity-60 ${
+          className={`w-full rounded-sm border border-[#727349] bg-[#131313] text-white outline-none transition-colors focus:border-[#E5E791] focus:ring-2 focus:ring-[#E5E791]/25 disabled:cursor-wait disabled:text-white/60 ${
             compact ? "px-2.5 py-2 text-[11px]" : "px-3 py-2.5 text-xs"
           }`}
         >
@@ -127,7 +127,7 @@ export default function ProductPurchaseControls({
       ) : (
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <span className="block truncate text-[9px] uppercase tracking-wider text-white/35">
+            <span className="block truncate text-[9px] uppercase tracking-wider text-white/60">
               {selectedOption?.sku || (activeProduct ? "SKU unavailable" : "Loading price")}
             </span>
             <strong className={`block text-[#f2f2f2] ${compact ? "text-sm" : "text-base"}`}>
@@ -135,12 +135,12 @@ export default function ProductPurchaseControls({
             </strong>
           </div>
 
-          <div className="flex shrink-0 items-center rounded-sm border border-white/10 bg-[#131313]">
+          <div className="flex shrink-0 items-center rounded-sm border border-[#727349] bg-[#131313]">
             <button
               type="button"
               onClick={() => setQuantity((value) => Math.max(1, value - 1))}
               aria-label={`Decrease quantity of ${product.name}`}
-              className={`${compact ? "p-2" : "p-2.5"} cursor-pointer border-0 bg-transparent text-white/55 hover:text-white`}
+              className={`${compact ? "p-2" : "p-2.5"} cursor-pointer border-0 bg-transparent text-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#E5E791]`}
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
@@ -159,7 +159,7 @@ export default function ProductPurchaseControls({
                 quantity >= Number(selectedOption.stockQuantity)
               }
               aria-label={`Increase quantity of ${product.name}`}
-              className={`${compact ? "p-2" : "p-2.5"} cursor-pointer border-0 bg-transparent text-white/55 hover:text-white`}
+              className={`${compact ? "p-2" : "p-2.5"} cursor-pointer border-0 bg-transparent text-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:text-white/35`}
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -169,7 +169,7 @@ export default function ProductPurchaseControls({
             type="button"
             onClick={handleAdd}
             disabled={!canAdd}
-            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border-0 bg-[#cc6633] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] disabled:cursor-wait disabled:opacity-45 ${
+            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border-0 bg-[#cc6633] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#b6532a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-wait disabled:opacity-70 ${
               compact ? "px-3 py-2.5 text-[9px]" : "px-4 py-3 text-[10px]"
             }`}
           >

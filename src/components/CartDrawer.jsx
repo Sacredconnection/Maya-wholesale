@@ -85,9 +85,9 @@ export default function CartDrawer() {
             aria-modal="true"
             aria-labelledby="cart-drawer-title"
             tabIndex={-1}
-            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-white/10 bg-[#1a1a1a] shadow-2xl animate-fade-in-left"
+            className="theme-dark-zone absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#999A61] bg-[#362E24] shadow-2xl animate-fade-in-left"
           >
-            <div className="flex items-center justify-between border-b border-white/10 bg-[#131313] px-5 py-5 sm:px-8 sm:py-6">
+            <div className="flex items-center justify-between border-b border-[#727349] bg-[#262019] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex items-center gap-3">
                 <ShoppingBag className="h-5 w-5 text-[#f2f2f2]" aria-hidden="true" />
                 <h2 id="cart-drawer-title" className="font-headline-md text-xl font-bold text-white">
@@ -99,7 +99,7 @@ export default function CartDrawer() {
                 type="button"
                 aria-label="Close cart"
                 onClick={closeCart}
-                className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border-0 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-[#727349] bg-[#362E24] text-white transition-colors hover:border-[#E5E791] hover:bg-[#473D2E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -108,7 +108,7 @@ export default function CartDrawer() {
             <div className="flex-grow overflow-y-auto scrollbar-none">
               {cart.length > 0 ? (
                 <div className="flex flex-col">
-                  <div className="flex flex-col gap-5 divide-y divide-white/5 px-5 py-5 sm:px-8 sm:py-6">
+                  <div className="flex flex-col gap-5 divide-y divide-white/10 px-5 py-5 sm:px-8 sm:py-6">
                     {cart.map((item, index) => (
                       <div
                         key={item.cartKey}
@@ -117,7 +117,7 @@ export default function CartDrawer() {
                         }`}
                       >
                         <div className="flex w-full min-w-0 flex-grow gap-3">
-                          <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-white/10 bg-white/5 text-[#f2f2f2]">
+                          <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-[#727349] bg-white/5 text-[#f2f2f2]">
                             {item.image ? (
                               <img
                                 src={item.image}
@@ -136,10 +136,10 @@ export default function CartDrawer() {
                               {item.name}
                             </h3>
                             <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
-                              <span className="rounded-sm border border-[#999933]/30 bg-[#999933]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#f2f2f2]">
+                              <span className="rounded-sm border border-[#BFC079] bg-[#474618] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                                 {item.optionName}
                               </span>
-                              <span className="break-all font-mono text-[10px] text-white/35">
+                              <span className="break-all font-mono text-[10px] text-white/60">
                                 {item.sku}
                               </span>
                             </div>
@@ -150,12 +150,12 @@ export default function CartDrawer() {
                           <span className="font-mono text-sm font-bold text-white">
                             ${(item.price * item.quantity).toFixed(2)}
                           </span>
-                          <div className="flex items-center rounded-sm border border-white/10 bg-[#131313]">
+                          <div className="flex items-center rounded-sm border border-[#727349] bg-[#262019]">
                             <button
                               type="button"
                               aria-label={`Decrease quantity of ${item.name}`}
                               onClick={() => updateQuantity(item.cartKey, -1)}
-                              className="cursor-pointer border-0 bg-transparent p-1.5 text-white/50 hover:text-white"
+                              className="cursor-pointer border-0 bg-transparent p-2 text-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#E5E791]"
                             >
                               <Minus className="h-3 w-3" aria-hidden="true" />
                             </button>
@@ -170,7 +170,7 @@ export default function CartDrawer() {
                                 item.stockQuantity != null &&
                                 item.quantity >= item.stockQuantity
                               }
-                              className="cursor-pointer border-0 bg-transparent p-1.5 text-white/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-25"
+                              className="cursor-pointer border-0 bg-transparent p-2 text-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:text-[#727349]"
                             >
                               <Plus className="h-3 w-3" aria-hidden="true" />
                             </button>
@@ -178,7 +178,7 @@ export default function CartDrawer() {
                           <button
                             type="button"
                             onClick={() => removeFromCart(item.cartKey)}
-                            className="cursor-pointer border-0 bg-transparent text-[10px] font-semibold uppercase tracking-wider text-white/35 transition-colors hover:text-[#cc6633]"
+                            className="cursor-pointer rounded-sm border-0 bg-transparent text-[10px] font-semibold uppercase tracking-wider text-[#E5E791] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791]"
                           >
                             Remove
                           </button>
@@ -187,7 +187,7 @@ export default function CartDrawer() {
                     ))}
                   </div>
 
-                  <div className="border-y border-[#999933]/25 bg-[#242f27] px-5 py-6 sm:px-8">
+                  <div className="border-y border-[#999A61] bg-[#473D2E] px-5 py-6 sm:px-8">
                     <ProductRecommendations
                       eyebrow="Optional add-ons"
                       title="You may also like"
@@ -198,13 +198,13 @@ export default function CartDrawer() {
                   </div>
                 </div>
               ) : (
-                <div className="flex h-64 flex-col items-center justify-center gap-4 px-5 text-center text-white/30 sm:px-8">
+                <div className="flex h-64 flex-col items-center justify-center gap-4 px-5 text-center text-white/60 sm:px-8">
                   <ShoppingBag className="h-12 w-12 stroke-[1.5]" aria-hidden="true" />
                   <p className="text-sm font-semibold">Your cart is currently empty.</p>
                   <button
                     type="button"
                     onClick={closeCart}
-                    className="cursor-pointer border-0 bg-transparent text-xs font-bold uppercase tracking-widest text-[#f2f2f2] hover:underline"
+                    className="cursor-pointer rounded-sm border-0 bg-transparent text-xs font-bold uppercase tracking-widest text-[#E5E791] hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E5E791]"
                   >
                     Browse catalog
                   </button>
@@ -212,7 +212,7 @@ export default function CartDrawer() {
               )}
             </div>
 
-            <div className="flex flex-col gap-5 border-t border-white/10 bg-[#131313] px-5 py-5 sm:px-8 sm:py-6">
+            <div className="flex flex-col gap-5 border-t border-[#727349] bg-[#262019] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-xs uppercase tracking-wider text-white/50">
                   <span>Total items</span>
@@ -253,7 +253,7 @@ export default function CartDrawer() {
                 type="button"
                 onClick={handleCheckout}
                 disabled={cart.length === 0}
-                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-sm border-0 bg-[#cc6633] py-5 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-[#cc6633]/20 transition-all hover:bg-[#b6532a] hover:shadow-[#cc6633]/40 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-sm border-0 bg-[#984C27] py-5 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-black/20 transition-all hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:bg-[#63311A] disabled:text-[#E5E791] disabled:shadow-none"
               >
                 {isLoggedIn ? "Proceed to checkout" : "Sign in to submit order"}
               </button>

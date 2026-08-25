@@ -41,6 +41,7 @@ const EMPTY_ADDRESS = {
 };
 
 const STEPS = ["Contact", "Delivery", "Review"];
+const BUNQ_CARD_PAYMENT_VISIBLE = false;
 const ORDER_SUBMISSION_STAGES = [
   {
     title: "Securing your order request",
@@ -397,7 +398,7 @@ export default function CheckoutPage() {
   }, [isSubmitting]);
 
   useEffect(() => {
-    if (!isLoggedIn) return undefined;
+    if (!isLoggedIn || !BUNQ_CARD_PAYMENT_VISIBLE) return undefined;
     let active = true;
 
     fetch("/api/payment-methods", {
@@ -597,7 +598,7 @@ export default function CheckoutPage() {
               Checkout
             </h1>
             <p className="mt-1.5 text-sm text-white/50">
-              Three short steps. Choose bank transfer or secure card payment.
+              Three short steps to confirm your wholesale order request.
             </p>
           </div>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
@@ -740,7 +741,7 @@ export default function CheckoutPage() {
                     <legend className="px-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f2f2f2]">
                       Payment method
                     </legend>
-                    <div className="grid gap-3 sm:grid-cols-2">
+                    <div className={`grid gap-3 ${BUNQ_CARD_PAYMENT_VISIBLE ? "sm:grid-cols-2" : ""}`}>
                       <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
                         paymentMethod === MANUAL_BANK_TRANSFER.id
                           ? "border-[#E5E791] bg-[#474618]"
@@ -771,49 +772,51 @@ export default function CheckoutPage() {
                         </span>
                       </label>
 
-                      <label className={`flex items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
-                        cardPaymentStatus.available
-                          ? "cursor-pointer"
-                          : "cursor-not-allowed"
-                      } ${
-                        paymentMethod === BUNQ_CARD_PAYMENT.id
-                          ? "border-[#E5E791] bg-[#474618]"
-                          : cardPaymentStatus.available
-                            ? "border-[#999A61] bg-[#262019] hover:border-[#E5E791]"
-                            : "border-[#727349] bg-[#262019] text-white/65"
-                      }`}>
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value={BUNQ_CARD_PAYMENT.id}
-                          checked={paymentMethod === BUNQ_CARD_PAYMENT.id}
-                          disabled={!cardPaymentStatus.available}
-                          onChange={() => {
-                            setPaymentMethod(BUNQ_CARD_PAYMENT.id);
-                            setConfirmed(false);
-                            setError("");
-                          }}
-                          className="mt-1 h-4 w-4 shrink-0 accent-[#999933]"
-                        />
-                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-[#f2f2f2]">
-                          <CreditCard className="h-4 w-4" aria-hidden="true" />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block text-sm font-black text-white">
-                            {BUNQ_CARD_PAYMENT.title}
+                      {BUNQ_CARD_PAYMENT_VISIBLE && (
+                        <label className={`flex items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
+                          cardPaymentStatus.available
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed"
+                        } ${
+                          paymentMethod === BUNQ_CARD_PAYMENT.id
+                            ? "border-[#E5E791] bg-[#474618]"
+                            : cardPaymentStatus.available
+                              ? "border-[#999A61] bg-[#262019] hover:border-[#E5E791]"
+                              : "border-[#727349] bg-[#262019] text-white/65"
+                        }`}>
+                          <input
+                            type="radio"
+                            name="payment-method"
+                            value={BUNQ_CARD_PAYMENT.id}
+                            checked={paymentMethod === BUNQ_CARD_PAYMENT.id}
+                            disabled={!cardPaymentStatus.available}
+                            onChange={() => {
+                              setPaymentMethod(BUNQ_CARD_PAYMENT.id);
+                              setConfirmed(false);
+                              setError("");
+                            }}
+                            className="mt-1 h-4 w-4 shrink-0 accent-[#999933]"
+                          />
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-[#f2f2f2]">
+                            <CreditCard className="h-4 w-4" aria-hidden="true" />
                           </span>
-                          <span className="mt-1 block text-[11px] font-bold text-white/55">
-                            Securely via {BUNQ_CARD_PAYMENT.provider}
-                          </span>
-                          {!cardPaymentStatus.available && (
-                            <span className="mt-2 block text-[10px] font-bold leading-relaxed text-[#E5E791]">
-                              {cardPaymentStatus.loading
-                                ? "Checking availability..."
-                                : cardPaymentStatus.reason}
+                          <span className="min-w-0">
+                            <span className="block text-sm font-black text-white">
+                              {BUNQ_CARD_PAYMENT.title}
                             </span>
-                          )}
-                        </span>
-                      </label>
+                            <span className="mt-1 block text-[11px] font-bold text-white/55">
+                              Securely via {BUNQ_CARD_PAYMENT.provider}
+                            </span>
+                            {!cardPaymentStatus.available && (
+                              <span className="mt-2 block text-[10px] font-bold leading-relaxed text-[#E5E791]">
+                                {cardPaymentStatus.loading
+                                  ? "Checking availability..."
+                                  : cardPaymentStatus.reason}
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      )}
                     </div>
 
                     <div className="mt-5 border-t border-white/10 pt-5">

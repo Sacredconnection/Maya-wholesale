@@ -38,7 +38,7 @@ export default function ProductRecommendations({
   const isDrawer = variant === "drawer";
 
   return (
-    <section className={`${isDrawer ? "border-t border-white/10 pt-5" : "rounded-lg border border-[#999933]/25 bg-[#242f27]/45 p-4 sm:p-5"}`}>
+    <section className={`${isDrawer ? "border-t border-[#999A61] pt-5" : "rounded-lg border border-[#999933]/25 bg-[#242f27]/45 p-4 sm:p-5"}`}>
       <div className="mb-4">
         {eyebrow && (
           <span className="mb-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#f2f2f2]">
@@ -47,12 +47,12 @@ export default function ProductRecommendations({
           </span>
         )}
         <h3 className={`${isDrawer ? "text-sm" : "text-base"} font-bold text-white`}>{title}</h3>
-        {description && <p className="mt-1 text-[10px] leading-relaxed text-white/45">{description}</p>}
+        {description && <p className="mt-1 text-[10px] leading-relaxed text-white/60">{description}</p>}
       </div>
 
       <div className={`grid gap-3 ${isDrawer ? "grid-cols-1" : "sm:grid-cols-2"}`}>
         {recommendations.map((product) => (
-          <article key={product.id} className="rounded-lg border border-white/10 bg-[#1a1a1a] p-3 shadow-md shadow-black/15">
+          <article key={product.id} className="rounded-lg border border-[#727349] bg-[#1a1a1a] p-3 shadow-md shadow-black/15">
             <div className="mb-3 flex items-center gap-3">
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white">
                 {product.image ? (
@@ -61,7 +61,7 @@ export default function ProductRecommendations({
               </div>
               <div className="min-w-0">
                 <h4 className="truncate text-xs font-bold text-white">{product.name}</h4>
-                <p className="mt-0.5 truncate text-[9px] uppercase tracking-wider text-white/40">
+                <p className="mt-0.5 truncate text-[9px] uppercase tracking-wider text-white/60">
                   {product.category}
                 </p>
               </div>
