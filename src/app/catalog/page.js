@@ -721,9 +721,6 @@ export default function CatalogPage() {
                             {product.tribe}
                           </span>
                         )}
-                        <span className="max-w-full break-words text-[10px] font-semibold text-white/40 px-1 py-0.5 uppercase tracking-wide font-label-sm">
-                          {product.storeName}
-                        </span>
                       </div>
                     </div>
 
