@@ -124,7 +124,7 @@ export default function LeadTimeAvailability({ product, option, compact = false 
                 aria-labelledby="lead-time-dialog-title"
                 aria-describedby="lead-time-dialog-description"
                 tabIndex={-1}
-                className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#727349] bg-[#262019] p-5 text-white shadow-2xl sm:p-7"
+                className="brand-contrast-zone max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#727349] bg-[#262019] p-5 text-white shadow-2xl sm:p-7"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -140,7 +140,7 @@ export default function LeadTimeAvailability({ product, option, compact = false 
                     onClick={closeDialog}
                     disabled={status === "submitting"}
                     aria-label="Close lead-time request"
-                    className="rounded-sm border border-white/15 bg-transparent p-2 text-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-[#E5E791] disabled:opacity-50"
+                    className="rounded-sm border border-[#675943] bg-[#362E24] p-2 text-white/70 hover:border-[#999933] hover:text-white focus-visible:outline-2 focus-visible:outline-[#E5E791] disabled:opacity-50"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -209,7 +209,7 @@ export default function LeadTimeAvailability({ product, option, compact = false 
                         value={note}
                         onChange={(event) => setNote(event.target.value)}
                         placeholder="Preferred delivery date or other information for our sales team"
-                        className="mt-1.5 w-full resize-y rounded-sm border border-[#727349] bg-[#362E24] px-4 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:border-[#E5E791] focus:ring-2 focus:ring-[#E5E791]/25"
+                        className="mt-1.5 w-full resize-y rounded-sm border border-[#727349] bg-[#362E24] px-4 py-3 text-sm text-white placeholder:text-[#BFC079] outline-none focus:border-[#E5E791] focus:ring-2 focus:ring-[#E5E791]/25"
                       />
                     </label>
 
@@ -222,7 +222,7 @@ export default function LeadTimeAvailability({ product, option, compact = false 
                     <button
                       type="submit"
                       disabled={status === "submitting" || !Number.isInteger(quantity) || quantity < 1 || quantity > 10000}
-                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-[#CC6633] px-5 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white hover:bg-[#B2592D] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:opacity-55"
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-[#984C27] px-5 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5E791] disabled:cursor-not-allowed disabled:opacity-55"
                     >
                       {status === "submitting" ? (
                         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
