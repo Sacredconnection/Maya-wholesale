@@ -1,5 +1,11 @@
 // Maps WooCommerce REST payloads to the internal product shape used by the UI.
 
+import {
+  LEAD_TIME_MODES,
+  leadTimeModeFromMeta,
+  outOfStockLeadTimePolicy,
+} from "@/lib/lead-time-policy.mjs";
+
 const decodeHtmlEntities = (value) =>
   String(value || "")
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
@@ -98,24 +104,30 @@ export function roleBasedPrices(metaData = []) {
   return prices;
 }
 
-export function mapVariationToOption(variation) {
+export function mapVariationToOption(variation, parentLeadTimeMode = LEAD_TIME_MODES.AUTO) {
   const name =
     (variation.attributes || [])
       .map((a) => a.option)
       .filter(Boolean)
       .join(" / ") || variation.sku;
 
+  const inStock = variation.stock_status !== "outofstock";
+  const weightGrams = extractWeightGrams(name, variation.weight);
+  const leadTimeMode = leadTimeModeFromMeta(variation.meta_data, parentLeadTimeMode);
+
   return {
     name,
     price: parseFloat(variation.price) || 0,
     rolePrices: roleBasedPrices(variation.meta_data),
     sku: variation.sku || String(variation.id),
-    weightGrams: extractWeightGrams(name, variation.weight),
+    weightGrams,
     image: variation.image?.src || null,
     wcVariationId: variation.id,
-    inStock: variation.stock_status !== "outofstock",
+    inStock,
     stockQuantity:
       variation.stock_quantity == null ? null : Number(variation.stock_quantity),
+    leadTimeMode,
+    leadTimePolicy: outOfStockLeadTimePolicy({ inStock, weightGrams, mode: leadTimeMode }),
   };
 }
 
@@ -137,16 +149,65 @@ const storeVariationName = (variation) => {
 
 const mapStoreVariationToOption = (variation) => {
   const name = storeVariationName(variation);
+  const inStock = variation.is_in_stock !== false;
+  const weightGrams = extractWeightGrams(name, null);
   return {
     name,
     price: storePrice(variation.prices),
     rolePrices: {},
     sku: variation.sku || String(variation.id),
-    weightGrams: extractWeightGrams(name, null),
+    weightGrams,
     image: variation.images?.[0]?.src || variation.image?.src || null,
     wcVariationId: variation.id,
-    inStock: variation.is_in_stock !== false,
+    inStock,
     stockQuantity: null,
+    leadTimeMode: LEAD_TIME_MODES.AUTO,
+    leadTimePolicy: outOfStockLeadTimePolicy({
+      inStock,
+      weightGrams,
+      mode: LEAD_TIME_MODES.AUTO,
+    }),
+  };
+};
+
+const mapSimpleProductToOption = (product, leadTimeMode) => {
+  const inStock = product.stock_status !== "outofstock";
+  const weightGrams = extractWeightGrams(product.name, product.weight);
+  return {
+    name: parseGramsFromText(product.name) ? `${parseGramsFromText(product.name)}g` : "Default",
+    price: parseFloat(product.price) || 0,
+    rolePrices: roleBasedPrices(product.meta_data),
+    sku: product.sku || String(product.id),
+    weightGrams,
+    image: null,
+    wcVariationId: null,
+    inStock,
+    stockQuantity:
+      product.stock_quantity == null ? null : Number(product.stock_quantity),
+    leadTimeMode,
+    leadTimePolicy: outOfStockLeadTimePolicy({ inStock, weightGrams, mode: leadTimeMode }),
+  };
+};
+
+const mapStoreSimpleProductToOption = (product) => {
+  const inStock = product.is_in_stock !== false;
+  const weightGrams = extractWeightGrams(product.name, null);
+  return {
+    name: parseGramsFromText(product.name) ? `${parseGramsFromText(product.name)}g` : "Default",
+    price: storePrice(product.prices),
+    rolePrices: {},
+    sku: product.sku || String(product.id),
+    weightGrams,
+    image: null,
+    wcVariationId: null,
+    inStock,
+    stockQuantity: null,
+    leadTimeMode: LEAD_TIME_MODES.AUTO,
+    leadTimePolicy: outOfStockLeadTimePolicy({
+      inStock,
+      weightGrams,
+      mode: LEAD_TIME_MODES.AUTO,
+    }),
   };
 };
 
@@ -300,27 +361,18 @@ export function mapProduct(
   store = { id: "maya-herbs", name: "Maya Herbs" }
 ) {
   const { parentById = {}, nameById = {} } = categoryContext;
+  const productLeadTimeMode = leadTimeModeFromMeta(product.meta_data);
 
   const options =
     product.type === "variable" && variations.length > 0
       ? variations
-          .filter((v) => v.purchasable !== false)
-          .map(mapVariationToOption)
+          .filter(
+            (variation) =>
+              variation.purchasable !== false || variation.stock_status === "outofstock"
+          )
+          .map((variation) => mapVariationToOption(variation, productLeadTimeMode))
           .sort((a, b) => (a.weightGrams ?? Infinity) - (b.weightGrams ?? Infinity))
-      : [
-          {
-            name: parseGramsFromText(product.name) ? `${parseGramsFromText(product.name)}g` : "Default",
-            price: parseFloat(product.price) || 0,
-            rolePrices: roleBasedPrices(product.meta_data),
-            sku: product.sku || String(product.id),
-            weightGrams: extractWeightGrams(product.name, product.weight),
-            image: null,
-            wcVariationId: null,
-            inStock: product.stock_status !== "outofstock",
-            stockQuantity:
-              product.stock_quantity == null ? null : Number(product.stock_quantity),
-          },
-        ];
+      : [mapSimpleProductToOption(product, productLeadTimeMode)];
 
   const trackedQuantities = options
     .map((option) => option.stockQuantity)
@@ -385,24 +437,13 @@ export function mapStoreProduct(
   const options =
     product.type === "variable" && variations.length > 0
       ? variations
-          .filter((variation) => variation.is_purchasable !== false)
+          .filter(
+            (variation) =>
+              variation.is_purchasable !== false || variation.is_in_stock === false
+          )
           .map(mapStoreVariationToOption)
           .sort((a, b) => (a.weightGrams ?? Infinity) - (b.weightGrams ?? Infinity))
-      : [
-          {
-            name: parseGramsFromText(product.name)
-              ? `${parseGramsFromText(product.name)}g`
-              : "Default",
-            price: storePrice(product.prices),
-            rolePrices: {},
-            sku: product.sku || String(product.id),
-            weightGrams: extractWeightGrams(product.name, null),
-            image: null,
-            wcVariationId: null,
-            inStock: product.is_in_stock !== false,
-            stockQuantity: null,
-          },
-        ];
+      : [mapStoreSimpleProductToOption(product)];
 
   const cats = product.categories || [];
   const topCats = cats.filter((category) => !parentById[category.id]);

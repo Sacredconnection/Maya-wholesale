@@ -289,8 +289,15 @@ export async function getAllProducts(storeId = PRIMARY_STORE_ID, { revalidate } 
     .filter((product) => product.catalog_visibility !== "hidden");
 }
 
-export async function getProductBySlug(slug, storeId = PRIMARY_STORE_ID) {
-  const { data } = await wcFetch(storeId, "products", { params: { slug, status: "publish" } });
+export async function getProductBySlug(
+  slug,
+  storeId = PRIMARY_STORE_ID,
+  { revalidate } = {}
+) {
+  const { data } = await wcFetch(storeId, "products", {
+    params: { slug, status: "publish" },
+    revalidate,
+  });
   return data[0] || null;
 }
 

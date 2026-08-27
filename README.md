@@ -85,9 +85,10 @@ The catalog is sourced exclusively from Maya Herbs. Configuration is entirely se
 | `WOOCOMMERCE_CONSUMER_SECRET` | Maya Herbs REST API secret |
 | `WC_REVALIDATE_SECONDS` | Optional server-side catalog cache TTL (default `300`) |
 | `WC_WEBHOOK_SECRET` | Shared secret for signed product and customer webhooks |
-| `RESEND_API_KEY` | Resend API key used for registration and approval emails |
+| `RESEND_API_KEY` | Resend API key used for account and lead-time emails |
 | `TRANSACTIONAL_EMAIL_FROM` | Verified sender, for example `Maya Herbs Wholesale <wholesale@mayaherbs.com>` |
 | `TRANSACTIONAL_EMAIL_REPLY_TO` | Reply-to address for partner emails |
+| `LEAD_TIME_REQUEST_TO` | Internal sales recipient for lead-time requests (`sales@mayaherbs.com`) |
 | `PORTAL_URL` | Public portal origin used by email action buttons |
 | `SESSION_SECRET` | Required random secret (minimum 32 characters) used to sign authentication cookies |
 
@@ -108,6 +109,15 @@ loaded once. Development automatically falls back to
 *   **Vercel:** add all variables for Production and Preview, then redeploy.
 
 **How it works:** [src/lib/commerce-stores.js](src/lib/commerce-stores.js) defines the server-only Maya Herbs backend. `/api/products` and `/api/catalog` load only that catalog. The cart preserves the product source, and `/api/orders` validates every item against Maya Herbs before creating the WooCommerce order. Authentication, the buyer profile, and order history remain authoritative in Maya Herbs.
+
+Out-of-stock formats below 250g show the short production notice (1–3 days).
+Formats of 250g or more show the bulk lead time (1–4 weeks) and allow an
+authenticated partner to send the required quantity to the sales team. The
+API reloads the current WooCommerce product before sending the email. Install
+[`maya-wholesale-admin-tools-v1.3.0.zip`](maya-wholesale-admin-tools-v1.3.0.zip)
+in WordPress to override the automatic policy from **Product data → Inventory**
+or from an individual variation's inventory panel. A variation override takes
+priority over the product-level setting.
 
 PDF exports always bypass the WooCommerce data cache, so every generated file uses the published products, current variations, stock returned at generation time. When generated from an authenticated wholesale session, the PDF includes the customer's current price for each available format. Normal catalog browsing keeps the short `WC_REVALIDATE_SECONDS` cache for performance.
 

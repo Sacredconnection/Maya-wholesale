@@ -15,6 +15,7 @@ import { productImageForOption } from "@/lib/product-images";
 import { useCart } from "@/components/CartContext";
 import { useAuth } from "@/components/AuthContext";
 import ShelfToggleButton from "@/components/ShelfToggleButton";
+import LeadTimeAvailability from "@/components/LeadTimeAvailability";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -429,7 +430,7 @@ export default function ProductDetailPage() {
                     className="bg-[#1a1a1a] border border-white/10 text-sm text-white rounded px-4 py-3.5 focus:border-[#999933] outline-none w-full"
                   >
                     {product.options.map((opt, idx) => (
-                      <option key={opt.sku} value={idx} disabled={opt.inStock === false}>
+                      <option key={opt.sku} value={idx}>
                         {opt.name} (${optionPriceForUser(opt, user, product.category).toFixed(2)})
                         {opt.inStock === false ? " · Out of stock" : ""}
                       </option>
@@ -438,8 +439,11 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Purchase Box */}
-              <div className="flex flex-col sm:flex-row sm:items-end gap-4 mt-1">
+              {selectedOption?.inStock === false ? (
+                <LeadTimeAvailability product={product} option={selectedOption} />
+              ) : (
+                /* Purchase Box */
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 mt-1">
 
                 {/* Quantity select */}
                 <div className="flex flex-col gap-1.5 sm:shrink-0">
@@ -493,7 +497,8 @@ export default function ProductDetailPage() {
                   </button>
                 </div>
 
-              </div>
+                </div>
+              )}
 
               <ShelfToggleButton
                 productId={product.id}

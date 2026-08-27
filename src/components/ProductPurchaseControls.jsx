@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import { useProducts } from "@/components/ProductsContext";
 import { optionPriceForUser } from "@/lib/pricing";
+import LeadTimeAvailability from "@/components/LeadTimeAvailability";
 
 export default function ProductPurchaseControls({
   product,
@@ -106,7 +107,6 @@ export default function ProductPurchaseControls({
               <option
                 key={`${option.wcVariationId || option.sku}-${index}`}
                 value={index}
-                disabled={option.inStock === false}
               >
                 {option.name} · ${optionPriceForUser(option, user, activeProduct.category).toFixed(2)}
                 {option.inStock === false ? " · Out of stock" : ""}
@@ -127,6 +127,23 @@ export default function ProductPurchaseControls({
         >
           {error} <strong className="ml-1 uppercase">Retry</strong>
         </button>
+      ) : selectedOption?.inStock === false ? (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <span className="block truncate text-[9px] uppercase tracking-wider text-white/60">
+                {selectedOption.sku || "SKU unavailable"}
+              </span>
+              <strong className={`block text-[#f2f2f2] ${compact ? "text-sm" : "text-base"}`}>
+                {price == null ? "—" : `$${price.toFixed(2)}`}
+              </strong>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/50">
+              Out of stock
+            </span>
+          </div>
+          <LeadTimeAvailability product={activeProduct} option={selectedOption} compact={compact} />
+        </div>
       ) : (
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">

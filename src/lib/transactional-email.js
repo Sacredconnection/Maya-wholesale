@@ -85,7 +85,7 @@ export function isTransactionalEmailConfigured() {
   return Boolean(process.env.RESEND_API_KEY && process.env.TRANSACTIONAL_EMAIL_FROM);
 }
 
-async function sendTransactionalEmail({ to, subject, html, text, idempotencyKey }) {
+async function sendTransactionalEmail({ to, subject, html, text, idempotencyKey, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.TRANSACTIONAL_EMAIL_FROM;
   if (!apiKey || !from) {
@@ -102,7 +102,7 @@ async function sendTransactionalEmail({ to, subject, html, text, idempotencyKey 
     body: JSON.stringify({
       from,
       to: [to],
-      reply_to: process.env.TRANSACTIONAL_EMAIL_REPLY_TO || DEFAULT_REPLY_TO,
+      reply_to: replyTo || process.env.TRANSACTIONAL_EMAIL_REPLY_TO || DEFAULT_REPLY_TO,
       subject,
       html,
       text,
@@ -115,6 +115,75 @@ async function sendTransactionalEmail({ to, subject, html, text, idempotencyKey 
     throw new Error(result?.message || `Email provider responded with HTTP ${response.status}.`);
   }
   return result;
+}
+
+export function isLeadTimeRequestEmailConfigured() {
+  const recipient = String(process.env.LEAD_TIME_REQUEST_TO || "").trim();
+  return isTransactionalEmailConfigured() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient);
+}
+
+export async function sendLeadTimeRequestEmail({
+  customer,
+  product,
+  option,
+  quantity,
+  note,
+  requestId,
+}) {
+  const recipient = String(process.env.LEAD_TIME_REQUEST_TO || "").trim();
+  if (!isLeadTimeRequestEmailConfigured()) {
+    throw new Error("Lead-time request email is not configured.");
+  }
+
+  const customerName =
+    [customer.first_name, customer.last_name].filter(Boolean).join(" ") ||
+    customer.username ||
+    customer.email;
+  const totalWeightGrams =
+    Number(option.weightGrams) > 0 ? Number(option.weightGrams) * quantity : null;
+  const requestedAmount = totalWeightGrams
+    ? `${quantity} × ${option.name} (${totalWeightGrams.toLocaleString("en-US")}g total)`
+    : `${quantity} × ${option.name}`;
+  const subject = `[Lead time request] ${product.name} — ${option.name}`;
+  const safeNote = note
+    ? `<div style="margin-top:18px;padding:16px 18px;background:#262019;border-left:3px solid #999933;border-radius:4px;">
+        <div style="font-size:10px;font-weight:800;color:#E5E791;letter-spacing:1.2px;text-transform:uppercase;">Buyer note</div>
+        <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#f2f2f2;white-space:pre-wrap;">${escapeHtml(note)}</p>
+      </div>`
+    : "";
+
+  return sendTransactionalEmail({
+    to: recipient,
+    replyTo: customer.email,
+    subject,
+    idempotencyKey: `lead-time-request/${requestId}`,
+    html: emailLayout({
+      eyebrow: "Wholesale availability request",
+      title: "A partner requested a lead time",
+      intro: "The requested product is currently unavailable and requires a production lead-time confirmation.",
+      body: `
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:22px;border-collapse:collapse;background:#163731;border:1px solid #315b53;border-radius:6px;overflow:hidden;">
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;width:34%;">Partner</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;font-weight:700;">${escapeHtml(customerName)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Company</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(customer.billing?.company || "Not provided")}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Email</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(customer.email)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Account</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">MAYA-WC-${escapeHtml(customer.id)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Product</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(product.name)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Format / SKU</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(option.name)} / ${escapeHtml(option.sku)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Requested amount</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;font-weight:700;border-top:1px solid #315b53;">${escapeHtml(requestedAmount)}</td></tr>
+        </table>
+        ${safeNote}`,
+    }),
+    text:
+      "Wholesale lead-time request\n\n" +
+      `Partner: ${customerName}\n` +
+      `Company: ${customer.billing?.company || "Not provided"}\n` +
+      `Email: ${customer.email}\n` +
+      `Account: MAYA-WC-${customer.id}\n` +
+      `Product: ${product.name}\n` +
+      `Format / SKU: ${option.name} / ${option.sku}\n` +
+      `Requested amount: ${requestedAmount}\n` +
+      (note ? `Note: ${note}\n` : ""),
+  });
 }
 
 export async function sendApplicationReceivedEmail(customer) {
