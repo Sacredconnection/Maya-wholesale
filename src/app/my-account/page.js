@@ -645,7 +645,7 @@ export default function MyAccountPage() {
                         </div>
                         <p className="text-xs text-white/50 leading-relaxed max-w-lg">
                           {activeOrder.items.map((i) => `${i.name} x ${i.quantity}`).join(" · ")}
-                          {" · $"}{Number(activeOrder.total).toFixed(2)}
+                          {" · €"}{Number(activeOrder.total).toFixed(2)}
                         </p>
                       </div>
                       <button
@@ -689,7 +689,7 @@ export default function MyAccountPage() {
                         <div>
                           <span className="text-[10px] font-mono text-white/50">Est. Total</span>
                           <p className="text-sm font-bold text-[#f2f2f2] mt-0.5">
-                            ${Number(activeOrder.total).toFixed(2)}
+                            €{Number(activeOrder.total).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -793,7 +793,7 @@ export default function MyAccountPage() {
                                   <span className="block text-[10px] font-normal text-white/40">{order.storeName}</span>
                                 </td>
                                 <td className="py-4 px-4">{formatOrderDate(order.dateCreated)}</td>
-                                <td className="py-4 px-4">${Number(order.total).toFixed(2)}</td>
+                                <td className="py-4 px-4">€{Number(order.total).toFixed(2)}</td>
                                 <td className="py-4 px-4">
                                   <span className={orderStatusInfo(order.status).className}>
                                     {orderStatusInfo(order.status).label}
@@ -839,7 +839,7 @@ export default function MyAccountPage() {
                                             )}
                                           </span>
                                           <span className="text-white/70 font-mono shrink-0 ml-4">
-                                            x{item.quantity} · ${Number(item.total).toFixed(2)}
+                                            x{item.quantity} · €{Number(item.total).toFixed(2)}
                                           </span>
                                         </div>
                                       ))}

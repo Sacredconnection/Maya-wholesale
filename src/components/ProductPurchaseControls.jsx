@@ -108,7 +108,7 @@ export default function ProductPurchaseControls({
                 key={`${option.wcVariationId || option.sku}-${index}`}
                 value={index}
               >
-                {option.name} · ${optionPriceForUser(option, user, activeProduct.category).toFixed(2)}
+                {option.name} · €{optionPriceForUser(option, user, activeProduct.category).toFixed(2)}
                 {option.inStock === false ? " · Out of stock" : ""}
               </option>
             ))
@@ -135,7 +135,7 @@ export default function ProductPurchaseControls({
                 {selectedOption.sku || "SKU unavailable"}
               </span>
               <strong className={`block text-[#f2f2f2] ${compact ? "text-sm" : "text-base"}`}>
-                {price == null ? "—" : `$${price.toFixed(2)}`}
+                {price == null ? "—" : `€${price.toFixed(2)}`}
               </strong>
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-white/50">
@@ -151,7 +151,7 @@ export default function ProductPurchaseControls({
               {selectedOption?.sku || (activeProduct ? "SKU unavailable" : "Loading price")}
             </span>
             <strong className={`block text-[#f2f2f2] ${compact ? "text-sm" : "text-base"}`}>
-              {price == null ? "—" : `$${price.toFixed(2)}`}
+              {price == null ? "—" : `€${price.toFixed(2)}`}
             </strong>
           </div>
 

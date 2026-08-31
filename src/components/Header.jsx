@@ -97,7 +97,7 @@ export default function Header({ onOpenLogin }) {
           >
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
             <span className="header-cart-label whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.07em]">
-              Cart · ${cartTotal.toFixed(2)}
+              Cart · €{cartTotal.toFixed(2)}
             </span>
             {cartTotalItems > 0 && (
               <span aria-hidden="true" className="header-cart-count absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold">
@@ -184,7 +184,7 @@ export default function Header({ onOpenLogin }) {
             className="header-cart-button relative flex h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded border px-3 text-[#2d2d2d] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#999933]"
           >
             <ShoppingBag className="h-[1.125rem] w-[1.125rem]" aria-hidden="true" />
-            <span className="header-cart-label hidden text-xs font-bold sm:inline">${cartTotal.toFixed(2)}</span>
+            <span className="header-cart-label hidden text-xs font-bold sm:inline">€{cartTotal.toFixed(2)}</span>
             {cartTotalItems > 0 && (
               <span aria-hidden="true" className="header-cart-count absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold">
                 {cartTotalItems}

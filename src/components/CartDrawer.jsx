@@ -147,7 +147,7 @@ export default function CartDrawer() {
 
                         <div className="flex w-full min-w-0 shrink-0 items-center justify-between gap-3 sm:w-auto sm:min-w-[100px] sm:flex-col sm:items-end">
                           <span className="font-mono text-sm font-bold text-white">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            €{(item.price * item.quantity).toFixed(2)}
                           </span>
                           <div className="flex items-center rounded-sm border border-[#727349] bg-[#262019]">
                             <button
@@ -218,7 +218,7 @@ export default function CartDrawer() {
                 {perGramRates.map(({ tableKey, label, rate }) => (
                   <div key={tableKey} className="flex items-center justify-between font-mono text-xs text-[#f2f2f2]">
                     <span>VOLUME RATE: {label}</span>
-                    <span className="font-bold">${rate.toFixed(2)}/g</span>
+                    <span className="font-bold">€{rate.toFixed(2)}/g</span>
                   </div>
                 ))}
                 <div className="my-2 h-px bg-white/5" />
@@ -227,7 +227,7 @@ export default function CartDrawer() {
                     Est. partner total
                   </span>
                   <span className="font-headline-lg text-2xl font-black text-[#f2f2f2]">
-                    ${(isLoggedIn && user ? finalTotal : cartSubtotal).toFixed(2)}
+                    €{(isLoggedIn && user ? finalTotal : cartSubtotal).toFixed(2)}
                   </span>
                 </div>
               </div>

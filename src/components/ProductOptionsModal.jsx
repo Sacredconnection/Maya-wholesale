@@ -110,7 +110,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
               >
                 {resolvedProduct.options.map((option, index) => (
                   <option key={`${option.wcVariationId || option.sku}-${index}`} value={index}>
-                    {option.name} (${optionPriceForUser(option, user, resolvedProduct.category).toFixed(2)})
+                    {option.name} (€{optionPriceForUser(option, user, resolvedProduct.category).toFixed(2)})
                   </option>
                 ))}
               </select>
@@ -119,7 +119,7 @@ export default function ProductOptionsModal({ product, user, onClose, onAddToCar
             <div className="flex flex-wrap items-end justify-between gap-4 rounded border border-white/5 bg-black/20 p-4">
               <div>
                 <span className="block text-[10px] font-mono uppercase tracking-wider text-white/40">Unit price</span>
-                <strong className="text-2xl text-[#f2f2f2]">${price?.toFixed(2)}</strong>
+                <strong className="text-2xl text-[#f2f2f2]">€{price?.toFixed(2)}</strong>
               </div>
               <div className="flex items-center rounded-sm border border-white/10 bg-[#101010]">
                 <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="cursor-pointer border-0 bg-transparent p-3 text-white/60 hover:text-white" aria-label="Decrease quantity"><Minus className="h-4 w-4" /></button>

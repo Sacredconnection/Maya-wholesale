@@ -34,7 +34,7 @@ function OrderReceivedContent() {
             {total && (
               <>
                 {" "}· Est. total:{" "}
-                <span className="text-white font-bold">${Number(total).toFixed(2)}</span>
+                <span className="text-white font-bold">€{Number(total).toFixed(2)}</span>
               </>
             )}
           </p>

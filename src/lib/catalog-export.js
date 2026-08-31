@@ -318,8 +318,8 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
     };
     row.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF2CC" } };
     row.getCell(3).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF9E8" } };
-    row.getCell(8).numFmt = '"$"#,##0.00';
-    row.getCell(9).numFmt = '"$"#,##0.00';
+    row.getCell(8).numFmt = '"€"#,##0.00';
+    row.getCell(9).numFmt = '"€"#,##0.00';
     if (includeLinks && item.productUrl) {
       row.getCell(10).value = {
         text: "Open product",
@@ -347,7 +347,7 @@ export async function exportCatalogExcel({ products, user, includeLinks }) {
   sheet.getCell(totalRow, 2).font = { bold: true };
   sheet.getCell(totalRow, 9).value = { formula: `SUM(I${firstDataRow}:I${lastDataRow})` };
   sheet.getCell(totalRow, 9).font = { bold: true, color: { argb: BRAND_RED } };
-  sheet.getCell(totalRow, 9).numFmt = '"$"#,##0.00';
+  sheet.getCell(totalRow, 9).numFmt = '"€"#,##0.00';
   sheet.autoFilter = { from: "A5", to: `J${lastDataRow}` };
   sheet.getColumn(11).hidden = true;
 
@@ -933,7 +933,7 @@ function drawGridProductCard(
 
   if (Number.isFinite(layout.price)) {
     const descriptionHeight = layout.description.lines.length * layout.description.lineHeight;
-    const priceLabel = `$${layout.price.toFixed(2)}`;
+    const priceLabel = `€${layout.price.toFixed(2)}`;
     const priceY = descriptionY + descriptionHeight + 7;
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(17);

@@ -4,8 +4,8 @@
 // ── Progressive weight-based pricing (New Customer level) ───────────────────
 // For the "New Customer" access level the price is per gram and the rate
 // improves with the TOTAL ORDER WEIGHT. Each product line has its own table:
-//   Indigenous (default): 100g+ $1.20/g · 250g+ $1.00/g · 500g+ $0.80/g · 1kg+ $0.60/g
-//   Shamanic (Maya Herbs line): 100g+ $1.00/g · 250g+ $0.90/g · 500g+ $0.70/g · 1kg+ $0.50/g
+//   Indigenous (default): 100g+ €1.20/g · 250g+ €1.00/g · 500g+ €0.80/g · 1kg+ €0.60/g
+//   Shamanic (Maya Herbs line): 100g+ €1.00/g · 250g+ €0.90/g · 500g+ €0.70/g · 1kg+ €0.50/g
 // The tier is chosen by the total order weight; the rate applied to each item
 // comes from that item's own table. Other levels use the flat role prices
 // configured per variation in WooCommerce (_role_based_pricing_rules).
@@ -47,7 +47,7 @@ const isNewCustomer = (user) => user?.role === NEW_CUSTOMER_ROLE;
 /**
  * Price shown in the catalog / product page for one option, before the cart
  * total is known. For New Customer the option's own weight sets the tier
- * (e.g. an indigenous 500g option shows 500 × $0.80 = $400); the cart then
+ * (e.g. an indigenous 500g option shows 500 × €0.80 = €400); the cart then
  * re-rates everything by the full order weight. `category` is the product's
  * top-level category, used to pick the tier table.
  */

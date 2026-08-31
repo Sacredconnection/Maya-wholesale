@@ -363,11 +363,11 @@ export default function ProductDetailPage() {
               <div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-[#f2f2f2] font-headline-lg">
-                    ${finalPrice.toFixed(2)}
+                    €{finalPrice.toFixed(2)}
                   </span>
                   {discountPercentage > 0 && (
                     <span className="text-xs font-mono text-white/40 line-through">
-                      ${basePrice.toFixed(2)}
+                      €{basePrice.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -431,7 +431,7 @@ export default function ProductDetailPage() {
                   >
                     {product.options.map((opt, idx) => (
                       <option key={opt.sku} value={idx}>
-                        {opt.name} (${optionPriceForUser(opt, user, product.category).toFixed(2)})
+                        {opt.name} (€{optionPriceForUser(opt, user, product.category).toFixed(2)})
                         {opt.inStock === false ? " · Out of stock" : ""}
                       </option>
                     ))}
@@ -613,7 +613,7 @@ export default function ProductDetailPage() {
 
                     {/* Price Range */}
                     <span className="text-[#f2f2f2] font-headline-md font-bold text-sm">
-                      ${minPrice.toFixed(2)} – ${maxPrice.toFixed(2)}
+                      €{minPrice.toFixed(2)} – €{maxPrice.toFixed(2)}
                     </span>
                   </div>
 

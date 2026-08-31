@@ -536,7 +536,7 @@ export async function POST(request) {
                 ? [{
                     key: "sc_per_gram_rate",
                     value: Object.entries(appliedRates)
-                      .map(([table, rate]) => `${table}: $${rate.toFixed(2)}/g`)
+                      .map(([table, rate]) => `${table}: €${rate.toFixed(2)}/g`)
                       .join(" · "),
                   }]
                 : []),

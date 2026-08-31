@@ -951,14 +951,14 @@ export default function CheckoutPage() {
                       <p className="truncate text-xs font-bold text-white">{item.name}</p>
                       <p className="mt-1 text-[10px] text-white/40">{item.optionName} · Qty {item.quantity}</p>
                     </div>
-                    <span className="shrink-0 text-xs font-bold text-white">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="shrink-0 text-xs font-bold text-white">€{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-5 text-xs">
-                <div className="flex justify-between text-white/50"><span>Subtotal</span><span>${cartSubtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between text-white/50"><span>Subtotal</span><span>€{cartSubtotal.toFixed(2)}</span></div>
                 {discountPercentage > 0 && (
-                  <div className="flex justify-between text-[#f2f2f2]"><span>B2B discount ({discountPercentage}%)</span><span>-${discountAmount.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-[#f2f2f2]"><span>B2B discount ({discountPercentage}%)</span><span>-€{discountAmount.toFixed(2)}</span></div>
                 )}
                 <div className="flex justify-between text-white/50">
                   <span>Est. weight</span>
@@ -967,7 +967,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-white/50"><span>Shipping</span><span>Calculated later</span></div>
                 <div className="mt-2 flex items-end justify-between border-t border-white/10 pt-4">
                   <span className="font-bold uppercase tracking-wider text-white">Estimated total</span>
-                  <span className="text-2xl font-black text-[#f2f2f2]">${finalTotal.toFixed(2)}</span>
+                  <span className="text-2xl font-black text-[#f2f2f2]">€{finalTotal.toFixed(2)}</span>
                 </div>
                 <div className="mt-3 flex items-start gap-2 rounded-sm border border-white/10 bg-[#262019] px-3 py-2.5 text-[10px] leading-relaxed text-white/60">
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />

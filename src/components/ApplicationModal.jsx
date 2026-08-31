@@ -262,10 +262,10 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     onChange={handleChange}
                     className="bg-[#131313] border border-[#3e4946] focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors appearance-none"
                   >
-                    <option value="low">Under $1,000 / month</option>
-                    <option value="medium">$1,000 - $5,000 / month</option>
-                    <option value="high">$5,000 - $20,000 / month</option>
-                    <option value="bulk">Over $20,000 / month</option>
+                    <option value="low">Under €1,000 / month</option>
+                    <option value="medium">€1,000 - €5,000 / month</option>
+                    <option value="high">€5,000 - €20,000 / month</option>
+                    <option value="bulk">Over €20,000 / month</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">

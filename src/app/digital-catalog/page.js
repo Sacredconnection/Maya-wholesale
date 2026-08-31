@@ -597,7 +597,7 @@ export default function CatalogPage() {
                   className="relative inline-flex items-center justify-center gap-2 rounded-sm border border-white/10 bg-[#1a1a1a] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:border-[#999933]/60"
                 >
                   <ShoppingBag className="h-4 w-4 text-[#f2f2f2]" aria-hidden="true" />
-                  Cart · ${cartTotal.toFixed(2)}
+                  Cart · €{cartTotal.toFixed(2)}
                   {cartTotalItems > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#cc6633] px-1 text-[10px] text-white">
                       {cartTotalItems}
