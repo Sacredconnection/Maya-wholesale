@@ -1,7 +1,19 @@
+import {
+  WORDPRESS_BACKEND_ORIGIN,
+  normalizeServiceBaseUrl,
+} from "./src/lib/deployment-urls.mjs";
+
 /** @type {import('next').NextConfig} */
 const isDevelopment = process.env.NODE_ENV === "development";
+const wordpressBaseUrl = normalizeServiceBaseUrl(
+  process.env.WOOCOMMERCE_URL || WORDPRESS_BACKEND_ORIGIN,
+  {
+    allowLocalHttp: isDevelopment,
+    name: "WOOCOMMERCE_URL",
+  }
+);
 const commerceOrigins = [
-  process.env.WOOCOMMERCE_URL || "https://wholesale.mayaherbs.com",
+  wordpressBaseUrl,
   process.env.RETAIL_WOOCOMMERCE_URL || "https://mayaherbs.com",
 ]
   .filter(Boolean)
@@ -62,8 +74,13 @@ const nextConfig = {
     return [
       {
         source: "/wp-admin/:path*",
-        destination: "https://wholesale.mayaherbs.com/wp-admin/:path*",
-        permanent: true,
+        destination: `${wordpressBaseUrl}/wp-admin/:path*`,
+        permanent: false,
+      },
+      {
+        source: "/wp-login.php",
+        destination: `${wordpressBaseUrl}/wp-login.php`,
+        permanent: false,
       },
     ];
   },

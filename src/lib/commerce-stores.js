@@ -1,5 +1,10 @@
 import "server-only";
 
+import {
+  WORDPRESS_BACKEND_ORIGIN,
+  normalizeServiceBaseUrl,
+} from "@/lib/deployment-urls.mjs";
+
 export const PRIMARY_STORE_ID = "maya-herbs";
 
 const STORE_DEFINITIONS = [
@@ -8,6 +13,7 @@ const STORE_DEFINITIONS = [
     name: "Maya Herbs",
     catalogLanguage: "en",
     urlEnv: "WOOCOMMERCE_URL",
+    defaultUrl: WORDPRESS_BACKEND_ORIGIN,
     keyEnv: "WOOCOMMERCE_CONSUMER_KEY",
     secretEnv: "WOOCOMMERCE_CONSUMER_SECRET",
   },
@@ -20,23 +26,19 @@ export function getCommerceStore(storeId = PRIMARY_STORE_ID) {
   const definition = definitionFor(storeId);
   if (!definition) throw new Error(`Unknown commerce store: ${storeId}`);
 
-  const rawUrl = (process.env[definition.urlEnv] || "").replace(/\/+$/, "");
-  if (!rawUrl) throw new Error(`${definition.urlEnv} is not configured.`);
-
-  const url = new URL(rawUrl);
-  const isLocalDevelopment =
-    process.env.NODE_ENV !== "production" &&
-    url.protocol === "http:" &&
-    ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
-  if (url.protocol !== "https:" && !isLocalDevelopment) {
-    throw new Error(`${definition.urlEnv} must use HTTPS.`);
-  }
+  const baseUrl = normalizeServiceBaseUrl(
+    process.env[definition.urlEnv] || definition.defaultUrl,
+    {
+      allowLocalHttp: process.env.NODE_ENV !== "production",
+      name: definition.urlEnv,
+    }
+  );
 
   return {
     id: definition.id,
     name: definition.name,
     catalogLanguage: definition.catalogLanguage || "",
-    baseUrl: rawUrl,
+    baseUrl,
     consumerKey: process.env[definition.keyEnv] || "",
     consumerSecret: process.env[definition.secretEnv] || "",
   };

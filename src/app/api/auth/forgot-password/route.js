@@ -1,11 +1,15 @@
-const FALLBACK_WORDPRESS_URL = "https://wholesale.mayaherbs.com";
+import {
+  WORDPRESS_BACKEND_ORIGIN,
+  wordpressBackendUrl,
+} from "@/lib/deployment-urls.mjs";
 
 export function GET() {
-  let baseUrl = FALLBACK_WORDPRESS_URL;
+  let baseUrl = WORDPRESS_BACKEND_ORIGIN;
 
   try {
-    const configuredUrl = new URL(process.env.WOOCOMMERCE_URL || FALLBACK_WORDPRESS_URL);
-    if (configuredUrl.protocol === "https:") baseUrl = configuredUrl.origin;
+    baseUrl = wordpressBackendUrl(process.env.WOOCOMMERCE_URL, {
+      allowLocalHttp: process.env.NODE_ENV !== "production",
+    });
   } catch {
     // Use the known HTTPS WordPress origin when the environment value is invalid.
   }

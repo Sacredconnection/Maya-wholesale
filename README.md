@@ -78,9 +78,18 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 The catalog is sourced exclusively from Maya Herbs. Configuration is entirely server-side through environment variables (see [.env.example](.env.example)):
 
+Production uses two separate HTTPS origins:
+
+- Public Next.js portal: `https://wholesale.mayaherbs.com`
+- WordPress/WooCommerce backend: `https://backend-wholesale.mayaherbs.com`
+
+The browser calls same-origin `/api/...` routes on the public portal. Those
+Route Handlers contact WordPress server-to-server, so the backend URL must not
+be exposed through a `NEXT_PUBLIC_` variable and browser CORS is not required.
+
 | Variable | Description |
 | --- | --- |
-| `WOOCOMMERCE_URL` | Maya Herbs WooCommerce base URL |
+| `WOOCOMMERCE_URL` | WordPress/WooCommerce backend URL: `https://backend-wholesale.mayaherbs.com` |
 | `WOOCOMMERCE_CONSUMER_KEY` | Maya Herbs REST API key with Read/Write permission |
 | `WOOCOMMERCE_CONSUMER_SECRET` | Maya Herbs REST API secret |
 | `WC_REVALIDATE_SECONDS` | Optional server-side catalog cache TTL (default `300`) |
@@ -89,7 +98,7 @@ The catalog is sourced exclusively from Maya Herbs. Configuration is entirely se
 | `TRANSACTIONAL_EMAIL_FROM` | Verified sender, for example `Maya Herbs Wholesale <wholesale@mayaherbs.com>` |
 | `TRANSACTIONAL_EMAIL_REPLY_TO` | Reply-to address for partner emails |
 | `LEAD_TIME_REQUEST_TO` | Internal sales recipient for lead-time requests (`sales@mayaherbs.com`) |
-| `PORTAL_URL` | Public portal origin used by email action buttons |
+| `PORTAL_URL` | Public portal origin used by email action buttons: `https://wholesale.mayaherbs.com` |
 | `SESSION_SECRET` | Required random secret (minimum 32 characters) used to sign authentication cookies |
 
 *   **Local dev:** copy `.env.example` to `.env.local` and fill in the Maya Herbs keys (WP Admin → WooCommerce → Settings → Advanced → REST API).
@@ -106,7 +115,7 @@ To keep the digital catalog available while the WooCommerce API is temporarily
 blocked or offline, run `npm run catalog:snapshot` after the live catalog has
 loaded once. Development automatically falls back to
 `tmp/catalog-snapshot.json`; set `CATALOG_SNAPSHOT_PATH` to use another file.
-*   **Vercel:** add all variables for Production and Preview, then redeploy.
+*   **Vercel:** set `WOOCOMMERCE_URL` to exactly `https://backend-wholesale.mayaherbs.com` and `PORTAL_URL` to exactly `https://wholesale.mayaherbs.com` for Production (and Preview when applicable). Do not use HTTP. Regenerate a WooCommerce REST API key with **Read/Write** permission if the previous `WOOCOMMERCE_CONSUMER_KEY` / `WOOCOMMERCE_CONSUMER_SECRET` pair was not preserved by the migration, then redeploy so the security policy is rebuilt with the new origin.
 
 **How it works:** [src/lib/commerce-stores.js](src/lib/commerce-stores.js) defines the server-only Maya Herbs backend. `/api/products` and `/api/catalog` load only that catalog. The cart preserves the product source, and `/api/orders` validates every item against Maya Herbs before creating the WooCommerce order. Authentication, the buyer profile, and order history remain authoritative in Maya Herbs.
 
@@ -121,7 +130,7 @@ priority over the product-level setting.
 
 PDF exports always bypass the WooCommerce data cache, so every generated file uses the published products, current variations, stock returned at generation time. When generated from an authenticated wholesale session, the PDF includes the customer's current price for each available format. Normal catalog browsing keeps the short `WC_REVALIDATE_SECONDS` cache for performance.
 
-Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://YOUR_DOMAIN/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
+Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
 
 WordPress role changes do not trigger WooCommerce's standard **Customer updated** topic. To send the approval email when an administrator changes a portal account from `pending` to an approved category:
 
@@ -129,11 +138,16 @@ WordPress role changes do not trigger WooCommerce's standard **Customer updated*
 2. Paste the contents of [`integrations/wordpress/maya-wholesale-role-webhook.php`](integrations/wordpress/maya-wholesale-role-webhook.php), excluding the opening `<?php` if WPCode already supplies it. Set the insertion method to **Auto Insert**, location to **Run Everywhere**, and activate it.
 3. In **WooCommerce → Settings → Advanced → Webhooks**, add an active webhook named `Maya Portal - Customer Approved`.
 4. Select topic **Action** and enter `woocommerce_sacred_wholesale_customer_approved` in **Action event**.
-5. Use `https://YOUR_DOMAIN/api/webhooks/woocommerce` as the delivery URL, the exact `WC_WEBHOOK_SECRET` value as the secret, and **WP REST API Integration v3** as the API version.
+5. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL, the exact `WC_WEBHOOK_SECRET` value as the secret, and **WP REST API Integration v3** as the API version.
 
 The action sends the WordPress user ID in WooCommerce's `arg` payload field. The portal then fetches the current customer, verifies that it originated in the wholesale portal and still has a pending approval marker, sends the approval email, and marks it as sent. Repeated deliveries therefore do not duplicate the email. Invalid webhook signatures are rejected.
 
 The sender domain in `TRANSACTIONAL_EMAIL_FROM` must be verified in Resend before customer emails can be delivered. Configure the email variables in Vercel before activating the customer webhooks; WooCommerce may automatically disable a webhook after repeated failed deliveries.
+
+After a domain migration, also verify that WordPress Address, Site Address,
+media URLs, and payment gateway return/callback URLs use
+`https://backend-wholesale.mayaherbs.com`. Webhook delivery stays on the public
+portal URL above because its receiver is a Next.js Route Handler.
 
 > Product route IDs combine store ID and WooCommerce slug, so equal slugs and SKUs can coexist across the two catalogs. Digital-catalog filters use real WooCommerce categories, subcategories, and product attributes, and only expose combinations that still return products.
 
