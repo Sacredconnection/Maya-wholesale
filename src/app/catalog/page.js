@@ -357,10 +357,11 @@ export default function CatalogPage() {
         const isPlantForm = ["plant-form", "plantform", "product-form"].includes(
           normalizedAttributeKey
         );
+        const isEffect = ["effects", "effect"].includes(normalizedAttributeKey);
 
         return {
           key,
-          name: isPlantForm ? "Plant Form" : name,
+          name: isPlantForm ? "Product Form" : isEffect ? "Effect" : name,
           options: [...counts.values()].sort((a, b) =>
             normalizeStr(a.value).localeCompare(normalizeStr(b.value))
           ),

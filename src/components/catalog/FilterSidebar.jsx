@@ -174,7 +174,7 @@ export default function FilterSidebar({
               onChange={(event) => updateAttribute(attribute.key, event.target.value)}
               disabled={attribute.options.length === 0}
             >
-              <option value="">All {attribute.name}</option>
+              <option value="">{attribute.name}</option>
               {attribute.options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.value} ({option.count})
