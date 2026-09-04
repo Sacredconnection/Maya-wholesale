@@ -133,3 +133,31 @@ export async function verifyWpCredentials(usernameOrEmail, password) {
   if (text.includes("<methodResponse>")) return { valid: true };
   throw new Error("Unexpected XML-RPC response from the WordPress backend.");
 }
+
+async function callPasswordRecoveryEndpoint(path, payload) {
+  const base = getWooCommerceBaseUrl();
+  const response = await fetch(`${base}/wp-json/maya-wholesale/v1/password/${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(result?.message || "Password recovery request failed.");
+    error.status = response.status;
+    throw error;
+  }
+
+  return result;
+}
+
+export function requestWordPressPasswordReset(email, clientIp = "") {
+  return callPasswordRecoveryEndpoint("forgot", { email, clientIp });
+}
+
+export function resetWordPressPassword({ login, key, password }) {
+  return callPasswordRecoveryEndpoint("reset", { login, key, password });
+}

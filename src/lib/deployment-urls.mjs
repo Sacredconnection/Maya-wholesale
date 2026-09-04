@@ -57,7 +57,5 @@ export function wordpressBackendUrl(
 }
 
 export function wordpressPasswordResetUrl() {
-  const resetUrl = new URL("/wp-login.php", PUBLIC_SITE_ORIGIN);
-  resetUrl.searchParams.set("action", "lostpassword");
-  return resetUrl.toString();
+  return new URL("/forgot-password", PUBLIC_SITE_ORIGIN).toString();
 }

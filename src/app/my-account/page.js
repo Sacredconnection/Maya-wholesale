@@ -1326,7 +1326,7 @@ export default function MyAccountPage() {
                       Password changes are handled by the secure account recovery page.
                     </p>
                     <a
-                      href="/api/auth/forgot-password"
+                      href="/forgot-password"
                       className="inline-flex text-xs font-bold text-[#f2f2f2] transition-colors hover:text-white hover:underline"
                     >
                       Open secure password management
