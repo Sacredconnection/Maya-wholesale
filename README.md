@@ -123,7 +123,7 @@ Out-of-stock formats below 250g show the short production notice (1–3 days).
 Formats of 250g or more show the bulk lead time (1–4 weeks) and allow an
 authenticated partner to send the required quantity to the sales team. The
 API reloads the current WooCommerce product before sending the email. Install
-[`maya-wholesale-admin-tools-v1.3.0.zip`](maya-wholesale-admin-tools-v1.3.0.zip)
+[`maya-wholesale-admin-tools-v1.4.0.zip`](maya-wholesale-admin-tools-v1.4.0.zip)
 in WordPress to override the automatic policy from **Product data → Inventory**
 or from an individual variation's inventory panel. A variation override takes
 priority over the product-level setting.

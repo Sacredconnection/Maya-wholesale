@@ -5,6 +5,7 @@ import {
   WORDPRESS_BACKEND_ORIGIN,
   normalizeServiceBaseUrl,
   wordpressBackendUrl,
+  wordpressPasswordResetUrl,
 } from "../src/lib/deployment-urls.mjs";
 
 test("production domains keep the public portal and WordPress backend separate", () => {
@@ -18,6 +19,13 @@ test("production domains keep the public portal and WordPress backend separate",
 
 test("WordPress falls back to the migrated HTTPS backend", () => {
   assert.equal(wordpressBackendUrl(), WORDPRESS_BACKEND_ORIGIN);
+});
+
+test("password recovery stays on the public wholesale domain", () => {
+  assert.equal(
+    wordpressPasswordResetUrl(),
+    "https://wholesale.mayaherbs.com/wp-login.php?action=lostpassword"
+  );
 });
 
 test("an external HTTP deployment value is upgraded to HTTPS", () => {
@@ -62,7 +70,7 @@ test("service URLs reject embedded request data and unsupported protocols", () =
   );
 });
 
-test("Next config upgrades the deployed HTTP value in CSP and WordPress redirects", async () => {
+test("Next config proxies password recovery while keeping wp-admin on the backend", async () => {
   const previousUrl = process.env.WOOCOMMERCE_URL;
   const previousNodeEnv = process.env.NODE_ENV;
   process.env.WOOCOMMERCE_URL =
@@ -81,10 +89,11 @@ test("Next config upgrades the deployed HTTP value in CSP and WordPress redirect
           "https://backend-wholesale.mayaherbs.com/wp-admin/:path*",
         permanent: false,
       },
+    ]);
+    assert.deepEqual(await nextConfig.rewrites(), [
       {
         source: "/wp-login.php",
         destination: "https://backend-wholesale.mayaherbs.com/wp-login.php",
-        permanent: false,
       },
     ]);
 

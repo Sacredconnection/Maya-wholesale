@@ -2,11 +2,81 @@
 /**
  * Plugin Name: Maya Herbs Wholesale Admin Tools
  * Description: Adds wholesale account approval tools and product lead-time controls for the Maya partner portal.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: Maya Herbs
  */
 
 defined( 'ABSPATH' ) || exit;
+
+const MAYA_WHOLESALE_PORTAL_ORIGIN = 'https://wholesale.mayaherbs.com';
+
+/**
+ * Keep customer password-recovery links and form submissions on the public
+ * wholesale hostname. Next.js proxies this single path to WordPress.
+ *
+ * @param string $url     Generated network site URL.
+ * @param string $path    Requested path.
+ * @param string $scheme  URL scheme context.
+ * @return string
+ */
+function maya_wholesale_public_recovery_url( $url, $path, $scheme ) {
+	if (
+		in_array( $scheme, array( 'login', 'login_post' ), true ) &&
+		preg_match( '#^wp-login\.php(?:\?|$)#', ltrim( (string) $path, '/' ) ) &&
+		preg_match( '/(?:^|[?&])action=(?:lostpassword|retrievepassword|rp|resetpass)(?:&|$)/', (string) $path )
+	) {
+		return esc_url_raw( MAYA_WHOLESALE_PORTAL_ORIGIN . '/' . ltrim( (string) $path, '/' ) );
+	}
+
+	return $url;
+}
+add_filter( 'network_site_url', 'maya_wholesale_public_recovery_url', 10, 3 );
+
+/** Send the recovery screen's "Log in" link back to the portal login modal. */
+add_filter(
+	'login_url',
+	static function ( $login_url ) {
+		$action = isset( $_REQUEST['action'] )
+			? sanitize_key( wp_unslash( $_REQUEST['action'] ) )
+			: '';
+
+		if ( in_array( $action, array( 'lostpassword', 'retrievepassword', 'rp', 'resetpass' ), true ) ) {
+			return MAYA_WHOLESALE_PORTAL_ORIGIN . '/my-account?login=1&redirect=%2Fmy-account';
+		}
+
+		return $login_url;
+	}
+);
+
+/** Permit the public portal as a target for WordPress safe redirects. */
+add_filter(
+	'allowed_redirect_hosts',
+	static function ( $hosts ) {
+		$hosts[] = wp_parse_url( MAYA_WHOLESALE_PORTAL_ORIGIN, PHP_URL_HOST );
+		return array_values( array_unique( array_filter( $hosts ) ) );
+	}
+);
+
+/** Return public storefront requests away from the headless backend hostname. */
+add_action(
+	'template_redirect',
+	static function () {
+		if (
+			is_admin() ||
+			wp_doing_ajax() ||
+			wp_doing_cron() ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+			( defined( 'WP_CLI' ) && WP_CLI ) ||
+			( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST )
+		) {
+			return;
+		}
+
+		wp_safe_redirect( MAYA_WHOLESALE_PORTAL_ORIGIN, 302, 'Maya Wholesale' );
+		exit;
+	},
+	0
+);
 
 const MAYA_WHOLESALE_LEAD_TIME_META_KEY = '_maya_lead_time_mode';
 

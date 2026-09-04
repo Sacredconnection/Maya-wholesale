@@ -55,3 +55,9 @@ export function wordpressBackendUrl(
     name: "WOOCOMMERCE_URL",
   });
 }
+
+export function wordpressPasswordResetUrl() {
+  const resetUrl = new URL("/wp-login.php", PUBLIC_SITE_ORIGIN);
+  resetUrl.searchParams.set("action", "lostpassword");
+  return resetUrl.toString();
+}

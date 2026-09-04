@@ -29,8 +29,8 @@ const commerceOrigins = [
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} ${commerceOrigins}`,
+  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ${commerceOrigins}`,
   `img-src 'self' data: blob: ${commerceOrigins}`,
   "font-src 'self' data: https://fonts.gstatic.com",
   `connect-src 'self' ${commerceOrigins}`,
@@ -77,10 +77,14 @@ const nextConfig = {
         destination: `${wordpressBaseUrl}/wp-admin/:path*`,
         permanent: false,
       },
+    ];
+  },
+
+  async rewrites() {
+    return [
       {
         source: "/wp-login.php",
         destination: `${wordpressBaseUrl}/wp-login.php`,
-        permanent: false,
       },
     ];
   },
