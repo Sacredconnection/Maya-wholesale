@@ -666,17 +666,6 @@ html [class~="before:bg-[#131313]"]::before {
   background-color: #f5f7f6 !important;
 }
 
-.maya-wholesale-banner {
-  background-image: url("/banner/maya-wholesale-cta/maya-wholesale-cta-banner-desktop.webp");
-}
-
-@media (max-width: 639px) {
-  .maya-wholesale-banner {
-    background-image: url("/banner/maya-wholesale-cta/maya-wholesale-cta-banner-mobile.webp");
-    background-position: center;
-  }
-}
-
 html [class~="text-[#f2f2f2]"],
 html [class~="text-white"] {
   color: #342f25 !important;

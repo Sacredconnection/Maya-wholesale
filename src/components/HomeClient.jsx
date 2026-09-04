@@ -8,7 +8,6 @@ import BotanicalCategories from '@/components/BotanicalCategories';
 import Onboarding from '@/components/Onboarding';
 import NGOSection from '@/components/NGOSection';
 import RetailRedirectSection from '@/components/RetailRedirectSection';
-import MayaWholesaleBanner from '@/components/MayaWholesaleBanner';
 import Footer from '@/components/Footer';
 import LoginModal from '@/components/LoginModal';
 
@@ -45,9 +44,6 @@ export default function HomeClient({ categories = [] }) {
           <NGOSection />
         </div>
       </main>
-
-      {/* Wholesale conversion banner */}
-      <MayaWholesaleBanner />
 
       {/* Footer Details */}
       <Footer />
