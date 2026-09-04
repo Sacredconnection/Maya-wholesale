@@ -113,7 +113,7 @@ function PasswordField({ id, label, value, onChange, visible }) {
         required
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-md border border-white/15 bg-[#171813] px-4 py-3.5 text-sm text-white outline-none transition focus:border-[#999933] focus:ring-2 focus:ring-[#999933]/20"
+        className="w-full rounded-md border border-white/20 bg-[#171813] px-4 py-3.5 text-sm text-white outline-none transition focus:border-[#E5E791] focus:ring-2 focus:ring-[#999933]/30"
       />
     </div>
   );

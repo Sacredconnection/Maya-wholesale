@@ -4,7 +4,7 @@ import { KeyRound, LockKeyhole } from "lucide-react";
 
 export default function PasswordRecoveryShell({ eyebrow, title, description, children }) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#171813] px-4 py-12 text-white sm:px-6">
+    <main className="brand-contrast-zone relative flex min-h-screen items-center justify-center overflow-hidden bg-[#171813] px-4 py-12 sm:px-6">
       <div
         aria-hidden="true"
         className="absolute inset-0 opacity-[0.07]"
@@ -13,7 +13,7 @@ export default function PasswordRecoveryShell({ eyebrow, title, description, chi
       <div aria-hidden="true" className="absolute -left-32 top-10 h-80 w-80 rounded-full bg-[#999933]/10 blur-3xl" />
       <div aria-hidden="true" className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-[#CC6633]/10 blur-3xl" />
 
-      <section className="relative z-10 w-full max-w-lg rounded-xl border border-white/10 bg-[#262019]/95 p-6 shadow-2xl shadow-black/40 sm:p-10">
+      <section className="relative z-10 w-full max-w-lg rounded-xl border border-white/15 bg-[#262019]/95 p-6 text-white shadow-2xl shadow-black/40 sm:p-10">
         <Link href="/" aria-label="Maya Herbs Wholesale home" className="mb-9 inline-block">
           <Image
             src="/banner/maya-wholesale/logo-maya-wholesale.svg"
@@ -30,7 +30,7 @@ export default function PasswordRecoveryShell({ eyebrow, title, description, chi
             <KeyRound className="h-4 w-4" aria-hidden="true" />
             {eyebrow}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
           <p className="mt-3 max-w-md text-sm leading-6 text-white/70">{description}</p>
         </div>
 

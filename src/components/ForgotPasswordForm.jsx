@@ -72,7 +72,7 @@ export default function ForgotPasswordForm() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="name@company.com"
-                className="w-full rounded-md border border-white/15 bg-[#171813] py-3.5 pl-11 pr-4 text-sm text-white outline-none transition focus:border-[#999933] focus:ring-2 focus:ring-[#999933]/20"
+                className="w-full rounded-md border border-white/20 bg-[#171813] py-3.5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-white/50 focus:border-[#E5E791] focus:ring-2 focus:ring-[#999933]/30"
               />
             </div>
           </div>

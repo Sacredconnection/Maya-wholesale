@@ -609,13 +609,7 @@ export default function MyAccountPage() {
 
                   <div className="h-px bg-white/10 my-6"></div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-[#131313] border border-white/5 p-4 rounded-lg flex flex-col gap-1">
-                      <span className="text-[10px] font-mono text-white/40 uppercase">Partner Discount</span>
-                      <span className="text-xl font-bold text-[#f2f2f2]">{user.discountRate}% Off Base</span>
-                      <span className="text-[10px] text-white/40 font-mono mt-0.5">Applied at wholesale checkout</span>
-                    </div>
-
+                  <div>
                     <div className="bg-[#131313] border border-white/5 p-4 rounded-lg flex flex-col gap-1">
                       <span className="text-[10px] font-mono text-white/40 uppercase">Company Status</span>
                       <span className="text-xl font-bold text-emerald-400 flex items-center gap-1.5">
