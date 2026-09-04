@@ -10,6 +10,7 @@ import { isApprovedWholesaleCustomer } from "@/lib/wc-mappers";
 import {
   isTransactionalEmailConfigured,
   sendApplicationApprovedEmail,
+  sendApplicationNotificationEmail,
   sendApplicationReceivedEmail,
 } from "@/lib/transactional-email";
 
@@ -52,17 +53,35 @@ async function handleCustomerWebhook(topic, payload) {
   }
 
   if (topic === "customer.created") {
-    const alreadySent = customerMeta(customer, "sc_pending_email_sent_at");
+    const confirmationAlreadySent = customerMeta(customer, "sc_pending_email_sent_at");
+    const notificationAlreadySent = customerMeta(
+      customer,
+      "sc_application_notification_sent_at"
+    );
     const isPending = !isApprovedWholesaleCustomer(customer);
-    if (alreadySent || !isPending) {
-      return { accepted: true, emailSent: false, reason: alreadySent ? "already-sent" : "not-pending" };
+    if (!isPending) {
+      return { accepted: true, emailSent: false, reason: "not-pending" };
     }
 
-    await sendApplicationReceivedEmail(customer);
-    await updateCustomerMeta(customer, {
-      sc_pending_email_sent_at: new Date().toISOString(),
-    });
-    return { accepted: true, emailSent: true, emailType: "application-received" };
+    const sentAt = new Date().toISOString();
+    const metaUpdates = {};
+    if (!confirmationAlreadySent) {
+      await sendApplicationReceivedEmail(customer);
+      metaUpdates.sc_pending_email_sent_at = sentAt;
+    }
+    if (!notificationAlreadySent) {
+      await sendApplicationNotificationEmail(customer);
+      metaUpdates.sc_application_notification_sent_at = sentAt;
+    }
+    if (Object.keys(metaUpdates).length) {
+      await updateCustomerMeta(customer, metaUpdates);
+    }
+    return {
+      accepted: true,
+      emailSent: Boolean(Object.keys(metaUpdates).length),
+      emailType: "application-received",
+      reason: Object.keys(metaUpdates).length ? undefined : "already-sent",
+    };
   }
 
   const approvalStatus = customerMeta(customer, "sc_approval_status");

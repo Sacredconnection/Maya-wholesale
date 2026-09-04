@@ -97,6 +97,7 @@ be exposed through a `NEXT_PUBLIC_` variable and browser CORS is not required.
 | `RESEND_API_KEY` | Resend API key used for account and lead-time emails |
 | `TRANSACTIONAL_EMAIL_FROM` | Verified sender, for example `Maya Herbs Wholesale <wholesale@mayaherbs.com>` |
 | `TRANSACTIONAL_EMAIL_REPLY_TO` | Reply-to address for partner emails |
+| `APPLICATION_NOTIFICATION_TO` | Internal recipient for new wholesale applications (defaults to `sales@mayaherbs.com`) |
 | `LEAD_TIME_REQUEST_TO` | Internal sales recipient for lead-time requests (`sales@mayaherbs.com`) |
 | `PORTAL_URL` | Public portal origin used by email action buttons: `https://wholesale.mayaherbs.com` |
 | `SESSION_SECRET` | Required random secret (minimum 32 characters) used to sign authentication cookies |

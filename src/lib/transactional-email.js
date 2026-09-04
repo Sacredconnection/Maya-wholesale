@@ -2,6 +2,7 @@ import "server-only";
 
 const DEFAULT_PORTAL_URL = "https://wholesale.mayaherbs.com";
 const DEFAULT_REPLY_TO = "info@mayaherbs.com";
+const DEFAULT_APPLICATION_NOTIFICATION_TO = "sales@mayaherbs.com";
 
 const escapeHtml = (value) =>
   String(value || "")
@@ -84,6 +85,11 @@ const emailLayout = ({ eyebrow, title, intro, body, actionLabel, actionUrl }) =>
 export function isTransactionalEmailConfigured() {
   return Boolean(process.env.RESEND_API_KEY && process.env.TRANSACTIONAL_EMAIL_FROM);
 }
+
+const applicationNotificationRecipient = () =>
+  String(
+    process.env.APPLICATION_NOTIFICATION_TO || DEFAULT_APPLICATION_NOTIFICATION_TO
+  ).trim();
 
 async function sendTransactionalEmail({ to, subject, html, text, idempotencyKey, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -213,6 +219,66 @@ export async function sendApplicationReceivedEmail(customer) {
       "We received your Maya Herbs wholesale application. Our team is reviewing your business information. " +
       "No action is required right now; we will email you again as soon as your wholesale access is approved.\n\n" +
       `Questions? Contact ${DEFAULT_REPLY_TO}.`,
+  });
+}
+
+export async function sendApplicationNotificationEmail(customer) {
+  const recipient = applicationNotificationRecipient();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+    throw new Error("Wholesale application notification recipient is invalid.");
+  }
+
+  const customerName =
+    [customer.first_name, customer.last_name].filter(Boolean).join(" ") ||
+    customer.username ||
+    customer.email;
+  const billing = customer.billing || {};
+  const metadata = customer.meta_data || [];
+  const vatNumber =
+    [...metadata]
+      .reverse()
+      .find(({ key, value }) =>
+        ["billing_vat", "vat_number", "maya_vat_number"].includes(key) && value
+      )?.value || "Not provided";
+  const address = [
+    billing.address_1,
+    billing.address_2,
+    billing.city,
+    billing.state,
+    billing.postcode,
+    billing.country,
+  ]
+    .filter(Boolean)
+    .join(", ") || "Not provided";
+  const accountId = `MAYA-WC-${customer.id}`;
+
+  return sendTransactionalEmail({
+    to: recipient,
+    replyTo: customer.email,
+    subject: `[New wholesale application] ${customerName}`,
+    idempotencyKey: `wholesale-application-notification/${customer.id}`,
+    html: emailLayout({
+      eyebrow: "New wholesale application",
+      title: "A new partner application is ready for review",
+      intro: "A business has submitted a registration through the Maya Herbs Wholesale portal.",
+      body: `
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:22px;border-collapse:collapse;background:#163731;border:1px solid #315b53;border-radius:6px;overflow:hidden;">
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;width:34%;">Partner</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;font-weight:700;">${escapeHtml(customerName)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Company</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(billing.company || "Not provided")}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Email</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(customer.email)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">VAT number</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(vatNumber)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Address</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(address)}</td></tr>
+          <tr><td style="padding:12px 16px;color:#929996;font-size:12px;border-top:1px solid #315b53;">Account</td><td style="padding:12px 16px;color:#ffffff;font-size:14px;border-top:1px solid #315b53;">${escapeHtml(accountId)}</td></tr>
+        </table>`,
+    }),
+    text:
+      "New wholesale application\n\n" +
+      `Partner: ${customerName}\n` +
+      `Company: ${billing.company || "Not provided"}\n` +
+      `Email: ${customer.email}\n` +
+      `VAT number: ${vatNumber}\n` +
+      `Address: ${address}\n` +
+      `Account: ${accountId}\n`,
   });
 }
 

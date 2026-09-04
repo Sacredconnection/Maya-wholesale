@@ -5,7 +5,10 @@ import {
   WooCommerceApiError,
 } from "@/lib/woocommerce";
 import { mapCustomerToUser, toWcAddress } from "@/lib/wc-mappers";
-import { sendApplicationReceivedEmail } from "@/lib/transactional-email";
+import {
+  sendApplicationNotificationEmail,
+  sendApplicationReceivedEmail,
+} from "@/lib/transactional-email";
 import { isSupportedCountryCode } from "@/lib/countries";
 import {
   cleanText,
@@ -119,6 +122,14 @@ export async function POST(request) {
       });
     } catch (emailError) {
       console.error("Wholesale application confirmation email failed:", emailError);
+    }
+    try {
+      await sendApplicationNotificationEmail(customer);
+      await updateCustomerMeta(customer, {
+        sc_application_notification_sent_at: new Date().toISOString(),
+      });
+    } catch (emailError) {
+      console.error("Wholesale application sales notification failed:", emailError);
     }
     return Response.json(
       { user: mapCustomerToUser(customer), confirmationEmailSent },
