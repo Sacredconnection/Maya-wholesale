@@ -136,15 +136,20 @@ PDF exports always bypass the WooCommerce data cache, so every generated file us
 
 Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
 
-WordPress role changes do not trigger WooCommerce's standard **Customer updated** topic. To send the approval email when an administrator changes a portal account from `pending` to an approved category:
+Customer roles and approval status follow these rules in Maya Wholesale Core 1.1.0:
 
-1. In **WP Admin → WPCode → Add Snippet → Add Your Custom Code**, create a PHP snippet named `Maya Wholesale - Role approval webhook`.
-2. Paste the contents of [`integrations/wordpress/maya-wholesale-role-webhook.php`](integrations/wordpress/maya-wholesale-role-webhook.php), excluding the opening `<?php` if WPCode already supplies it. Set the insertion method to **Auto Insert**, location to **Run Everywhere**, and activate it.
-3. In **WooCommerce → Settings → Advanced → Webhooks**, add an active webhook named `Maya Portal - Customer Approved`.
-4. Select topic **Action** and enter `woocommerce_sacred_wholesale_customer_approved` in **Action event**.
-5. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL, the exact `WC_WEBHOOK_SECRET` value as the secret, and **WP REST API Integration v3** as the API version.
+- New WordPress and WooCommerce accounts default to `pending` (Pending approval).
+- Assigning `customer` approves the account and synchronizes both approval metadata fields and the admin label.
+- A Pending role blocks access even if old metadata says approved.
+- Opening WordPress admin as a user who can promote users repairs up to 100 existing Customer accounts with stale pending markers per request, without sending approval emails. Repeat loading admin pages if more accounts need repair.
 
-The action sends the WordPress user ID in WooCommerce's `arg` payload field. The portal then fetches the current customer, verifies that it originated in the wholesale portal and still has a pending approval marker, sends the approval email, and marks it as sent. Repeated deliveries therefore do not duplicate the email. Invalid webhook signatures are rejected.
+Install the updated Core ZIP before deploying the portal changes so new registrations receive the Pending role before Customer starts granting access. Keep legacy Maya wholesale plugins and the old role-webhook snippet deactivated.
+
+Core 1.1.0 also routes WooCommerce account password links to the existing frontend reset form before the backend storefront redirect runs. New-account links preserve `key` and `login`; reset emails using `key` and `id` resolve the login only after validating the key. Ordinary account links open `/my-account`, and the lost-password endpoint without a key opens `/forgot-password`. Previously sent links work while their native WordPress reset keys remain valid. This updates the same `maya-wholesale-core.php` plugin; no second plugin is needed. Run the PHP regression checks with `php tests/wordpress-password-links.test.php`.
+
+WordPress role changes use the approval action already included in Core. In **WooCommerce ? Settings ? Advanced ? Webhooks**, add an active webhook named **Maya Portal - Customer Approved**, select **Action**, and enter `woocommerce_sacred_wholesale_customer_approved`. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL, the exact `WC_WEBHOOK_SECRET` value as the secret, and **WP REST API Integration v3** as the API version.
+
+The portal fetches the current customer, checks that it came from the wholesale portal and is approved, and sends the approval email only if there is no previous approval-email marker. Invalid webhook signatures are rejected.
 
 The sender domain in `TRANSACTIONAL_EMAIL_FROM` must be verified in Resend before customer emails can be delivered. Configure the email variables in Vercel before activating the customer webhooks; WooCommerce may automatically disable a webhook after repeated failed deliveries.
 

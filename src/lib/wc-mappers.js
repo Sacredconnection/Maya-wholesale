@@ -282,6 +282,10 @@ const customerMeta = (customer, key) => {
 export function isApprovedWholesaleCustomer(customer) {
   if (!customer) return false;
 
+  const role = String(customer.role || "").toLowerCase();
+  if (["pending", "pending_approval"].includes(role)) return false;
+  if (role === "customer") return true;
+
   const approvalStatus = String(
     customerMeta(customer, "maya_account_status") ||
       customerMeta(customer, "sc_approval_status") ||
@@ -291,7 +295,7 @@ export function isApprovedWholesaleCustomer(customer) {
   if (["pending", "pending_approval"].includes(approvalStatus)) return false;
   if (approvalStatus === "approved") return true;
 
-  return !["pending", "customer"].includes((customer.role || "").toLowerCase());
+  return Boolean(role);
 }
 
 // Maps a WooCommerce customer to the user shape the UI stores in AuthContext.

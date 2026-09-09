@@ -84,14 +84,15 @@ async function handleCustomerWebhook(topic, payload) {
     };
   }
 
-  const approvalStatus = customerMeta(customer, "sc_approval_status");
-  if (approvalStatus !== "pending" || !isApprovedWholesaleCustomer(customer)) {
+  if (customerMeta(customer, "sc_approval_email_sent_at") || !isApprovedWholesaleCustomer(customer)) {
     return { accepted: true, emailSent: false, reason: "no-pending-approval-transition" };
   }
 
   await sendApplicationApprovedEmail(customer);
   await updateCustomerMeta(customer, {
     sc_approval_status: "approved",
+    maya_account_status: "approved",
+    maya_account_status_label: "Approved",
     sc_approval_email_role: customer.role || "",
     sc_approval_email_sent_at: new Date().toISOString(),
   });

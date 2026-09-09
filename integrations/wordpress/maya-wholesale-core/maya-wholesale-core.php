@@ -2,11 +2,64 @@
 /**
  * Plugin Name: Maya Wholesale Core
  * Description: Provides wholesale approvals, product lead-time controls, registration compatibility, webhooks, and branded password recovery.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Maya Herbs
  */
 
 defined( 'ABSPATH' ) || exit;
+
+/** New accounts await review; assigning Customer is an approval decision. */
+add_action( 'init', static function () {
+	add_role( 'pending', 'Pending approval', array( 'read' => true ) );
+} );
+add_filter( 'pre_option_default_role', static function () { return 'pending'; } );
+add_filter( 'woocommerce_new_customer_data', static function ( $data ) {
+	$data['role'] = 'pending';
+	return $data;
+} );
+// WooCommerce writes the object's role again after creating the WP user.
+add_filter( 'woocommerce_update_customer_args', static function ( $args, $customer ) {
+	if ( array_key_exists( 'role', $args ) ) {
+		$args['role'] = 'pending';
+		$customer->set_role( 'pending' );
+	}
+	return $args;
+}, 10, 2 );
+
+/** Keep the legacy column and portal metadata aligned with explicit roles. */
+function maya_wholesale_core_sync_approval( $user_id ) {
+	$user = get_userdata( $user_id );
+	if ( ! $user ) {
+		return;
+	}
+	$is_pending = (bool) array_intersect( array( 'pending', 'pending_approval' ), $user->roles );
+	if ( ! $is_pending && ! in_array( 'customer', $user->roles, true ) ) {
+		return;
+	}
+	update_user_meta( $user_id, 'sc_approval_status', $is_pending ? 'pending' : 'approved' );
+	update_user_meta( $user_id, 'maya_account_status', $is_pending ? 'pending_approval' : 'approved' );
+	update_user_meta( $user_id, 'maya_account_status_label', $is_pending ? 'Pending approval' : 'Approved' );
+}
+add_action( 'user_register', 'maya_wholesale_core_sync_approval', 20 );
+add_action( 'add_user_role', 'maya_wholesale_core_sync_approval', 20 );
+add_action( 'remove_user_role', 'maya_wholesale_core_sync_approval', 20 );
+
+/** Repair old Customer markers in bounded batches without sending emails. */
+add_action( 'admin_init', static function () {
+	if ( ! current_user_can( 'promote_users' ) ) {
+		return;
+	}
+	$customers = get_users( array(
+		'role' => 'customer',
+		'role__not_in' => array( 'pending', 'pending_approval' ),
+		'number' => 100,
+		'fields' => 'ID',
+		'meta_query' => maya_wholesale_core_pending_meta_query(),
+	) );
+	foreach ( $customers as $user_id ) {
+		maya_wholesale_core_sync_approval( $user_id );
+	}
+} );
 
 const MAYA_WHOLESALE_CORE_PORTAL_ORIGIN = 'https://wholesale.mayaherbs.com';
 
@@ -40,6 +93,40 @@ function maya_wholesale_core_public_recovery_url( $url, $path, $scheme ) {
 	);
 }
 add_filter( 'network_site_url', 'maya_wholesale_core_public_recovery_url', 10, 3 );
+
+/**
+ * Keep WooCommerce new-account and reset emails usable on the headless site.
+ * New-account links use key/login; reset emails can use key/id instead.
+ * The frontend still validates the one-time key when saving the password.
+ */
+function maya_wholesale_core_account_redirect_url( $args, $is_account, $is_lost_password ) {
+	$origin = MAYA_WHOLESALE_CORE_PORTAL_ORIGIN;
+	if ( ! $is_account && ! $is_lost_password ) {
+		return $origin;
+	}
+
+	$key = isset( $args['key'] ) && is_string( $args['key'] ) ? $args['key'] : '';
+	$login = isset( $args['login'] ) && is_string( $args['login'] ) ? $args['login'] : '';
+	if ( '' !== $key ) {
+		if ( '' === $login && isset( $args['id'] ) && is_scalar( $args['id'] ) && ctype_digit( (string) $args['id'] ) ) {
+			$user = get_user_by( 'id', (int) $args['id'] );
+			// Do not disclose a username from a guessed user ID and invalid key.
+			if ( $user && ! is_wp_error( check_password_reset_key( $key, $user->user_login ) ) ) {
+				$login = $user->user_login;
+			}
+		}
+		if ( '' !== $login ) {
+			return add_query_arg( array( 'key' => $key, 'login' => $login ), $origin . '/reset-password' );
+		}
+		return $origin . '/reset-password';
+	}
+
+	$action = isset( $args['action'] ) && is_string( $args['action'] ) ? $args['action'] : '';
+	if ( $is_lost_password || in_array( $action, array( 'newaccount', 'lostpassword', 'rp', 'resetpass' ), true ) ) {
+		return $origin . '/forgot-password';
+	}
+	return $origin . '/my-account';
+}
 
 /** Apply a small persistent throttle to public password-recovery requests. */
 function maya_wholesale_core_password_rate_limited( $bucket, $limit, $window ) {
@@ -146,10 +233,16 @@ add_action(
 			return;
 		}
 
-		wp_safe_redirect( MAYA_WHOLESALE_CORE_PORTAL_ORIGIN, 302, 'Maya Wholesale' );
+		$destination = maya_wholesale_core_account_redirect_url(
+			wp_unslash( $_GET ),
+			function_exists( 'is_account_page' ) && is_account_page(),
+			function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'lost-password' )
+		);
+		nocache_headers();
+		wp_safe_redirect( $destination, 302, 'Maya Wholesale' );
 		exit;
 	},
-	0
+	-1
 );
 
 const MAYA_WHOLESALE_CORE_LEAD_TIME_META_KEY = '_maya_lead_time_mode';
@@ -438,8 +531,9 @@ add_action(
 	static function ( $user_id, $role, $old_roles ) {
 		$user_id = absint( $user_id );
 		$role    = strtolower( sanitize_key( $role ) );
+		maya_wholesale_core_sync_approval( $user_id );
 
-		if ( 0 === $user_id || in_array( $role, array( 'pending', 'customer' ), true ) ) {
+		if ( 0 === $user_id || '' === $role || in_array( $role, array( 'pending', 'pending_approval' ), true ) ) {
 			return;
 		}
 
