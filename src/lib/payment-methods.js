@@ -6,13 +6,10 @@ export const MANUAL_BANK_TRANSFER = Object.freeze({
   referenceInstruction:
     "Your Order Number will be generated after you submit the order. Use it as the payment reference.",
   accountName: "Maya World Trading B.V.",
-  accountDetails: "NL79 TRIO 0391 0734 19",
-  bankName: "Triodos Bank",
-  bankAddress: [
-    "De Reehorst, Hoofdstraat 10",
-    "3972 LA Driebergen-Rijsenburg",
-    "The Netherlands",
-  ],
+  accountDetails: "NL11 INGB 0007 9517 851",
+  bankName: "ING Bank1",
+  bic: "INGBNL2A1",
+  bankAddress: [],
   companyAddress: [
     "Maya World Trading BV",
     "Mollerusweg 66",
@@ -36,9 +33,9 @@ export const bankTransferOrderNote = () => {
     method.description,
     method.referenceInstruction,
     `Account Name: ${method.accountName}`,
-    `Account Details: ${method.accountDetails}`,
+    `IBAN: ${method.accountDetails}`,
     `Bank Name: ${method.bankName}`,
-    `Bank Address: ${method.bankAddress.join(", ")}`,
+    `BIC: ${method.bic}`,
     `Company Address: ${method.companyAddress.join(", ")}`,
   ].join("\n");
 };

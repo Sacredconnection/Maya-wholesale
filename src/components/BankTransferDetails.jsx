@@ -19,6 +19,7 @@ function AddressBlock({ title, lines, icon: Icon }) {
 
 export default function BankTransferDetails({ showTitle = true, orderReference = "" }) {
   const method = MANUAL_BANK_TRANSFER;
+  const hasBankAddress = Array.isArray(method.bankAddress) && method.bankAddress.length > 0;
   const referenceInstruction = orderReference
     ? `Use ${orderReference} as the payment reference.`
     : method.referenceInstruction;
@@ -53,7 +54,7 @@ export default function BankTransferDetails({ showTitle = true, orderReference =
         </div>
       </div>
 
-      <dl className="brand-contrast-zone grid gap-3 rounded-lg border border-white/15 bg-[#262019] p-4 text-xs sm:grid-cols-3">
+      <dl className={`brand-contrast-zone grid gap-3 rounded-lg border border-white/15 bg-[#262019] p-4 text-xs ${method.bic ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
         <div>
           <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
             Account Name
@@ -62,7 +63,7 @@ export default function BankTransferDetails({ showTitle = true, orderReference =
         </div>
         <div>
           <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
-            Account Details
+            IBAN
           </dt>
           <dd className="mt-1 font-mono font-bold text-white">{method.accountDetails}</dd>
         </div>
@@ -72,10 +73,20 @@ export default function BankTransferDetails({ showTitle = true, orderReference =
           </dt>
           <dd className="mt-1 font-bold text-white">{method.bankName}</dd>
         </div>
+        {method.bic && (
+          <div>
+            <dt className="text-[9px] font-black uppercase tracking-wider text-white/60">
+              BIC / SWIFT
+            </dt>
+            <dd className="mt-1 font-mono font-bold text-white">{method.bic}</dd>
+          </div>
+        )}
       </dl>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <AddressBlock title="Bank address" lines={method.bankAddress} icon={Landmark} />
+      <div className={`grid gap-3 ${hasBankAddress ? "sm:grid-cols-2" : ""}`}>
+        {hasBankAddress && (
+          <AddressBlock title="Bank address" lines={method.bankAddress} icon={Landmark} />
+        )}
         <AddressBlock title="Company address" lines={method.companyAddress} icon={Building2} />
       </div>
     </div>
