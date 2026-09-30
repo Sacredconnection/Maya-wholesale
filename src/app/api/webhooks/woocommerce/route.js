@@ -52,7 +52,19 @@ async function handleCustomerWebhook(topic, payload) {
     return { accepted: true, emailSent: false, reason: "not-wholesale-registration" };
   }
 
-  if (topic === "customer.created") {
+  const approved = isApprovedWholesaleCustomer(customer);
+  if (topic === "customer.created" && approved) {
+    return { accepted: true, emailSent: false, reason: "not-pending" };
+  }
+  if ((topic === "customer.created" || topic === "customer.updated") && !approved) {
+    const statuses = ["sc_approval_status", "maya_account_status", "pw_user_status"]
+      .map((key) => String(customerMeta(customer, key) || "").trim().toLowerCase())
+      .filter(Boolean);
+    const pending = ["pending", "pending_approval"].includes(customer.role) ||
+      statuses.some((status) => ["pending", "pending_approval"].includes(status));
+    if (!pending || statuses.some((status) => !["approved", "pending", "pending_approval"].includes(status))) {
+      return { accepted: true, emailSent: false, reason: "not-pending" };
+    }
     const confirmationAlreadySent = customerMeta(customer, "sc_pending_email_sent_at");
     const notificationAlreadySent = customerMeta(
       customer,
@@ -68,13 +80,12 @@ async function handleCustomerWebhook(topic, payload) {
     if (!confirmationAlreadySent) {
       await sendApplicationReceivedEmail(customer);
       metaUpdates.sc_pending_email_sent_at = sentAt;
+      await updateCustomerMeta(customer, { sc_pending_email_sent_at: sentAt });
     }
     if (!notificationAlreadySent) {
       await sendApplicationNotificationEmail(customer);
       metaUpdates.sc_application_notification_sent_at = sentAt;
-    }
-    if (Object.keys(metaUpdates).length) {
-      await updateCustomerMeta(customer, metaUpdates);
+      await updateCustomerMeta(customer, { sc_application_notification_sent_at: sentAt });
     }
     return {
       accepted: true,

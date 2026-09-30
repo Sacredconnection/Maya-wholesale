@@ -30,6 +30,7 @@ import {
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 import styles from "./checkout.module.css";
+import { calculateDiscountedLines } from "@/lib/order-totals.mjs";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -349,7 +350,6 @@ export default function CheckoutPage() {
     clearCart,
     removeItemsByStore,
     setIsCartOpen,
-    cartSubtotal,
     cartTotalItems,
     cartTotalWeightGrams,
   } = useCart();
@@ -449,9 +449,15 @@ export default function CheckoutPage() {
 
   if (loading || !isLoggedIn || !user) return <AuthGate loading={loading} />;
 
-  const discountPercentage = user.discountRate || 0;
-  const discountAmount = cartSubtotal * (discountPercentage / 100);
-  const finalTotal = cartSubtotal - discountAmount;
+  const {
+    subtotal: cartSubtotal,
+    discountRate: discountPercentage,
+    discount: discountAmount,
+    total: finalTotal,
+  } = calculateDiscountedLines(
+    cart.map((item) => item.price * item.quantity),
+    user.discountRate
+  );
   const effectiveBillingAddress = billingMatchesShipping ? shippingAddress : billingAddress;
 
   const validateAddress = (address) =>

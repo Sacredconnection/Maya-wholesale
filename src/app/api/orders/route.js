@@ -43,6 +43,7 @@ import {
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 import { createHash } from "node:crypto";
+import { calculateDiscountedLines } from "@/lib/order-totals.mjs";
 
 const ORDER_CUSTOMER_NOTE =
   process.env.WHOLESALE_ORDER_NOTE?.replace(/\\n/g, "\n").trim() ||
@@ -92,6 +93,8 @@ const mapOrderForClient = (order, store) => ({
 const productCanFulfill = (product, quantity) =>
   Boolean(
     product &&
+      (!product.status || product.status === "publish") &&
+      product.type !== "variable" &&
       product.purchasable !== false &&
       product.stock_status !== "outofstock" &&
       (product.stock_quantity == null ||
@@ -341,6 +344,7 @@ export async function POST(request) {
             getVariation(storeId, requestedProductId, requestedVariationId),
             getParentProduct(storeId, requestedProductId),
           ]);
+          if (parentProduct.status !== "publish") return { unavailable: `${store.name}: unavailable product` };
           payload = variation;
           productId = requestedProductId;
           variationId = requestedVariationId;
@@ -355,9 +359,9 @@ export async function POST(request) {
             payload = found;
             productId = found.parent_id || found.id;
             variationId = found.parent_id ? found.id : null;
-            categories = variationId
-              ? (await getParentProduct(storeId, productId)).categories
-              : found.categories;
+            const parent = variationId ? await getParentProduct(storeId, productId) : found;
+            if (parent.status !== "publish") return { unavailable: `${store.name}: unavailable product` };
+            categories = parent.categories;
           }
         }
 
@@ -484,7 +488,7 @@ export async function POST(request) {
     const creationResults = await Promise.allSettled(
       storesInOrder.map(async (store) => {
         const appliedRates = {};
-        const lineItems = entriesByStore.get(store.id).map((entry) => {
+        const pricedEntries = entriesByStore.get(store.id).map((entry) => {
           const rate = isProgressive
             ? progressivePerGramRate(totalWeightGrams, entry.tableKey)
             : null;
@@ -495,13 +499,21 @@ export async function POST(request) {
                 ? entry.rolePrice
                 : entry.basePrice;
           if (rate != null && entry.weightGrams > 0) appliedRates[entry.tableKey] = rate;
-          const lineTotal = (unitPrice * entry.quantity).toFixed(2);
+          if (!Number.isFinite(unitPrice) || unitPrice < 0) throw new Error("Invalid authoritative price.");
+          return { entry, amount: unitPrice * entry.quantity };
+        });
+        const totals = calculateDiscountedLines(
+          pricedEntries.map(({ amount }) => amount),
+          customer.discountRate
+        );
+        const lineItems = pricedEntries.map(({ entry }, index) => {
+          const line = totals.lines[index];
           return {
             product_id: entry.productId,
             ...(entry.variationId ? { variation_id: entry.variationId } : {}),
             quantity: entry.quantity,
-            subtotal: lineTotal,
-            total: lineTotal,
+            subtotal: line.subtotal.toFixed(2),
+            total: line.total.toFixed(2),
           };
         });
 
@@ -541,8 +553,8 @@ export async function POST(request) {
                   }]
                 : []),
               ...(customer.accountId ? [{ key: "sc_account_id", value: String(customer.accountId) }] : []),
-              ...(customer.discountRate
-                ? [{ key: "sc_discount_rate", value: String(customer.discountRate) }]
+              ...(totals.discountRate
+                ? [{ key: "sc_discount_rate", value: String(totals.discountRate) }]
                 : []),
             ],
           },
