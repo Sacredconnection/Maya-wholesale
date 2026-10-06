@@ -4,6 +4,7 @@
 // Keeping this provider above the pages lets /catalog reuse the loaded data.
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { organizeCatalogProduct } from "@/lib/catalog-organization.mjs";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 
@@ -40,6 +41,7 @@ export function ProductsProvider({ children }) {
           if (response.status === 401) invalidateSession();
           throw new Error(data.error || "Could not load product options.");
         }
+        data.product = organizeCatalogProduct(data.product);
         setProducts((currentProducts) =>
           currentProducts.map((entry) => (entry.id === data.product.id ? data.product : entry))
         );
@@ -102,7 +104,7 @@ export function ProductsProvider({ children }) {
           throw new Error(data.error || "Could not load the Maya Herbs catalog.");
         }
         if (!cancelled) {
-          setProducts(Array.isArray(data.products) ? data.products : []);
+          setProducts(Array.isArray(data.products) ? data.products.map(organizeCatalogProduct) : []);
         }
       } catch (catalogError) {
         if (!cancelled) {

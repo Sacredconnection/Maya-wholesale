@@ -1,3 +1,5 @@
+import { enforceRateLimit } from "@/lib/auth-rate-limit";
+import { customerMeta } from "@/lib/wholesale-approval.mjs";
 import { verifyWpCredentials } from "@/lib/wp-auth";
 import { getCustomerByEmail, isWooCommerceConfigured } from "@/lib/woocommerce";
 import { isApprovedWholesaleCustomer, mapCustomerToUser } from "@/lib/wc-mappers";
@@ -41,6 +43,9 @@ export async function POST(request) {
 
   if (!isWooCommerceConfigured()) return securityError("Authentication backend unavailable.", 503);
 
+  const rateError = await enforceRateLimit(request, "login", email);
+  if (rateError) return rateError;
+
   let authenticationStage = "WordPress credential verification";
   try {
     const { valid } = await verifyWpCredentials(email, password);
@@ -58,7 +63,7 @@ export async function POST(request) {
 
     const user = mapCustomerToUser(customer);
     authenticationStage = "session creation";
-    await createSession({ email: user.email, customerId: customer.id });
+    await createSession({ email: user.email, customerId: customer.id, sessionVersion: String(customerMeta(customer, "sc_session_version") || "") });
     return Response.json({ user }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     console.error(`POST /api/auth/login failed during ${authenticationStage}:`, err);

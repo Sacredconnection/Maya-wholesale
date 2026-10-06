@@ -43,14 +43,7 @@ function OrderReceivedContent() {
 
       <div className="flex w-full max-w-2xl flex-col gap-5 rounded-xl border border-[#999933]/35 bg-[#1a1a1a] p-5 text-left sm:p-8">
         <BankTransferDetails orderReference={orderSummary || (orderNumber ? `#${orderNumber}` : "")} />
-        {(orderSummary || orderNumber) && (
-          <div className="rounded-lg border border-[#999933]/35 bg-[#999933]/10 px-4 py-3 text-xs leading-relaxed text-white/70">
-            Payment reference:{" "}
-            <strong className="font-mono text-white">
-              {orderSummary || `#${orderNumber}`}
-            </strong>
-          </div>
-        )}
+
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">

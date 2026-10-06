@@ -1,44 +1,16 @@
+export const ORDER_CONFIRMATION = "Thank you for your wholesale order. Our sales team will confirm product availability and shipping terms, then send your invoice with payment instructions. Please wait for the invoice before making any payment. Once payment is received, we will arrange shipment of your order.";
+export const ORDER_STEPS = Object.freeze([
+  "Submit your wholesale order.",
+  "Our sales team reviews your details and product availability.",
+  "We confirm your order and shipping terms, then send your invoice.",
+  "Pay using the instructions on your invoice.",
+  "We ship your products after receiving payment.",
+]);
 export const MANUAL_BANK_TRANSFER = Object.freeze({
   id: "bacs",
-  title: "Manual bank transfer",
-  description:
-    "Make your payment directly into our bank account. Your order will be shipped as soon as the funds have cleared in our account.",
-  referenceInstruction:
-    "Your Order Number will be generated after you submit the order. Use it as the payment reference.",
-  accountName: "Maya World Trading B.V.",
-  accountDetails: "NL79 TRIO 0391 0734 19",
-  bankName: "Triodos Bank",
-  bankAddress: [
-    "De Reehorst, Hoofdstraat 10",
-    "3972 LA Driebergen-Rijsenburg",
-    "The Netherlands",
-  ],
-  companyAddress: [
-    "Maya World Trading BV",
-    "Mollerusweg 66",
-    "2031 BZ, Haarlem",
-    "The Netherlands",
-  ],
+  title: "Manual bank transfer after receiving the invoice",
+  description: "Please wait for your invoice before making any payment. Payment instructions will be included in the invoice.",
 });
-
-export const BUNQ_CARD_PAYMENT = Object.freeze({
-  id: "bunq_payment_2000",
-  title: "Credit or debit card",
-  provider: "Bunq Payment 2000",
-  description:
-    "Pay securely by card on the WooCommerce payment page. Card details are never entered or stored on this wholesale portal.",
-});
-
-export const bankTransferOrderNote = () => {
-  const method = MANUAL_BANK_TRANSFER;
-  return [
-    method.title,
-    method.description,
-    method.referenceInstruction,
-    `Account Name: ${method.accountName}`,
-    `Account Details: ${method.accountDetails}`,
-    `Bank Name: ${method.bankName}`,
-    `Bank Address: ${method.bankAddress.join(", ")}`,
-    `Company Address: ${method.companyAddress.join(", ")}`,
-  ].join("\n");
-};
+// Retained for historical records; new wholesale orders use invoice payment.
+export const BUNQ_CARD_PAYMENT = Object.freeze({ id: "bunq_payment_2000", title: "Credit or debit card", provider: "Bunq Payment 2000" });
+export const bankTransferOrderNote = () => "Payment method: " + MANUAL_BANK_TRANSFER.title + ". " + MANUAL_BANK_TRANSFER.description;

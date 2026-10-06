@@ -8,14 +8,15 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
-import ProductPurchaseControls from "@/components/ProductPurchaseControls";
-import ShelfToggleButton from "@/components/ShelfToggleButton";
+import ProductCard from "@/components/catalog/ProductCard";
+import { compareCategories, compareCatalogProducts } from "@/lib/catalog-organization.mjs";
+
 import AuthGate from "@/components/AuthGate";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import { useAuth } from "@/components/AuthContext";
 import { useCart } from "@/components/CartContext";
 import {
-  ShoppingBag,
+  Bookmark,
   Trash2,
   X,
   Check,
@@ -24,18 +25,17 @@ import {
   Download,
   FileSpreadsheet,
   Info,
-  LoaderCircle,
   PackageOpen,
   Upload,
 } from "lucide-react";
 
 import { useProducts } from "@/components/ProductsContext";
-import { getEthnicityColor } from "@/lib/ethnicity-colors";
-import { productImageForOption } from "@/lib/product-images";
+
+
 import {
-  downloadDigitalCatalogPdf,
   exportCatalogExcel,
 } from "@/lib/catalog-export";
+import { productImageForOption } from "@/lib/product-images";
 import { readCatalogOrderWorkbook } from "@/lib/catalog-order-workbook";
 
 // Normalize string for accent-insensitive comparison
@@ -96,7 +96,7 @@ function CatalogActionInfo({ id, label, children }) {
       <span
         id={id}
         role="tooltip"
-        className="catalog-primary-action pointer-events-none absolute bottom-[calc(100%+0.65rem)] right-0 z-30 w-64 rounded-md border border-[#999A61] bg-[#262019] px-3 py-2.5 text-left text-[11px] font-medium normal-case leading-relaxed tracking-normal opacity-0 shadow-xl shadow-black/25 transition-opacity group-hover/info:opacity-100 group-focus-within/info:opacity-100"
+        className="catalog-primary-action pointer-events-none absolute bottom-[calc(100%+0.65rem)] right-0 z-30 w-64 rounded-md border border-[#999A61] bg-[#1a1a1a] px-3 py-2.5 text-left text-[11px] font-medium normal-case leading-relaxed tracking-normal opacity-0 shadow-xl shadow-black/25 transition-opacity group-hover/info:opacity-100 group-focus-within/info:opacity-100"
       >
         {children}
       </span>
@@ -108,11 +108,9 @@ export default function CatalogPage() {
   const router = useRouter();
   const { products, loading: productsLoading, error: productsError, warning: productsWarning, reload } = useProducts();
   const { isLoggedIn, user, loading: authLoading } = useAuth();
-  const { setIsCartOpen, addSelectionsToCart, cartTotalItems } = useCart();
+  const { setIsCartOpen, addSelectionsToCart } = useCart();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [excelBusy, setExcelBusy] = useState(false);
-  const [pdfBusy, setPdfBusy] = useState(false);
-  const [selectedProductImages, setSelectedProductImages] = useState({});
   const [importItems, setImportItems] = useState([]);
   const [isImportReviewOpen, setIsImportReviewOpen] = useState(false);
   const importInputRef = useRef(null);
@@ -126,7 +124,7 @@ export default function CatalogPage() {
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   // Read URL query parameters to set initial category, tribe and page filters.
   // Resolve accent-insensitively against actual data so URL params always match.
@@ -222,9 +220,7 @@ export default function CatalogPage() {
         const key = normalizeStr(product.category);
         if (key && !seen.has(key)) seen.set(key, product.category);
       });
-    const unique = [...seen.values()].sort((a, b) =>
-      normalizeStr(a).localeCompare(normalizeStr(b))
-    );
+    const unique = [...seen.values()].sort(compareCategories);
     return ["All", ...unique];
   }, [attributeFilters, childCategory, products, subcategory]);
 
@@ -248,9 +244,7 @@ export default function CatalogPage() {
           seen.set(key, value);
         }
       });
-    return [...seen.values()].sort((a, b) =>
-      normalizeStr(a).localeCompare(normalizeStr(b))
-    );
+    return [...seen.values()].sort(compareCategories);
   }, [attributeFilters, category, childCategory, products]);
 
   const childCategories = useMemo(() => {
@@ -297,7 +291,7 @@ export default function CatalogPage() {
           normalizeStr(product.childCategory) === normChildCategory;
         return matchesSearch && matchesCategory && matchesSubcategory && matchesChildCategory;
       })
-      .sort((a, b) => normalizeStr(a.name).localeCompare(normalizeStr(b.name)));
+      .sort(compareCatalogProducts);
   }, [products, search, category, subcategory, childCategory]);
 
   const { availableAttributes, compoundFilteredProducts } = useMemo(() => {
@@ -394,7 +388,7 @@ export default function CatalogPage() {
       startIndex,
       startIndex + itemsPerPage
     );
-  }, [compoundFilteredProducts, currentPage]);
+  }, [compoundFilteredProducts, currentPage, itemsPerPage]);
 
   const totalPages =
     Math.ceil(compoundFilteredProducts.length / itemsPerPage) || 1;
@@ -429,21 +423,16 @@ export default function CatalogPage() {
 
   const exportExcel = async () => {
     setExcelBusy(true);
-    try { await exportCatalogExcel({ products: compoundFilteredProducts, user, includeLinks: true }); }
+    try {
+      const response = await fetch("/api/catalog?export=true", { credentials: "same-origin", cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "The workbook could not be prepared.");
+      const ids = new Set(compoundFilteredProducts.map(product => product.id));
+      await exportCatalogExcel({ products: data.products.filter(product => ids.has(product.id)), user, includeLinks: true });
+    } catch (error) { window.alert(error.message || "The workbook could not be generated."); }
     finally { setExcelBusy(false); }
   };
 
-  const downloadPdf = async () => {
-    if (pdfBusy) return;
-    setPdfBusy(true);
-    try {
-      await downloadDigitalCatalogPdf({ includePrices: true, user });
-    } catch (error) {
-      window.alert(error.message || "The PDF catalog could not be generated.");
-    } finally {
-      setPdfBusy(false);
-    }
-  };
 
   const importExcel = async (event) => {
     const file = event.target.files?.[0]; event.target.value = "";
@@ -451,14 +440,18 @@ export default function CatalogPage() {
     setExcelBusy(true);
     try {
       const rows = await readCatalogOrderWorkbook(file);
+      const response = await fetch("/api/catalog?export=true", { credentials: "same-origin", cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "The current catalog could not be checked.");
+      const currentProducts = data.products || [];
       const selections = rows.flatMap(({ storeId, sku, quantity }) => {
-        const product = products.find((item) => String(item.storeId || "maya-herbs") === storeId && item.options?.some((option) => option.sku === sku));
+        const product = currentProducts.find((item) => String(item.storeId || "maya-herbs") === storeId && item.options?.some((option) => option.sku === sku));
         const optionIndex = product?.options?.findIndex((option) => option.sku === sku) ?? -1;
         return product && optionIndex >= 0 && product.options[optionIndex].inStock !== false
           ? [{ product, optionIndex, quantity }]
           : [];
       });
-      if (!selections.length) throw new Error("No current products were found in this workbook.");
+      if (selections.length !== rows.length) throw new Error("Some spreadsheet products are unavailable or their SKU has changed. Download a new workbook and review those lines before importing; no items have been added.");
       setImportItems(selections);
       setIsImportReviewOpen(true);
     } catch (error) { window.alert(error.message || "The Excel file could not be imported."); }
@@ -481,10 +474,8 @@ export default function CatalogPage() {
     setIsImportReviewOpen(false);
   };
 
-  // Catalog is partner-only: block until authenticated
-  if (authLoading || !isLoggedIn) {
-    return <AuthGate loading={authLoading} />;
-  }
+  if (authLoading) return <AuthGate key="loading" loading />;
+  if (!isLoggedIn) return <AuthGate key="login" openLogin />;
 
   return (
     <div id="top" className="site-background-page bg-[#25362D] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">
@@ -504,23 +495,16 @@ export default function CatalogPage() {
               <span className="block sm:whitespace-nowrap">Product Catalog</span>
             </h1>
             <p className="mt-3 max-w-sm font-body-md text-base leading-relaxed text-white/70">
-              Explore our current wholesale assortment. Approved partners can view their pricing and build an order.
+              Order online by choosing sizes and quantities below, or prepare your order in Excel. Create Catalog makes a separate PDF for saving, sharing or printing. Sacred Snuff is our own Hapé brand.
             </p>
           </div>
 
-          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid w-full gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <input ref={importInputRef} type="file" accept=".xlsx" className="sr-only" onChange={importExcel} />
             <div className="relative">
-              <button type="button" disabled={pdfBusy} onClick={downloadPdf} className={catalogActionClass}>
-                {pdfBusy ? (
-                  <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-[#E5E791]" aria-hidden="true" />
-                ) : (
-                  <Download className="h-4 w-4 shrink-0 text-[#E5E791]" aria-hidden="true" />
-                )}
-                {pdfBusy ? "Generating PDF" : "PDF Catalog"}
-              </button>
+<Link href="/digital-catalog" className={catalogActionClass}><Download className="h-4 w-4" aria-hidden="true" /> Create Catalog</Link>
               <CatalogActionInfo id="pdf-catalog-info" label="PDF Catalog">
-                Download a printable PDF with the current wholesale assortment.
+                Choose products or categories and generate a detailed PDF catalog or a compact price list.
               </CatalogActionInfo>
             </div>
 
@@ -554,23 +538,16 @@ export default function CatalogPage() {
               </CatalogActionInfo>
             </div>
 
-            <div className="relative">
-              <button type="button" onClick={() => setIsCartOpen(true)} className={catalogActionClass}>
-                <ShoppingBag className="h-4 w-4 shrink-0 text-[#E5E791]" aria-hidden="true" />
-                Order Sheet
-              </button>
-              {cartTotalItems > 0 && (
-                <span className="catalog-primary-action absolute -right-2 -top-2 z-30 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#093D38] px-1 text-[10px] font-bold">
-                  {cartTotalItems}
-                </span>
-              )}
-              <CatalogActionInfo id="order-sheet-info" label="Order Sheet">
-                Review selected products, adjust quantities and continue to checkout.
-              </CatalogActionInfo>
-            </div>
+
           </div>
         </section>
 
+<section className="grid gap-5 rounded-lg border border-white/15 bg-[#1a1a1a] p-5 text-sm leading-6 text-white/75 lg:grid-cols-3">
+          <div><h2 className="text-sm font-bold text-white">Export Order Excel</h2><p>Prefer preparing your order in Excel? Download the order workbook and enter the quantities you need. Then upload it using Import Order Excel. You can also order directly on this page.</p></div>
+          <div><h2 className="text-sm font-bold text-white">Import Order Excel</h2><p>Upload your completed workbook to load the selected products and quantities into your cart. Review your order before submitting it.</p></div>
+          <div><h2 className="flex items-center gap-2 text-sm font-bold text-white"><Bookmark className="h-4 w-4" aria-hidden="true" /> My Shelf</h2><p>Save products to your personal online collection using the bookmark icon beside each product name. Access them any time through My Shelf in the top navigation.</p></div>
+        </section>
+        <label className="flex items-center gap-3 text-sm">Products per page<select aria-label="Products per page" value={itemsPerPage} onChange={e => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="rounded border border-white/25 bg-[#1a1a1a] px-3 py-2">{[10,20,50,100].map(size => <option key={size}>{size}</option>)}</select></label>
         <FilterSidebar
           filters={{ search, category, subcategory, childCategory, attributes: attributeFilters }}
           categories={categories.slice(1)}
@@ -667,80 +644,7 @@ export default function CatalogPage() {
               </button>
             </div>
           ) : paginatedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:grid-cols-2">
-              {paginatedProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="catalog-product-row grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-5 rounded-xl border border-white/10 bg-[#171717] p-5 shadow-lg shadow-black/20 transition-[background-color,border-color,box-shadow] hover:border-[#999933]/50 hover:bg-[#1b1b1b] hover:shadow-xl"
-                  >
-                    {/* Image Column — product thumbnail, tribe-letter fallback */}
-                    <div className="col-span-1 flex items-center">
-                      <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="block">
-                        {(selectedProductImages[product.id] || product.image) ? (
-                          <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 bg-[#131313] shadow-md transition-all duration-300 hover:border-[#999933]/45 hover:shadow-lg">
-                            <img
-                              src={selectedProductImages[product.id] || product.image}
-                              alt={product.name}
-                              loading="lazy"
-                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            className="relative flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 text-lg font-black uppercase text-white shadow-md transition-all duration-300 hover:border-[#999933]/45 hover:shadow-lg font-mono select-none"
-                            style={{ backgroundColor: getEthnicityColor(product.tribe, product.category) }}
-                          >
-                            <span className="transform hover:scale-110 transition-transform duration-300">
-                              {product.tribe ? product.tribe.charAt(0).toUpperCase() : ""}
-                            </span>
-                          </div>
-                        )}
-                      </Link>
-                    </div>
-
-                    {/* Name Column */}
-                    <div className="col-span-1 flex min-w-0 flex-col gap-2">
-                      <div className="flex min-w-0 items-start justify-between gap-2">
-                        <Link href={`/product/${product.id}?fromPage=${currentPage}`} className="min-w-0 hover:text-[#f2f2f2] transition-colors text-left no-underline group">
-                          <h3 className="catalog-product-title font-headline-md text-lg font-bold text-white group-hover:text-[#f2f2f2] transition-colors flex items-center gap-2 flex-wrap">
-                            {product.name}
-                            {product.isNew && (
-                              <span className="inline-block text-[9px] font-black tracking-widest bg-emerald-500 text-white px-1.5 py-0.5 rounded-sm uppercase align-middle">
-                                New
-                              </span>
-                            )}
-                          </h3>
-                        </Link>
-                        <ShelfToggleButton productId={product.id} productName={product.name} variant="icon" className="-mt-1 h-9 w-9" />
-                      </div>
-                      <div className="flex min-w-0 flex-wrap gap-2">
-                        <span className="max-w-full break-words text-[10px] font-semibold bg-[#999933]/15 text-[#f2f2f2] border border-[#999933]/30 px-2 py-0.5 rounded-sm uppercase tracking-wide font-label-sm">
-                          {product.category}
-                        </span>
-                        {product.tribe && (
-                          <span className="max-w-full break-words text-[10px] font-semibold bg-white/5 text-white/50 border border-white/10 px-2 py-0.5 rounded-sm uppercase tracking-wide font-label-sm">
-                            {product.tribe}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="col-span-2 border-t border-white/10 pt-4">
-                      <ProductPurchaseControls
-                        product={product}
-                        onOptionChange={(activeProduct, option) => {
-                          const nextImage = productImageForOption(activeProduct, option);
-                          setSelectedProductImages((currentImages) => {
-                            if (currentImages[product.id] === nextImage) return currentImages;
-                            return { ...currentImages, [product.id]: nextImage };
-                          });
-                        }}
-                      />
-                    </div>
-
-                  </div>
-              ))}
-            </div>
+            <div className="space-y-5 p-3 sm:p-4">{paginatedProducts.map(product => <ProductCard key={product.id} product={product} user={user} isLoggedIn />)}</div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 px-6 gap-4">
               <PackageOpen className="w-16 h-16 text-white/20" />
@@ -822,15 +726,17 @@ export default function CatalogPage() {
         </div>
       </main>
 
+      <Footer />
+
       {/* Shared Modals */}
       {isImportReviewOpen && (
         <div
-          className="brand-contrast-zone fixed inset-0 z-[150] flex items-center justify-center bg-[#262019]/85 p-4 backdrop-blur-sm"
+          className="brand-contrast-zone fixed inset-0 z-[150] flex items-center justify-center bg-[#1a1a1a]/85 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="excel-import-review-title"
         >
-          <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#999933]/45 bg-[#262019] shadow-2xl shadow-black/50">
+          <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#999933]/45 bg-[#1a1a1a] shadow-2xl shadow-black/50">
             <div className="flex items-start justify-between gap-6 border-b border-white/10 p-5 sm:p-7">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#E5E791]">
@@ -854,7 +760,7 @@ export default function CatalogPage() {
             </div>
 
             <div className="max-h-[50vh] overflow-y-auto p-4 sm:p-6">
-              <div className="divide-y divide-white/10 overflow-hidden rounded-lg border border-[#727349] bg-[#362E24]">
+              <div className="divide-y divide-white/10 overflow-hidden rounded-lg border border-[#727349] bg-[#1a1a1a]">
                 {importItems.map(({ product, optionIndex, quantity }) => {
                   const option = product.options[optionIndex];
                   const image = productImageForOption(product, option);
@@ -886,7 +792,7 @@ export default function CatalogPage() {
 
             <div className="border-t border-white/10 bg-black/10 p-4 sm:p-6">
               <p className="mb-4 text-xs leading-relaxed text-white/70">
-                Confirming will add {importItems.length} {importItems.length === 1 ? "product line" : "product lines"} to your order sheet.
+                Confirming will add {importItems.length} {importItems.length === 1 ? "product line" : "product lines"} to your cart.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <button

@@ -59,7 +59,7 @@ export default function MyShelfPage() {
               <div>
                 <h1 className="type-page-title text-white">My Shelf</h1>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60 sm:text-base">
-                  Keep products close while you plan your next wholesale order. Your shelf is saved to your partner account.
+                  My Shelf is your personal online collection of products. Click the bookmark icon beside a product name to save it; click it again to remove it. Return to My Shelf in the top navigation to find your saved products.
                 </p>
               </div>
               {!isLoading && productIds.length > 0 && (

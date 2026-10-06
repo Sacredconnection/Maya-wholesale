@@ -1,3 +1,5 @@
+import { organizeCatalogProduct, compareCategories, compareCatalogProducts } from "@/lib/catalog-organization.mjs";
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import { readFile } from "node:fs/promises";
 import {
   getAllProducts,
@@ -103,7 +105,7 @@ async function resolveCustomer(request) {
   const customer = await getCustomerByEmail(session.email);
   if (
     !isApprovedWholesaleCustomer(customer) ||
-    customer.id !== session.customerId
+    !isSessionCurrent(session, customer)
   ) {
     return null;
   }
@@ -248,7 +250,9 @@ export async function GET(request) {
   const maxPrice = positiveNumber(searchParams.get("maxPrice"));
   const onlyInStock = searchParams.get("inStock") === "true";
   const exportAll = searchParams.get("export") === "true";
+  if (exportAll && !customer) return Response.json({ error: "Sign in to create a catalog." }, { status: 401 });
   const requestedPage = pageNumber(searchParams.get("page"));
+  const pageSize = [10,20,50,100].includes(Number(searchParams.get("pageSize"))) ? Number(searchParams.get("pageSize")) : PAGE_SIZE;
   // Local PDF generation must reuse the catalog cache. A full uncached export
   // can trigger the upstream firewall because it requests every product and
   // variation at once. Production exports remain fresh as documented.
@@ -318,6 +322,7 @@ export async function GET(request) {
       }
     }
 
+    products = products.map(organizeCatalogProduct);
     const allPrices = products.flatMap((product) => [
       product.priceMin,
       product.priceMax,
@@ -400,7 +405,7 @@ export async function GET(request) {
           .map((product) => product.category)
           .filter(Boolean)
       )
-    ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
+    ).sort(compareCategories);
 
     const availableSubcategories = Array.from(
       new Set(
@@ -411,7 +416,7 @@ export async function GET(request) {
           .map((product) => product.subcategory || product.tribe)
           .filter(Boolean)
       )
-    ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
+    ).sort(compareCategories);
 
     const availableChildCategories = Array.from(
       new Set(
@@ -422,7 +427,7 @@ export async function GET(request) {
           .map((product) => product.childCategory)
           .filter(Boolean)
       )
-    ).sort((a, b) => normalize(a).localeCompare(normalize(b)));
+    ).sort(compareCategories);
 
     const attributeDefinitions = new Map();
     products.forEach((product) => {
@@ -458,19 +463,19 @@ export async function GET(request) {
           ) &&
           (attribute.options.length > 0 || selectedAttributes[attribute.key])
       )
-      .sort((a, b) => normalize(a.name).localeCompare(normalize(b.name)));
+      .sort(compareCatalogProducts);
 
     const filtered = products
       .filter((product) => matchesFilters(product))
       .sort((a, b) => normalize(a.name).localeCompare(normalize(b.name)));
 
     const totalItems = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
     const page = exportAll ? 1 : Math.min(requestedPage, totalPages);
-    const start = (page - 1) * PAGE_SIZE;
+    const start = (page - 1) * pageSize;
     const visibleProducts = exportAll
       ? filtered
-      : filtered.slice(start, start + PAGE_SIZE);
+      : filtered.slice(start, start + pageSize);
 
     return Response.json(
       {
@@ -478,7 +483,7 @@ export async function GET(request) {
         products: visibleProducts,
         pagination: {
           page,
-          pageSize: exportAll ? totalItems : PAGE_SIZE,
+          pageSize: exportAll ? totalItems : pageSize,
           totalItems,
           totalPages: exportAll ? 1 : totalPages,
         },

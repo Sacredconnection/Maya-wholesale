@@ -30,6 +30,7 @@ import {
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 import styles from "./checkout.module.css";
+import { calculateDiscountedLines } from "@/lib/order-totals.mjs";
 
 const EMPTY_ADDRESS = {
   street: "",
@@ -343,13 +344,12 @@ function AddressFields({ prefix, value, onChange }) {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { isLoggedIn, user, loading } = useAuth();
+  const { isLoggedIn, user, loading, updateUser } = useAuth();
   const {
     cart,
     clearCart,
     removeItemsByStore,
     setIsCartOpen,
-    cartSubtotal,
     cartTotalItems,
     cartTotalWeightGrams,
   } = useCart();
@@ -371,6 +371,7 @@ export default function CheckoutPage() {
     available: false,
     reason: "",
   });
+  const [saveDetails, setSaveDetails] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -387,6 +388,7 @@ export default function CheckoutPage() {
     });
     setShippingAddress({ ...EMPTY_ADDRESS, ...(user.shippingAddress || {}) });
     setBillingAddress({ ...EMPTY_ADDRESS, ...(user.billingAddress || {}) });
+    setBillingMatchesShipping(["street", "neighborhood", "city", "state", "zip", "country"].every(key => (user.billingAddress?.[key] || "") === (user.shippingAddress?.[key] || "")));
   }, [user]);
 
   useEffect(() => {
@@ -449,9 +451,15 @@ export default function CheckoutPage() {
 
   if (loading || !isLoggedIn || !user) return <AuthGate loading={loading} />;
 
-  const discountPercentage = user.discountRate || 0;
-  const discountAmount = cartSubtotal * (discountPercentage / 100);
-  const finalTotal = cartSubtotal - discountAmount;
+  const {
+    subtotal: cartSubtotal,
+    discountRate: discountPercentage,
+    discount: discountAmount,
+    total: finalTotal,
+  } = calculateDiscountedLines(
+    cart.map((item) => item.price * item.quantity),
+    user.discountRate
+  );
   const effectiveBillingAddress = billingMatchesShipping ? shippingAddress : billingAddress;
 
   const validateAddress = (address) =>
@@ -489,6 +497,15 @@ export default function CheckoutPage() {
     setError("");
 
     try {
+      if (saveDetails) {
+        const saved = await fetch("/api/account/checkout-details", {
+          method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstName: contact.firstName, lastName: contact.lastName, company: contact.company, shippingAddress, billingAddress: effectiveBillingAddress }),
+        });
+        const result = await saved.json().catch(() => ({}));
+        if (!saved.ok) throw new Error(result.error || "Your details could not be saved. Please retry or uncheck Save these details for next time.");
+        updateUser(result.user);
+      }
       if (!orderIdempotencyKey.current) {
         orderIdempotencyKey.current = crypto.randomUUID();
       }
@@ -767,7 +784,7 @@ export default function CheckoutPage() {
                             {MANUAL_BANK_TRANSFER.title}
                           </span>
                           <span className="mt-1 block text-[11px] leading-relaxed text-white/50">
-                            Pay directly from your bank account.
+                            Pay only after our sales team sends your invoice.
                           </span>
                         </span>
                       </label>
@@ -840,18 +857,6 @@ export default function CheckoutPage() {
                     </div>
                   </fieldset>
 
-                  <div className="flex items-start gap-3 rounded-lg border border-[#999933]/25 bg-[#999933]/10 p-4">
-                    <MessageCircleMore className="mt-0.5 h-4 w-4 shrink-0 text-[#f2f2f2]" />
-                    <div>
-                      <h3 className="text-xs font-bold text-white">What happens next?</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-white/55">
-                        {paymentMethod === MANUAL_BANK_TRANSFER.id
-                          ? "After submitting, your Order Number will be generated and shown on the confirmation page. Use it as the bank transfer reference. Your order ships after the funds clear and freight is confirmed."
-                          : "After submitting, you will be redirected to the secure card payment page. The order is prepared after payment is confirmed."}
-                      </p>
-                    </div>
-                  </div>
-
                   <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors focus-within:ring-2 focus-within:ring-[#E5E791]/35 ${
                     confirmed
                       ? "border-[#E5E791] bg-[#474618]"
@@ -875,6 +880,7 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              {step === 1 && <label className="mt-6 flex items-start gap-3 rounded-lg border border-white/20 p-4 text-sm"><input type="checkbox" checked={saveDetails} onChange={event => setSaveDetails(event.target.checked)} className="mt-1 h-4 w-4 accent-[#999933]" /><span><strong className="block">Save these details for next time</strong><span className="mt-1 block text-xs text-white/65">Save your contact, billing and delivery details to your account. You can review and edit them on your next order.</span></span></label>}
               <div className="mt-8 flex flex-col-reverse gap-3 border-t border-white/10 pt-6 sm:flex-row sm:justify-between">
                 {step > 0 ? (
                   <button
@@ -973,7 +979,7 @@ export default function CheckoutPage() {
                   <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f2f2f2]" />
                   {paymentMethod === BUNQ_CARD_PAYMENT.id
                     ? `Secure card payment via ${BUNQ_CARD_PAYMENT.provider}.`
-                    : "Manual bank transfer. Your Order Number is generated after submission and must be used as the payment reference."}
+                    : "Manual bank transfer after receiving the invoice. Please wait for the invoice before paying."}
                 </div>
               </div>
             </aside>

@@ -1,3 +1,5 @@
+import { enforceRateLimit } from "@/lib/auth-rate-limit";
+import { deleteSession } from "@/lib/session";
 import { resetWordPressPassword } from "@/lib/wp-auth";
 import {
   cleanText,
@@ -27,8 +29,12 @@ export async function POST(request) {
     return securityError("Use a password with at least 12 characters.", 400);
   }
 
+  const rateError = await enforceRateLimit(request, "reset", login);
+  if (rateError) return rateError;
+
   try {
     await resetWordPressPassword({ login, key, password });
+    await deleteSession();
     return Response.json(
       { message: "Your password has been updated." },
       { headers: { "Cache-Control": "no-store" } }

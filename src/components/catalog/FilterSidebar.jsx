@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ChevronDown, Filter, Search, SlidersHorizontal } from "lucide-react";
 
+import { categoryLabel } from "@/lib/catalog-organization.mjs";
+
 function SelectField({ id, label, value, onChange, children, disabled = false }) {
   return (
     <div className="flex w-full min-w-0 flex-col gap-2">
@@ -133,7 +135,7 @@ export default function FilterSidebar({
           >
             <option value={allValue}>All Categories</option>
             {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>{categoryLabel(category)}</option>
             ))}
           </SelectField>
 
@@ -146,7 +148,7 @@ export default function FilterSidebar({
           >
             <option value={allValue}>All Subcategories</option>
             {subcategories.map((subcategory) => (
-              <option key={subcategory} value={subcategory}>{subcategory}</option>
+              <option key={subcategory} value={subcategory}>{categoryLabel(subcategory)}</option>
             ))}
           </SelectField>
 
@@ -160,7 +162,7 @@ export default function FilterSidebar({
             >
               <option value={allValue}>All Level 2 Subcategories</option>
               {childCategories.map((category) => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category} value={category}>{categoryLabel(category)}</option>
               ))}
             </SelectField>
           )}

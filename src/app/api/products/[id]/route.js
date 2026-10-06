@@ -1,3 +1,4 @@
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import {
   getCategories,
   getCustomerByEmail,
@@ -44,7 +45,7 @@ export async function GET(request, { params }) {
     ]);
     if (
       !localDevUser &&
-      (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId)
+      (!isApprovedWholesaleCustomer(customer) || !isSessionCurrent(session, customer))
     ) {
       return securityError("Authentication required.", 401);
     }

@@ -136,15 +136,26 @@ PDF exports always bypass the WooCommerce data cache, so every generated file us
 
 Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
 
-WordPress role changes do not trigger WooCommerce's standard **Customer updated** topic. To send the approval email when an administrator changes a portal account from `pending` to an approved category:
+New portal accounts receive the real `pending` role and pending approval
+metadata. Access requires explicit approval in WordPress; a default `customer`
+role alone never grants portal access. Manual approval synchronizes
+`sc_approval_status`, `maya_account_status` and New User Approve `pw_user_status`.
 
-1. In **WP Admin → WPCode → Add Snippet → Add Your Custom Code**, create a PHP snippet named `Maya Wholesale - Role approval webhook`.
-2. Paste the contents of [`integrations/wordpress/maya-wholesale-role-webhook.php`](integrations/wordpress/maya-wholesale-role-webhook.php), excluding the opening `<?php` if WPCode already supplies it. Set the insertion method to **Auto Insert**, location to **Run Everywhere**, and activate it.
+1. Upload [`maya-wholesale-core.zip`](maya-wholesale-core.zip) in **WP Admin → Plugins → Add Plugin → Upload Plugin** and activate it.
+2. Deactivate older Maya approval snippets or the standalone Admin Tools plugin before enabling Core; the two Maya plugins should not run together.
 3. In **WooCommerce → Settings → Advanced → Webhooks**, add an active webhook named `Maya Portal - Customer Approved`.
 4. Select topic **Action** and enter `woocommerce_sacred_wholesale_customer_approved` in **Action event**.
 5. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL, the exact `WC_WEBHOOK_SECRET` value as the secret, and **WP REST API Integration v3** as the API version.
 
-The action sends the WordPress user ID in WooCommerce's `arg` payload field. The portal then fetches the current customer, verifies that it originated in the wholesale portal and still has a pending approval marker, sends the approval email, and marks it as sent. Repeated deliveries therefore do not duplicate the email. Invalid webhook signatures are rejected.
+Administrators can approve a pending account by changing its role, using the
+row action **Approve as Customer**, or selecting **Approve as Customer** from
+the bulk actions menu in WordPress. Profile updates and plugin upgrades never
+approve applications. Existing portal accounts with unresolved approval markers
+are returned to Pending approval during the upgrade. Previously approved records
+are retained; accounts incorrectly approved by older versions require manual review.
+The
+action webhook sends the approval email once; repeated deliveries are
+idempotent and invalid signatures are rejected.
 
 The sender domain in `TRANSACTIONAL_EMAIL_FROM` must be verified in Resend before customer emails can be delivered. Configure the email variables in Vercel before activating the customer webhooks; WooCommerce may automatically disable a webhook after repeated failed deliveries.
 
@@ -173,3 +184,22 @@ npm run start
 Authentication is verified against WordPress/WooCommerce. The application then
 stores only a signed, short-lived session in an `HttpOnly` cookie; passwords and
 authentication state are never stored in browser `localStorage`.
+
+
+### Security update: registration and authentication
+
+Install **Maya Wholesale Core 1.0.3** from [maya-wholesale-core-v1.0.3.zip](maya-wholesale-core-v1.0.3.zip) before deploying the updated portal. Keep Core and standalone Admin Tools mutually exclusive. Admin Tools 1.4.3 includes the shared counters and session revocation, but Core is the recommended package because it also provides the password-recovery bridge.
+
+Configure existing server secrets `WP_ADMIN_USER`, `WP_APP_PASSWORD` (administrator with `manage_options`), `SESSION_SECRET`, WooCommerce credentials and transactional email. These values stay server-side. Authentication and protected write endpoints return 503 if the shared rate-limit service is missing or unavailable; they never silently disable throttling.
+
+Registration returns HTTP 202 and the same public body for new, existing and backend-rejected accounts. Next.js `after()` processes creation and sends the appropriate email after the response. It has a 120-second route budget and relies on the hosting platform's support for `after`/`waitUntil`; this is not a durable queue. Monitor processing failures and mail delivery. New users remain pending; changing their role from pending to customer in WordPress still grants approval.
+
+The shared WordPress counters use atomic database writes. Per-client/per-account limits are: registration 10/3 per 15 minutes, login 40/10 per 15 minutes, recovery 10/3 per 15 minutes, reset 30/10 per 15 minutes, avatar 30/10 per 15 minutes, lead-time requests 30/5 per minute and orders 60/20 per 15 minutes. Expired counters are removed by the daily `maya_wholesale_security_cleanup` WP-Cron event. Ensure WP-Cron is running.
+
+Vercel's protected client-IP header is used automatically. For other hosts, configure `TRUSTED_CLIENT_IP_HEADER` only when the reverse proxy overwrites it and direct access to the application is blocked. Without a trusted valid IP, requests share a conservative bucket. Account identifiers and IPs are HMAC-hashed before being sent to the limiter.
+
+Every account-backed route rechecks identity, approval and the session version. Password changes/reset in WordPress revoke previous portal cookies. The development-only login remains disabled in production. Photo uploads and webhook bodies are capped while streaming; photos are decoded and re-encoded before storage.
+
+Run `npm test`, `npm run lint`, `npm run build`, and `npm audit`. Set `PHP_BINARY` to a PHP executable to include the PHP hook tests (otherwise those tests explicitly skip). The ExcelJS-scoped UUID override retains its v4 API and is covered by an XLSX export/read regression.
+
+See [the security review](docs/security-review-2026-09-08.md) for findings, verification and remaining limitations.

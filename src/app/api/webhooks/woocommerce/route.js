@@ -1,3 +1,4 @@
+import { readLimitedBody, RequestBodyError } from "@/lib/body-limits.mjs";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
 import { getRequiredCommerceStores } from "@/lib/commerce-stores";
@@ -6,7 +7,10 @@ import {
   getWooCommerceCatalogCacheTag,
   updateCustomerMeta,
 } from "@/lib/woocommerce";
-import { isApprovedWholesaleCustomer } from "@/lib/wc-mappers";
+import {
+  customerMeta,
+  isApprovedWholesaleCustomer,
+} from "@/lib/wholesale-approval.mjs";
 import {
   isTransactionalEmailConfigured,
   sendApplicationApprovedEmail,
@@ -31,14 +35,6 @@ const CUSTOMER_TOPICS = new Set([
 ]);
 const MAX_WEBHOOK_BYTES = 2 * 1024 * 1024;
 
-const customerMeta = (customer, key) => {
-  const entries = customer.meta_data || [];
-  for (let index = entries.length - 1; index >= 0; index -= 1) {
-    if (entries[index].key === key) return entries[index].value;
-  }
-  return undefined;
-};
-
 async function handleCustomerWebhook(topic, payload) {
   const customerId = Number(
     topic === CUSTOMER_ROLE_APPROVED_TOPIC ? payload?.arg : payload?.id
@@ -52,29 +48,36 @@ async function handleCustomerWebhook(topic, payload) {
     return { accepted: true, emailSent: false, reason: "not-wholesale-registration" };
   }
 
-  if (topic === "customer.created") {
+  const approved = isApprovedWholesaleCustomer(customer);
+  if (topic === "customer.created" && approved) {
+    return { accepted: true, emailSent: false, reason: "not-pending" };
+  }
+  if ((topic === "customer.created" || topic === "customer.updated") && !approved) {
+    const statuses = ["sc_approval_status", "maya_account_status", "pw_user_status"]
+      .map((key) => String(customerMeta(customer, key) || "").trim().toLowerCase())
+      .filter(Boolean);
+    const pending = customer.role === "pending" ||
+      statuses.some((status) => ["pending", "pending_approval"].includes(status));
+    if (!pending || statuses.some((status) => !["approved", "pending", "pending_approval"].includes(status))) {
+      return { accepted: true, emailSent: false, reason: "not-pending" };
+    }
     const confirmationAlreadySent = customerMeta(customer, "sc_pending_email_sent_at");
     const notificationAlreadySent = customerMeta(
       customer,
       "sc_application_notification_sent_at"
     );
-    const isPending = !isApprovedWholesaleCustomer(customer);
-    if (!isPending) {
-      return { accepted: true, emailSent: false, reason: "not-pending" };
-    }
 
     const sentAt = new Date().toISOString();
     const metaUpdates = {};
     if (!confirmationAlreadySent) {
       await sendApplicationReceivedEmail(customer);
       metaUpdates.sc_pending_email_sent_at = sentAt;
+      await updateCustomerMeta(customer, { sc_pending_email_sent_at: sentAt });
     }
     if (!notificationAlreadySent) {
       await sendApplicationNotificationEmail(customer);
       metaUpdates.sc_application_notification_sent_at = sentAt;
-    }
-    if (Object.keys(metaUpdates).length) {
-      await updateCustomerMeta(customer, metaUpdates);
+      await updateCustomerMeta(customer, { sc_application_notification_sent_at: sentAt });
     }
     return {
       accepted: true,
@@ -84,14 +87,22 @@ async function handleCustomerWebhook(topic, payload) {
     };
   }
 
-  const approvalStatus = customerMeta(customer, "sc_approval_status");
-  if (approvalStatus !== "pending" || !isApprovedWholesaleCustomer(customer)) {
+  if (!isApprovedWholesaleCustomer(customer)) {
     return { accepted: true, emailSent: false, reason: "no-pending-approval-transition" };
+  }
+
+  // Approval is checked above against current roles and all approval markers.
+  // A missed approval action can be recovered by customer.updated once approved.
+
+  if (customerMeta(customer, "sc_approval_email_sent_at")) {
+    return { accepted: true, emailSent: false, reason: "already-sent" };
   }
 
   await sendApplicationApprovedEmail(customer);
   await updateCustomerMeta(customer, {
     sc_approval_status: "approved",
+    maya_account_status: "approved",
+    maya_account_status_label: "Approved",
     sc_approval_email_role: customer.role || "",
     sc_approval_email_sent_at: new Date().toISOString(),
   });
@@ -138,7 +149,14 @@ export async function POST(request) {
     );
   }
 
-  const body = Buffer.from(await request.arrayBuffer());
+  let body;
+  try { body = await readLimitedBody(request, MAX_WEBHOOK_BYTES); }
+  catch (error) {
+    return Response.json({ error: "Invalid webhook body." }, {
+      status: error instanceof RequestBodyError ? error.status : 400,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
   if (body.byteLength > MAX_WEBHOOK_BYTES) {
     return Response.json(
       { error: "Webhook payload is too large." },

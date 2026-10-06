@@ -30,6 +30,8 @@ export function AuthProvider({ children }) {
           setUser(data.user);
           setIsLoggedIn(true);
         }
+      } catch {
+        if (!cancelled) { setUser(null); setIsLoggedIn(false); }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -63,7 +65,7 @@ export function AuthProvider({ children }) {
     });
     const data = await responseJson(response);
     if (!response.ok) throw new Error(data.error || "Registration failed. Please try again.");
-    return data.user;
+    return data;
   };
 
   const invalidateSession = useCallback(() => {

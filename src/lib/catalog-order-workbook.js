@@ -28,21 +28,26 @@ export async function readCatalogOrderWorkbook(file) {
   try { await workbook.xlsx.load(await file.arrayBuffer()); } catch { throw new Error("The Excel workbook could not be read."); }
   const metadata = workbook.getWorksheet(ORDER_WORKBOOK_META_SHEET);
   if (!metadata || String(metadata.getCell("B1").value || "") !== ORDER_WORKBOOK_MARKER || String(metadata.getCell("B2").value || "") !== ORDER_WORKBOOK_VERSION) {
-    throw new Error("This is not a Maya Herbs order workbook. Download a new spreadsheet from the digital catalog.");
+    throw new Error("This is not a Maya Herbs order workbook. Download a new spreadsheet using Export Order Excel in the wholesale catalog.");
   }
-  const sheet = workbook.worksheets.find((item) => item.name === "Order");
-  if (!sheet) throw new Error("The order worksheet is missing.");
+  const sheets = workbook.worksheets.filter(sheet => sheet.name !== ORDER_WORKBOOK_META_SHEET && sheet.getRow(5).values.includes(ORDER_ITEM_HEADER));
+  if (!sheets.length) throw new Error("The order worksheets are missing.");
+  const selected = new Map();
+  let scannedRows = 0;
+  for (const sheet of sheets) {
   let quantityColumn = 0;
   let itemColumn = 0;
   sheet.getRow(5).eachCell({ includeEmpty: true }, (cell, column) => {
     const header = String(scalar(cell)).trim();
-    if (header === "Quantidade") quantityColumn = column;
+    if (header === "Quantity" || header === "Quantidade") quantityColumn = column;
     if (header === ORDER_ITEM_HEADER) itemColumn = column;
   });
   if (!quantityColumn || !itemColumn) throw new Error("The order workbook is missing required columns.");
-  const selected = new Map();
-  for (let rowNumber = 6; rowNumber <= sheet.actualRowCount && rowNumber < MAX_ROWS + 6; rowNumber += 1) {
+
+  for (let rowNumber = 6; rowNumber <= sheet.rowCount; rowNumber += 1) {
+    if (++scannedRows > MAX_ROWS) throw new Error("The workbook contains too many rows.");
     const row = sheet.getRow(rowNumber);
+    if (!scalar(row.getCell(itemColumn)) && String(scalar(row.getCell(1))) === "ORDER TOTAL") continue;
     const quantity = Number(scalar(row.getCell(quantityColumn)) || 0);
     if (quantity === 0) continue;
     if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 1000) throw new Error(`Invalid quantity in row ${rowNumber}. Use a whole number from 1 to 1000.`);
@@ -56,6 +61,7 @@ export async function readCatalogOrderWorkbook(file) {
     if (nextQuantity > 1000) throw new Error(`The combined quantity for SKU ${sku} exceeds 1000.`);
     selected.set(key, { storeId, sku, quantity: nextQuantity });
     if (selected.size > MAX_LINES) throw new Error("Select no more than 100 different products per order.");
+  }
   }
   if (!selected.size) throw new Error("Enter a quantity for at least one product before importing.");
   return [...selected.values()];

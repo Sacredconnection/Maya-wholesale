@@ -5,6 +5,9 @@ import {
   leadTimeModeFromMeta,
   outOfStockLeadTimePolicy,
 } from "@/lib/lead-time-policy.mjs";
+import { isApprovedWholesaleCustomer } from "@/lib/wholesale-approval.mjs";
+
+export { isApprovedWholesaleCustomer } from "@/lib/wholesale-approval.mjs";
 
 const decodeHtmlEntities = (value) =>
   String(value || "")
@@ -77,12 +80,11 @@ const parseGramsFromText = (text) => {
   return /kg/i.test(m[2]) ? n * 1000 : n;
 };
 
-// The store's weight unit is configurable; this backend uses kg (e.g. "0.028"
-// for a 28g pouch). Values under 5 are treated as kg, otherwise as grams.
+// WooCommerce's configured weight unit for Maya is kg, at every magnitude.
+// Named package weights (g/kg) still take precedence over shipping weight.
 const weightFieldToGrams = (weight) => {
-  const n = parseFloat(weight);
-  if (!n) return null;
-  return n < 5 ? n * 1000 : n;
+  const n = Number(String(weight ?? "").trim());
+  return Number.isFinite(n) && n > 0 ? n * 1000 : null;
 };
 
 export const extractWeightGrams = (nameText, weightField) =>
@@ -278,21 +280,6 @@ const customerMeta = (customer, key) => {
   }
   return undefined;
 };
-
-export function isApprovedWholesaleCustomer(customer) {
-  if (!customer) return false;
-
-  const approvalStatus = String(
-    customerMeta(customer, "maya_account_status") ||
-      customerMeta(customer, "sc_approval_status") ||
-      ""
-  ).toLowerCase();
-
-  if (["pending", "pending_approval"].includes(approvalStatus)) return false;
-  if (approvalStatus === "approved") return true;
-
-  return !["pending", "customer"].includes((customer.role || "").toLowerCase());
-}
 
 // Maps a WooCommerce customer to the user shape the UI stores in AuthContext.
 // Wholesale discounts live in customer meta so the team can manage them from

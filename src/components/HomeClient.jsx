@@ -30,6 +30,10 @@ export default function HomeClient({ categories = [] }) {
         <div className="home-content-shell flex flex-col gap-12 lg:gap-16">
           {/* B2B Onboarding Steps */}
           <Onboarding />
+          <section className="rounded-lg border border-[#999933]/30 bg-[#999933]/5 p-6">
+            <h2 className="text-xl font-bold">A catalog tailored to your business</h2>
+            <p className="mt-2 text-sm leading-6">Registered clients can sign in to choose individual products or entire categories and create a personalized PDF catalog to save, share or print.</p>
+          </section>
 
           {/* Maya's core wholesale ranges */}
           <BotanicalCategories categories={categories} />

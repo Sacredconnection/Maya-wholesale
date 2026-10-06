@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import "server-only";
 
 const DEFAULT_PORTAL_URL = "https://wholesale.mayaherbs.com";
@@ -310,5 +311,25 @@ export async function sendApplicationApprovedEmail(customer) {
       `Hello ${customer.first_name || customer.username || "Partner"},\n\n` +
       `Your Maya Herbs wholesale registration has been approved. Your partner access level is ${accessLevel}.\n\n` +
       `Sign in: ${loginUrl}\n\nQuestions? Contact ${DEFAULT_REPLY_TO}.`,
+  });
+}
+
+export async function sendRegistrationGuidanceEmail(email) {
+  const message = "A registration request was submitted using this email address. You already have an account, and its details have not been changed. If your account has been approved, you can sign in or use Forgot password. If it is awaiting approval, our team will contact you after review. If you did not submit this request, no action is needed.";
+  return sendTransactionalEmail({
+    to: email, subject: "Your Maya Herbs account access",
+    idempotencyKey: "registration-guidance/" + createHash("sha256").update(email.toLowerCase()).digest("hex") + "/" + new Date().toISOString().slice(0, 10),
+    html: emailLayout({ eyebrow: "Account access", title: "Access your existing account", intro: "Hello,", body: '<p style="font-size:15px;line-height:1.7;color:#d0d0cc;">' + message + '</p>', actionLabel: "Account access", actionUrl: portalUrl() + "/my-account?login=1" }),
+    text: message + "\n\n" + portalUrl() + "/my-account?login=1",
+  });
+}
+
+export async function sendRegistrationFailureEmail(email) {
+  const message = "We received a registration request using this email address, but could not complete its processing. Please try again later or contact info@mayaherbs.com for help. If you did not submit this request, no action is needed.";
+  return sendTransactionalEmail({
+    to: email, subject: "Your Maya Herbs registration request",
+    idempotencyKey: "registration-processing/" + createHash("sha256").update(email.toLowerCase()).digest("hex") + "/" + new Date().toISOString().slice(0, 10),
+    html: emailLayout({ eyebrow: "Registration request", title: "We could not complete your request", intro: "Hello,", body: '<p style="font-size:15px;line-height:1.7;color:#d0d0cc;">' + message + '</p>' }),
+    text: message,
   });
 }

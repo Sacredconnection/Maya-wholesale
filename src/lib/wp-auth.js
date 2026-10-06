@@ -44,6 +44,7 @@ export async function uploadWordPressMedia({ bytes, contentType, filename, altTe
     },
     body: bytes,
     cache: "no-store",
+    redirect: "error",
     signal: AbortSignal.timeout(30000),
   });
   const media = await response.json().catch(() => ({}));
@@ -61,6 +62,7 @@ export async function uploadWordPressMedia({ bytes, contentType, filename, altTe
       },
       body: JSON.stringify({ alt_text: altText }),
       cache: "no-store",
+    redirect: "error",
       signal: AbortSignal.timeout(15000),
     }).catch(() => {});
   }
@@ -72,7 +74,8 @@ export async function uploadWordPressMedia({ bytes, contentType, filename, altTe
  * Sets a WordPress user's role via the wp/v2 users API. Needs an admin
  * Application Password (WP Admin → Users → Profile → Application Passwords)
  * in WP_ADMIN_USER / WP_APP_PASSWORD. Returns false (without throwing) when
- * those env vars are absent or the call fails — callers treat it as optional.
+ * those env vars are absent or the call fails. Registration treats role
+ * assignment as required and rolls back incomplete customer records.
  */
 export async function setWpUserRole(userId, role) {
   let base;
@@ -93,12 +96,15 @@ export async function setWpUserRole(userId, role) {
       },
       body: JSON.stringify({ roles: [role] }),
       cache: "no-store",
+    redirect: "error",
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) {
       console.error(`setWpUserRole(${userId}, ${role}) failed with HTTP ${res.status}`);
       return false;
     }
-    return true;
+    const user = await res.json();
+    return Array.isArray(user.roles) && user.roles.length === 1 && user.roles[0] === role;
   } catch (err) {
     console.error(`setWpUserRole(${userId}, ${role}) failed:`, err);
     return false;
@@ -112,6 +118,20 @@ export async function setWpUserRole(userId, role) {
 export async function verifyWpCredentials(usernameOrEmail, password) {
   const base = getWooCommerceBaseUrl();
 
+  const authorization = wpAdminAuthHeader();
+  if (authorization) {
+    const response = await fetch(base + "/wp-json/maya-wholesale/v1/auth/verify", {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: authorization },
+      body: JSON.stringify({ login: usernameOrEmail, password }),
+      signal: AbortSignal.timeout(15000), cache: "no-store", redirect: "error",
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok && typeof result.valid === "boolean") return { valid: result.valid };
+    if (response.status !== 404 || result.code !== "rest_no_route") {
+      throw new Error("WordPress authentication bridge unavailable (HTTP " + response.status + ").");
+    }
+  }
+
   const body =
     `<?xml version="1.0"?><methodCall><methodName>wp.getUsersBlogs</methodName><params>` +
     `<param><value><string>${xmlEscape(usernameOrEmail)}</string></value></param>` +
@@ -121,8 +141,10 @@ export async function verifyWpCredentials(usernameOrEmail, password) {
   const res = await fetch(`${base}/xmlrpc.php`, {
     method: "POST",
     headers: { "Content-Type": "text/xml" },
+    signal: AbortSignal.timeout(15000),
     body,
     cache: "no-store",
+    redirect: "error",
   });
 
   const text = await res.text();
@@ -130,17 +152,20 @@ export async function verifyWpCredentials(usernameOrEmail, password) {
     throw new Error(`XML-RPC endpoint responded with HTTP ${res.status}.`);
   }
   if (text.includes("<fault>")) return { valid: false };
-  if (text.includes("<methodResponse>")) return { valid: true };
+  if (text.includes("<methodResponse>") && text.includes("<array>") && text.includes("<name>blogid</name>")) return { valid: true };
   throw new Error("Unexpected XML-RPC response from the WordPress backend.");
 }
 
 async function callPasswordRecoveryEndpoint(path, payload) {
   const base = getWooCommerceBaseUrl();
+  const authorization = wpAdminAuthHeader();
+  if (!authorization) throw new Error("Password recovery backend unavailable.");
   const response = await fetch(`${base}/wp-json/maya-wholesale/v1/password/${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: authorization },
     body: JSON.stringify(payload),
     cache: "no-store",
+    redirect: "error",
     signal: AbortSignal.timeout(15000),
   });
   const result = await response.json().catch(() => ({}));

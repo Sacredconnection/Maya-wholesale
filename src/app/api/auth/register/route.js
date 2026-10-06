@@ -1,13 +1,19 @@
+import { after } from "next/server";
+import { enforceRateLimit } from "@/lib/auth-rate-limit";
 import {
   createCustomer,
+  deleteCustomer,
+  getCustomerById,
   isWooCommerceConfigured,
   updateCustomerMeta,
   WooCommerceApiError,
 } from "@/lib/woocommerce";
-import { mapCustomerToUser, toWcAddress } from "@/lib/wc-mappers";
+import { toWcAddress } from "@/lib/wc-mappers";
 import {
   sendApplicationNotificationEmail,
   sendApplicationReceivedEmail,
+  sendRegistrationGuidanceEmail,
+  sendRegistrationFailureEmail,
 } from "@/lib/transactional-email";
 import { isSupportedCountryCode } from "@/lib/countries";
 import {
@@ -18,6 +24,9 @@ import {
   RequestBodyError,
   securityError,
 } from "@/lib/request-security";
+import { setWpUserRole } from "@/lib/wp-auth";
+
+export const maxDuration = 120;
 
 const VAT_META_KEYS = ["billing_vat", "vat_number", "maya_vat_number"];
 
@@ -83,75 +92,89 @@ export async function POST(request) {
     return securityError("Please select a valid Country.", 400);
   }
 
-  try {
-    const customer = await createCustomer({
-      email,
-      username: email,
-      first_name: firstName,
-      last_name: lastName,
-      billing: { first_name: firstName, last_name: lastName, email, ...toWcAddress(address) },
-      shipping: { first_name: firstName, last_name: lastName, ...toWcAddress(address) },
-      // Preserve the field names used by Maya's legacy WordPress registration
-      // validation. WooCommerce ignores unknown properties when persisting the
-      // customer, but WordPress hooks can still read them from the REST request.
-      vat_number: vatNumber,
-      billing_vat: vatNumber,
-      maya_vat_number: vatNumber,
-      address: address.street,
-      city: address.city,
-      state: address.state,
-      postcode: address.zip,
-      zip: address.zip,
-      country: address.country,
-      meta_data: [
-        { key: "sc_channel", value: "wholesale-portal" },
-        { key: "sc_approval_status", value: "pending" },
-        { key: "sc_display_name", value: name },
-        { key: "maya_account_status", value: "pending_approval" },
-        { key: "maya_account_status_label", value: "Pending approval" },
-        ...VAT_META_KEYS.map((key) => ({ key, value: vatNumber })),
-      ],
-    });
+  const rateError = await enforceRateLimit(request, "register", email);
+  if (rateError) return rateError;
 
-    let confirmationEmailSent = false;
+  // All existence-dependent work runs only after the identical public response.
+  after(async () => {
     try {
-      await sendApplicationReceivedEmail(customer);
-      confirmationEmailSent = true;
-      await updateCustomerMeta(customer, {
-        sc_pending_email_sent_at: new Date().toISOString(),
+      const customer = await createCustomer({
+        email,
+        username: email,
+        first_name: firstName,
+        last_name: lastName,
+        billing: { first_name: firstName, last_name: lastName, email, ...toWcAddress(address) },
+        shipping: { first_name: firstName, last_name: lastName, ...toWcAddress(address) },
+        // Preserve the field names used by Maya's legacy WordPress registration
+        // validation. WooCommerce ignores unknown properties when persisting the
+        // customer, but WordPress hooks can still read them from the REST request.
+        vat_number: vatNumber,
+        billing_vat: vatNumber,
+        maya_vat_number: vatNumber,
+        address: address.street,
+        city: address.city,
+        state: address.state,
+        postcode: address.zip,
+        zip: address.zip,
+        country: address.country,
+        meta_data: [
+          { key: "sc_channel", value: "wholesale-portal" },
+          { key: "sc_approval_status", value: "pending" },
+          { key: "sc_display_name", value: name },
+          { key: "maya_account_status", value: "pending_approval" },
+          { key: "maya_account_status_label", value: "Pending approval" },
+          { key: "pw_user_status", value: "pending" },
+          ...VAT_META_KEYS.map((key) => ({ key, value: vatNumber })),
+        ],
       });
-    } catch (emailError) {
-      console.error("Wholesale application confirmation email failed:", emailError);
-    }
-    try {
-      await sendApplicationNotificationEmail(customer);
-      await updateCustomerMeta(customer, {
-        sc_application_notification_sent_at: new Date().toISOString(),
-      });
-    } catch (emailError) {
-      console.error("Wholesale application sales notification failed:", emailError);
-    }
-    return Response.json(
-      { user: mapCustomerToUser(customer), confirmationEmailSent },
-      { status: 201, headers: { "Cache-Control": "no-store" } }
-    );
-  } catch (err) {
-    if (err instanceof WooCommerceApiError) {
-      const code = err.details?.code || "";
-      if (code.includes("email-exists") || code.includes("username-exists")) {
-        return securityError(
-          "An account with this email already exists. Please sign in or use another email address.",
-          409
-        );
+
+      let pendingCustomer;
+      try {
+        const pendingRoleApplied = customer.role === "pending" ||
+          await setWpUserRole(customer.id, "pending");
+        if (!pendingRoleApplied) throw new Error("Pending role was not applied.");
+        pendingCustomer = await getCustomerById(customer.id);
+        if (pendingCustomer.role !== "pending") throw new Error("Pending role was not persisted.");
+      } catch (approvalError) {
+        console.error("Could not initialize pending approval:", approvalError);
+        try {
+          await deleteCustomer(customer.id);
+        } catch (rollbackError) {
+          console.error("Failed to roll back customer after pending-role assignment failed:", rollbackError);
+        }
+        await sendRegistrationFailureEmail(email).catch(() => console.error("Registration failure notification failed."));
+        return;
       }
-      console.error("POST /api/auth/register rejected:", err.details);
-      const upstreamMessage = cleanText(err.details?.message, 240);
-      return securityError(
-        upstreamMessage || "WordPress rejected the registration details.",
-        422
-      );
+
+      try {
+        await sendApplicationReceivedEmail(pendingCustomer);
+        await updateCustomerMeta(pendingCustomer, {
+          sc_pending_email_sent_at: new Date().toISOString(),
+        });
+      } catch (emailError) {
+        console.error("Wholesale application confirmation email failed:", emailError);
+      }
+      try {
+        await sendApplicationNotificationEmail(pendingCustomer);
+        await updateCustomerMeta(pendingCustomer, {
+          sc_application_notification_sent_at: new Date().toISOString(),
+        });
+      } catch (emailError) {
+        console.error("Wholesale application sales notification failed:", emailError);
+      }
+
+    } catch (err) {
+      const code = err instanceof WooCommerceApiError ? String(err.details?.code || "") : "";
+      if (/email[-_]exists|username[-_]exists|existing_user_(email|login)/.test(code)) {
+        await sendRegistrationGuidanceEmail(email).catch(() => console.error("Registration guidance email failed."));
+        return;
+      }
+      console.error("Registration processing failed.", { code: code || "upstream_failure" });
+      await sendRegistrationFailureEmail(email).catch(() => console.error("Registration failure notification failed."));
     }
-    console.error("POST /api/auth/register failed:", err);
-    return securityError("Registration failed. Please try again.", 502);
-  }
+  });
+  return Response.json(
+    { accepted: true, message: "Request received. Check your email for guidance on accessing your account." },
+    { status: 202, headers: { "Cache-Control": "no-store" } }
+  );
 }

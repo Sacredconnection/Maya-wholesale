@@ -1,3 +1,5 @@
+import { enforceRateLimit } from "@/lib/auth-rate-limit";
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import {
   createOrder,
   findProductBySku,
@@ -39,22 +41,21 @@ import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import { isSupportedCountryCode } from "@/lib/countries";
 import {
   bankTransferOrderNote,
+  ORDER_CONFIRMATION,
   BUNQ_CARD_PAYMENT,
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 import { createHash } from "node:crypto";
+import { calculateDiscountedLines } from "@/lib/order-totals.mjs";
 
-const ORDER_CUSTOMER_NOTE =
-  process.env.WHOLESALE_ORDER_NOTE?.replace(/\\n/g, "\n").trim() ||
-  "Thank you for your wholesale order request. The Maya Herbs team will confirm availability, shipping and payment instructions before fulfillment.";
+const ORDER_CUSTOMER_NOTE = ORDER_CONFIRMATION;
 const ORDER_CUSTOMER_NOTE_WITH_PAYMENT =
   `${ORDER_CUSTOMER_NOTE}\n\n${bankTransferOrderNote()}`;
 const CARD_CUSTOMER_NOTE =
   `${ORDER_CUSTOMER_NOTE}\n\nPayment method: ${BUNQ_CARD_PAYMENT.title} via ${BUNQ_CARD_PAYMENT.provider}. Complete payment on the secure WooCommerce payment page.`;
 const SUPPORTED_PAYMENT_METHODS = new Set([
   MANUAL_BANK_TRANSFER.id,
-  BUNQ_CARD_PAYMENT.id,
-]);
+ ]);
 
 const missingBackendsResponse = () => {
   const missingStores = getMissingCommerceStores();
@@ -92,6 +93,8 @@ const mapOrderForClient = (order, store) => ({
 const productCanFulfill = (product, quantity) =>
   Boolean(
     product &&
+      (!product.status || product.status === "publish") &&
+      product.type !== "variable" &&
       product.purchasable !== false &&
       product.stock_status !== "outofstock" &&
       (product.stock_quantity == null ||
@@ -154,6 +157,13 @@ export async function GET(request) {
   }
   const configurationError = missingBackendsResponse();
   if (configurationError) return configurationError;
+
+  try {
+    const customer = await getCustomerByEmail(session.email);
+    if (!isApprovedWholesaleCustomer(customer) || !isSessionCurrent(session, customer)) {
+      return securityError("Authentication required.", 401);
+    }
+  } catch { return securityError("Authentication backend unavailable.", 502); }
 
   const stores = getRequiredCommerceStores();
   const results = await Promise.allSettled(
@@ -248,9 +258,11 @@ export async function POST(request) {
   try {
     // Authentication and buyer profile remain authoritative in Maya Herbs.
     const wcCustomer = await getCustomerByEmail(session.email, PRIMARY_STORE_ID);
-    if (!isApprovedWholesaleCustomer(wcCustomer) || wcCustomer.id !== session.customerId) {
+    if (!isApprovedWholesaleCustomer(wcCustomer) || !isSessionCurrent(session, wcCustomer)) {
       return securityError("Authentication required.", 401);
     }
+    const rateError = await enforceRateLimit(request, "order", session.email);
+    if (rateError) return rateError;
     const customer = mapCustomerToUser(wcCustomer);
     const role = wcCustomer.role || null;
     const stores = getRequiredCommerceStores();
@@ -341,6 +353,7 @@ export async function POST(request) {
             getVariation(storeId, requestedProductId, requestedVariationId),
             getParentProduct(storeId, requestedProductId),
           ]);
+          if (parentProduct.status !== "publish") return { unavailable: `${store.name}: unavailable product` };
           payload = variation;
           productId = requestedProductId;
           variationId = requestedVariationId;
@@ -355,9 +368,9 @@ export async function POST(request) {
             payload = found;
             productId = found.parent_id || found.id;
             variationId = found.parent_id ? found.id : null;
-            categories = variationId
-              ? (await getParentProduct(storeId, productId)).categories
-              : found.categories;
+            const parent = variationId ? await getParentProduct(storeId, productId) : found;
+            if (parent.status !== "publish") return { unavailable: `${store.name}: unavailable product` };
+            categories = parent.categories;
           }
         }
 
@@ -368,6 +381,11 @@ export async function POST(request) {
           return {
             unavailable: `${store.name}: ${sku || payload.name || "unknown item"}`,
           };
+        }
+
+        const basePrice = Number(payload.price);
+        if (payload.price == null || payload.price === "" || !Number.isFinite(basePrice) || basePrice < 0) {
+          return { unavailable: `${store.name}: unavailable price` };
         }
 
         const optionText =
@@ -385,7 +403,8 @@ export async function POST(request) {
             weightGrams,
             tableKey: tableKeyFromCategories(categories),
             rolePrice: role ? roleBasedPrices(payload.meta_data)[role] : undefined,
-            basePrice: parseFloat(payload.price) || 0,
+            basePrice,
+            stockQuantity: payload.stock_quantity == null ? null : Number(payload.stock_quantity),
           },
           lineWeightGrams: weightGrams * quantity,
         };
@@ -420,6 +439,16 @@ export async function POST(request) {
         },
         { status: 409, headers: { "Cache-Control": "no-store" } }
       );
+    }
+    // The same SKU may occur on multiple lines; compare the aggregate with stock.
+    const quantities = new Map();
+    for (const entry of resolved) {
+      const key = entry.store.id + ":" + entry.productId + ":" + (entry.variationId || "");
+      const quantity = (quantities.get(key) || 0) + entry.quantity;
+      quantities.set(key, quantity);
+      if (quantity > 1000 || (entry.stockQuantity != null && quantity > entry.stockQuantity)) {
+        return securityError("The combined quantity exceeds available stock or the order limit.", 409);
+      }
     }
     const isProgressive = role === NEW_CUSTOMER_ROLE;
     const entriesByStore = new Map();
@@ -484,7 +513,7 @@ export async function POST(request) {
     const creationResults = await Promise.allSettled(
       storesInOrder.map(async (store) => {
         const appliedRates = {};
-        const lineItems = entriesByStore.get(store.id).map((entry) => {
+        const pricedEntries = entriesByStore.get(store.id).map((entry) => {
           const rate = isProgressive
             ? progressivePerGramRate(totalWeightGrams, entry.tableKey)
             : null;
@@ -495,13 +524,21 @@ export async function POST(request) {
                 ? entry.rolePrice
                 : entry.basePrice;
           if (rate != null && entry.weightGrams > 0) appliedRates[entry.tableKey] = rate;
-          const lineTotal = (unitPrice * entry.quantity).toFixed(2);
+          if (!Number.isFinite(unitPrice) || unitPrice < 0) throw new Error("Invalid authoritative price.");
+          return { entry, amount: unitPrice * entry.quantity };
+        });
+        const totals = calculateDiscountedLines(
+          pricedEntries.map(({ amount }) => amount),
+          customer.discountRate
+        );
+        const lineItems = pricedEntries.map(({ entry }, index) => {
+          const line = totals.lines[index];
           return {
             product_id: entry.productId,
             ...(entry.variationId ? { variation_id: entry.variationId } : {}),
             quantity: entry.quantity,
-            subtotal: lineTotal,
-            total: lineTotal,
+            subtotal: line.subtotal.toFixed(2),
+            total: line.total.toFixed(2),
           };
         });
 
@@ -524,12 +561,7 @@ export async function POST(request) {
               { key: "sc_source_store", value: store.id },
               { key: "sc_request_reference", value: requestReference },
               { key: "sc_payment_method", value: selectedPaymentMethod.id },
-              ...(isCardPayment
-                ? [{ key: "sc_payment_provider", value: BUNQ_CARD_PAYMENT.provider }]
-                : [{
-                    key: "sc_payment_account",
-                    value: MANUAL_BANK_TRANSFER.accountDetails,
-                  }]),
+              { key: "sc_invoice_before_payment", value: "yes" },
               { key: "sc_access_level", value: role || "none (base prices)" },
               { key: "sc_total_weight_grams", value: String(Math.round(totalWeightGrams)) },
               ...(Object.keys(appliedRates).length > 0
@@ -541,8 +573,8 @@ export async function POST(request) {
                   }]
                 : []),
               ...(customer.accountId ? [{ key: "sc_account_id", value: String(customer.accountId) }] : []),
-              ...(customer.discountRate
-                ? [{ key: "sc_discount_rate", value: String(customer.discountRate) }]
+              ...(totals.discountRate
+                ? [{ key: "sc_discount_rate", value: String(totals.discountRate) }]
                 : []),
             ],
           },

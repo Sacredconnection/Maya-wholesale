@@ -1,7 +1,7 @@
 export const metadata = {
-  title: "Digital Catalog | Maya Herbs Wholesale",
+  title: "Create Catalog | Maya Herbs Wholesale",
   description:
-    "Explore the public Maya Herbs digital catalog with product search and category filters.",
+    "Create a personalized wholesale PDF catalog or compact price list from selected products and categories.",
   alternates: {
     canonical: "/digital-catalog",
   },

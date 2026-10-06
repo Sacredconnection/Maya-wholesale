@@ -1,9 +1,11 @@
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
+import { isApprovedWholesaleCustomer } from "@/lib/wholesale-approval.mjs";
+import { securityError } from "@/lib/request-security";
 import { getSession } from "@/lib/session";
 import { getLocalDevSessionUser } from "@/lib/local-dev-auth";
 import { getMissingCommerceStores, getRequiredCommerceStores } from "@/lib/commerce-stores";
-import { getPaymentGateway } from "@/lib/woocommerce";
+import { getPaymentGateway, getCustomerByEmail } from "@/lib/woocommerce";
 import {
-  BUNQ_CARD_PAYMENT,
   MANUAL_BANK_TRANSFER,
 } from "@/lib/payment-methods";
 
@@ -35,6 +37,13 @@ export async function GET(request) {
     );
   }
 
+  if (!session.localDev) {
+    try {
+      const customer = await getCustomerByEmail(session.email);
+      if (!isApprovedWholesaleCustomer(customer) || !isSessionCurrent(session, customer)) return securityError("Authentication required.", 401);
+    } catch { return securityError("Authentication backend unavailable.", 502); }
+  }
+
   const missingStores = getMissingCommerceStores();
   if (missingStores.length > 0) {
     return Response.json(
@@ -44,10 +53,7 @@ export async function GET(request) {
   }
 
   const stores = getRequiredCommerceStores();
-  const [bankTransferAvailable, bunqCardAvailable] = await Promise.all([
-    gatewayAvailableEverywhere(MANUAL_BANK_TRANSFER.id, stores),
-    gatewayAvailableEverywhere(BUNQ_CARD_PAYMENT.id, stores),
-  ]);
+  const bankTransferAvailable = await gatewayAvailableEverywhere(MANUAL_BANK_TRANSFER.id, stores);
 
   return Response.json(
     {
@@ -56,13 +62,7 @@ export async function GET(request) {
           ...MANUAL_BANK_TRANSFER,
           available: bankTransferAvailable,
         },
-        {
-          ...BUNQ_CARD_PAYMENT,
-          available: bunqCardAvailable,
-          unavailableReason: bunqCardAvailable
-            ? ""
-            : "Card payment is being activated and is not available yet.",
-        },
+
       ],
     },
     { headers: responseHeaders }

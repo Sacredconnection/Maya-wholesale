@@ -1,3 +1,4 @@
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import { unstable_cache } from "next/cache";
 import {
   getAllProducts,
@@ -66,7 +67,7 @@ export async function GET(request) {
     let role = localDevUser?.role || null;
     if (!localDevUser) {
       const customer = await getCustomerByEmail(session.email);
-      if (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId) {
+      if (!isApprovedWholesaleCustomer(customer) || !isSessionCurrent(session, customer)) {
         return securityError("Authentication required.", 401);
       }
       role = customer.role;

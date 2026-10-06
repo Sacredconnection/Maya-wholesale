@@ -1,5 +1,6 @@
 import { getCommerceStoreOrigins } from "@/lib/commerce-stores";
-import sharp from "sharp";
+import { normalizeImage } from "@/lib/safe-image.mjs";
+import { readLimitedBody, RequestBodyError } from "@/lib/body-limits.mjs";
 
 export const runtime = "nodejs";
 
@@ -34,15 +35,19 @@ export async function GET(request) {
 
     const target = new URL(repairLegacyUtf8Url(source));
     const catalogHosts = new Set(
-      getCommerceStoreOrigins().map((origin) => new URL(origin).hostname)
+      getCommerceStoreOrigins()
     );
     const allowed =
       target.protocol === "https:" &&
-      catalogHosts.has(target.hostname) &&
+      !target.username && !target.password &&
+      catalogHosts.has(target.origin) &&
       target.pathname.startsWith("/wp-content/uploads/");
     if (!allowed) return new Response("Image URL is not allowed.", { status: 403 });
 
+    target.search = "";
+    target.hash = "";
     const response = await fetch(target, {
+      signal: AbortSignal.timeout(10000),
       redirect: "error",
       next: { revalidate: 86400 },
     });
@@ -53,16 +58,14 @@ export async function GET(request) {
       return new Response("Unsupported image type.", { status: 415 });
     }
 
-    const image = await response.arrayBuffer();
+    const image = await readLimitedBody(response, MAX_IMAGE_BYTES);
     if (image.byteLength > MAX_IMAGE_BYTES) {
       return new Response("Image is too large.", { status: 413 });
     }
 
-    const optimized = await sharp(Buffer.from(image))
-      .rotate()
-      .resize(240, 240, { fit: "cover", position: "centre" })
-      .png({ compressionLevel: 9, adaptiveFiltering: true })
-      .toBuffer();
+    let optimized;
+    try { optimized = await normalizeImage(image, 240); }
+    catch { return new Response("Unsupported image type.", { status: 415 }); }
 
     const cacheHeaders = {
       "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
@@ -86,6 +89,7 @@ export async function GET(request) {
       { headers: cacheHeaders }
     );
   } catch (error) {
+    if (error instanceof RequestBodyError) return new Response(error.message, { status: error.status });
     console.error("GET /api/catalog/image failed:", error);
     return new Response("Image unavailable.", { status: 502 });
   }
