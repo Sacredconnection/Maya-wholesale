@@ -96,7 +96,7 @@ function CatalogActionInfo({ id, label, children }) {
       <span
         id={id}
         role="tooltip"
-        className="catalog-primary-action pointer-events-none absolute bottom-[calc(100%+0.65rem)] right-0 z-30 w-64 rounded-md border border-[#999A61] bg-[#1a1a1a] px-3 py-2.5 text-left text-[11px] font-medium normal-case leading-relaxed tracking-normal opacity-0 shadow-xl shadow-black/25 transition-opacity group-hover/info:opacity-100 group-focus-within/info:opacity-100"
+        className="text-[#2D2D2D] pointer-events-none absolute bottom-[calc(100%+0.65rem)] right-0 z-30 w-64 rounded-md border border-[#999A61] bg-white px-3 py-2.5 text-left text-[11px] font-medium normal-case leading-relaxed tracking-normal opacity-0 shadow-xl shadow-black/25 transition-opacity group-hover/info:opacity-100 group-focus-within/info:opacity-100"
       >
         {children}
       </span>

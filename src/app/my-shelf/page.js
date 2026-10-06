@@ -51,7 +51,7 @@ export default function MyShelfPage() {
             className="absolute inset-y-0 right-0 w-32 bg-[url('/patterns/maya-brand-pattern.svg')] bg-cover bg-left opacity-[0.07] sm:w-52"
           />
           <div className="relative max-w-3xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#999933]/35 bg-[#999933]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E5E791]">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#999933]/35 bg-[#999933]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#4C4C31]">
               <Bookmark className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
               Your saved collection
             </div>
@@ -72,7 +72,7 @@ export default function MyShelfPage() {
         </section>
 
         {(shelfError || productsError) && (
-          <div role="alert" className="flex flex-col items-start justify-between gap-3 rounded-sm border border-[#D9962B]/35 bg-[#D9962B]/10 px-4 py-3 text-sm text-[#eadcae] sm:flex-row sm:items-center">
+          <div role="alert" className="flex flex-col items-start justify-between gap-3 rounded-sm border border-[#D9962B]/35 bg-[#D9962B]/10 px-4 py-3 text-sm text-[#6F4C16] sm:flex-row sm:items-center">
             <span>{shelfError || productsError}</span>
             {productsError && (
               <button type="button" onClick={reload} className="shrink-0 font-bold uppercase tracking-wider text-white hover:underline">
@@ -91,7 +91,7 @@ export default function MyShelfPage() {
               type="button"
               disabled={shelfSaving}
               onClick={() => replaceProductIds(savedProducts.map((product) => product.id))}
-              className="shrink-0 font-bold uppercase tracking-wider text-[#E5E791] hover:text-white hover:underline disabled:cursor-wait disabled:opacity-50"
+              className="shrink-0 font-bold uppercase tracking-wider text-[#4C4C31] hover:text-white hover:underline disabled:cursor-wait disabled:opacity-50"
             >
               Remove unavailable
             </button>
@@ -107,7 +107,7 @@ export default function MyShelfPage() {
         ) : savedProducts.length > 0 ? (
           <section aria-label="Products on My Shelf" className="grid gap-4 md:grid-cols-2">
             {savedProducts.map((product) => (
-              <article key={product.id} className="grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-4 rounded-xl border border-white/10 bg-[#171717] p-4 shadow-lg shadow-black/20 transition-colors hover:border-[#999933]/50 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:p-5">
+              <article key={product.id} className="grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-4 rounded-xl border border-white/10 bg-white p-4 shadow-sm transition-colors hover:border-[#999933]/50 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:p-5">
                 <Link href={`/product/${encodeURIComponent(product.id)}`} className="block aspect-square overflow-hidden rounded-lg border border-white/10 bg-white">
                   {product.image ? (
                     <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-contain transition-transform duration-500 hover:scale-105" />
@@ -124,9 +124,9 @@ export default function MyShelfPage() {
                 <div className="flex min-w-0 flex-col">
                   <div className="flex min-w-0 items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#E5E791]">{product.category}</p>
+                      <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#4C4C31]">{product.category}</p>
                       <Link href={`/product/${encodeURIComponent(product.id)}`} className="no-underline">
-                        <h2 className="text-lg font-bold leading-snug text-white transition-colors hover:text-[#E5E791] sm:text-xl">{product.name}</h2>
+                        <h2 className="text-lg font-bold leading-snug text-white transition-colors hover:text-[#4C4C31] sm:text-xl">{product.name}</h2>
                       </Link>
                       {product.tribe && <p className="mt-1 text-[10px] uppercase tracking-wider text-white/40">Origin: {product.tribe}</p>}
                     </div>
@@ -146,7 +146,7 @@ export default function MyShelfPage() {
         ) : (
           <section className="relative overflow-hidden rounded-xl border border-dashed border-[#999933]/40 bg-[#1a1a1a] px-6 py-16 text-center sm:py-20">
             <div className="mx-auto flex max-w-lg flex-col items-center">
-              <div className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-[#999933]/35 bg-[#999933]/10 text-[#E5E791]">
+              <div className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-[#999933]/35 bg-[#999933]/10 text-[#4C4C31]">
                 <PackageOpen className="h-7 w-7" aria-hidden="true" />
               </div>
               <h2 className="text-2xl font-bold text-white">Your shelf is ready</h2>
