@@ -495,7 +495,9 @@ export default function CatalogPage() {
               <span className="block sm:whitespace-nowrap">Product Catalog</span>
             </h1>
             <p className="mt-3 max-w-sm font-body-md text-base leading-relaxed text-white/70">
-              Order online by choosing sizes and quantities below, or prepare your order in Excel. Create Catalog makes a separate PDF for saving, sharing or printing. Sacred Snuff is our own Hapé brand.
+              Order online by choosing sizes and quantities below, or prepare your order in Excel.
+              <br />
+              Create Catalog makes a separate PDF for saving, sharing or printing.
             </p>
           </div>
 

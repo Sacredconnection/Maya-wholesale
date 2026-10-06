@@ -475,6 +475,7 @@ async function buildDigitalCatalogPdf(options = {}) {
   if (!products.length) throw new Error("The selected products are no longer available. Reload the catalog and select again.");
   const pdf = await renderDigitalCatalogPdf({
     products,
+    format: options.format || "detailed",
     includePrices: Boolean(options.includePrices),
     user: options.user || null,
     filterLabel: options.filterLabel || "Complete catalog",
@@ -596,7 +597,6 @@ export async function renderDigitalCatalogPdf({ products, includePrices = true, 
   for(let page=1;page<=total;page++) {
     pdf.setPage(page); pdf.setFont("helvetica","normal"); pdf.setFontSize(7); pdf.setTextColor(92,91,31);
     pdf.text("Prices in EUR. Final quantities, shipping and taxes are confirmed on your invoice.",12,278);
-    pdf.text("Sacred Snuff is our own Hapé brand.",12,282);
     pdf.text(stamp,12,289); pdf.text(page+" / "+total,198,289,{align:"right"});
   }
   return pdf;

@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.IO.Compression
 $workspace = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $slug = 'maya-wholesale-site-corrections'
 $source = Join-Path $workspace "integrations\wordpress\$slug"
-$destination = Join-Path $workspace "$slug-v1.0.0.zip"
+$destination = Join-Path $workspace "$slug-v1.0.1.zip"
 $stream = [IO.File]::Open($destination, [IO.FileMode]::Create)
 try {
     $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $false)

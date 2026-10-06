@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Maya Wholesale Site Corrections
  * Description: Invoice-first wholesale confirmations and a private authentication bridge. Complements the existing Maya Core plugin.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Maya Herbs
  */
 defined( 'ABSPATH' ) || exit;

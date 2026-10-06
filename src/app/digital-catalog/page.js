@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FileText, LoaderCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,6 +11,12 @@ import { categoryLabel, compareCategories, compareCatalogProducts } from "@/lib/
 
 export default function CreateCatalogPage() {
   const { isLoggedIn, user, loading: authLoading } = useAuth();
+  const [step, setStep] = useState(1);
+  const [scope, setScope] = useState("all");
+  const [generated, setGenerated] = useState(false);
+  const stepTitle = useRef(null);
+  const changeStep = (next) => { setStep(next); setGenerated(false); };
+  useEffect(() => { stepTitle.current?.focus({ preventScroll: true }); }, [step]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,36 +53,57 @@ export default function CreateCatalogPage() {
     setSelectedIds(current => ids.every(id => current.includes(id)) ? current.filter(id => !ids.includes(id)) : [...new Set([...current, ...ids])]);
   };
   const generate = async () => {
-    setGenerating(true); setError("");
-    try { await downloadDigitalCatalogPdf({ selectedIds, format, includePrices: true, user, filterLabel: selectedIds.length ? "Personalized catalog" : "Complete catalog" }); }
+    setGenerating(true); setError(""); setGenerated(false);
+    try { await downloadDigitalCatalogPdf({ selectedIds: scope === "all" ? [] : selectedIds, format, includePrices: true, user, filterLabel: scope === "custom" && selectedIds.length ? "Personalized catalog" : "Complete catalog" }); setGenerated(true); }
     catch (failure) { setError(failure.message || "The PDF could not be generated."); }
     finally { setGenerating(false); }
   };
   if (authLoading || !isLoggedIn) return <AuthGate loading={authLoading} />;
-  return <div id="top" className="site-background-page flex min-h-screen flex-col bg-[#1a1a1a] text-white">
+  const allProducts = scope === "all" || selectedIds.length === 0;
+  const count = allProducts ? products.length : selectedIds.length;
+  const primary = "catalog-primary-action inline-flex min-h-12 items-center justify-center gap-2 rounded bg-[#984C27] px-6 py-3 font-bold hover:bg-[#7D3E20] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#707026] disabled:opacity-50";
+  const secondary = "inline-flex min-h-12 items-center justify-center rounded border border-[#999A61] bg-white px-5 py-3 font-semibold text-[#4C4C31] hover:bg-[#999933]/10 disabled:opacity-50";
+  const choice = (active) => "flex cursor-pointer items-start gap-3 rounded-lg border-2 p-5 transition-colors " + (active ? "border-[#707026] bg-[#999933]/10" : "border-[#999A61]/30 bg-white hover:border-[#707026]");
+  return <div id="top" className="site-background-page flex min-h-screen flex-col text-[#262019]">
     <Header />
-    <main className="site-content-shell flex-grow space-y-8 py-10">
-      <section className="space-y-4 rounded-xl border border-[#999933]/40 bg-[#1a1a1a] p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#707026]">Create Catalog</p>
-        <h1 className="type-page-title">Create your own catalog</h1>
-        <p className="max-w-3xl leading-7 text-white/75">Choose individual products or entire categories to create a catalog tailored to your needs. Download a PDF to save, share or print.</p>
-        <p className="max-w-3xl leading-7 text-white/75">Choose a format, select what you would like to include, then click Generate catalog. With no selection, the complete catalog will be generated. Products are organized by category and subcategory. Filters help you find products; only the Include checkboxes change your selection.</p>
-        <fieldset className="grid gap-4 pt-3 sm:grid-cols-2"><legend className="mb-3 font-bold">Catalog format</legend>
-          {[ ["detailed", "Detailed catalog", "Product photos, descriptions, available sizes and price ranges."], ["compact", "Compact price list", "SKU, product name, available sizes and price ranges. No photos or descriptions."] ].map(([value, title, description]) => <label key={value} className="flex items-start gap-3 rounded-lg border border-white/20 p-4"><input type="radio" name="catalog-format" value={value} checked={format === value} onChange={() => setFormat(value)} className="mt-1 accent-[#999933]" /><span><strong className="block">{title}</strong><span className="mt-1 block text-sm text-white/70">{description}</span></span></label>)}
-        </fieldset>
-        <p className="text-xs text-white/60">Prices are in EUR. Account and volume pricing follow the online catalog; final quantities, shipping and applicable taxes are confirmed on your invoice.</p>
+    <main className="site-content-shell flex-grow space-y-7 py-8 sm:py-12">
+      <header className="max-w-3xl space-y-3">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#707026]">Your wholesale collection</p>
+        <h1 className="type-page-title">Create your catalog</h1>
+        <p className="leading-7 text-[#574B39]">Build a PDF to save, share or print. Choose a format, decide what to include, then download.</p>
+      </header>
+      <nav aria-label="Catalog creation steps" className="rounded-lg border border-[#999A61]/40 bg-white">
+        <ol className="grid grid-cols-3">{["Format", "Products", "Review & download"].map((label, index) => <li key={label} className="min-w-0"><button type="button" disabled={generating || index + 1 > step} onClick={() => changeStep(index + 1)} aria-current={step === index + 1 ? "step" : undefined} className={"flex h-full w-full flex-col items-start gap-2 border-b-4 px-3 py-4 text-left text-sm sm:flex-row sm:items-center sm:gap-3 sm:px-6 " + (step === index + 1 ? "border-[#984C27] font-bold text-[#262019]" : "border-transparent text-[#574B39]")}><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#999A61] text-xs">{index + 1}</span>{label}</button></li>)}</ol>
+      </nav>
+      {error && <div role="alert" className="rounded border border-[#D9962B] bg-white p-4 text-[#6F4C16]">{error} {products.length === 0 && <button onClick={() => setRetry(retry + 1)} className="ml-3 underline">Try again</button>}</div>}
+      <section aria-labelledby="catalog-step-title" className="space-y-6 rounded-xl border border-[#999A61]/40 bg-white p-5 sm:p-8">
+        <div><p className="mb-2 text-xs font-bold uppercase tracking-widest text-[#707026]">Step {step} of 3</p><h2 id="catalog-step-title" ref={stepTitle} tabIndex={-1} className="text-2xl font-bold outline-none">{step === 1 ? "Choose your format" : step === 2 ? "What would you like to include?" : "Your catalog is ready to generate"}</h2></div>
+        {step === 1 && <fieldset className="grid gap-4 sm:grid-cols-2"><legend className="sr-only">Catalog format</legend>{[["detailed", "Detailed catalog", "Product photos and descriptions, with available sizes and price ranges."], ["compact", "Compact price list", "A concise list of SKUs, product names, sizes and price ranges. No photos or descriptions."]].map(([value, title, description]) => <label key={value} className={choice(format === value)}><input type="radio" name="catalog-format" checked={format === value} onChange={() => setFormat(value)} className="mt-1 h-4 w-4 shrink-0 accent-[#707026]" /><span><strong className="block text-lg">{title}</strong><span className="mt-2 block text-sm leading-6 text-[#574B39]">{description}</span></span></label>)}</fieldset>}
+        {step === 2 && <>
+          <fieldset className="grid gap-4 sm:grid-cols-2" disabled={loading}><legend className="sr-only">Products to include</legend>{[["all", "Complete catalog", "Include all available products. No selection needed."], ["custom", "Choose products", "Select entire categories or individual products."]].map(([value, title, description]) => <label key={value} className={choice(scope === value)}><input type="radio" name="catalog-scope" checked={scope === value} onChange={() => setScope(value)} className="mt-1 h-4 w-4 shrink-0 accent-[#707026]" /><span><strong className="block">{title}</strong><span className="mt-1 block text-sm leading-6 text-[#574B39]">{description}</span></span></label>)}</fieldset>
+          {loading ? <p role="status">Loading available products...</p> : scope === "all" ? <p className="rounded-lg bg-[#999933]/10 p-5 text-[#4C4C31]">All {products.length} products will be included, organized by category and subcategory.</p> : <div className="space-y-6">
+            <fieldset className="space-y-3"><legend className="mb-3 font-bold">Select entire categories</legend><div className="flex flex-wrap gap-3">{categories.map(name => { const items = products.filter(p => p.category === name); const selected = items.filter(p => selectedIds.includes(p.id)).length; return <label key={name} className="flex cursor-pointer items-center gap-2 rounded border border-[#999A61]/50 px-3 py-2 text-sm"><input type="checkbox" checked={selected === items.length} ref={el => { if (el) el.indeterminate = selected > 0 && selected < items.length; }} onChange={() => toggleCategory(name)} className="h-4 w-4 accent-[#707026]" />{categoryLabel(name)} <span className="text-[#574B39]">({selected}/{items.length})</span></label>; })}</div></fieldset>
+            <div className="space-y-4 border-t border-[#999A61]/30 pt-5"><div><h3 className="font-bold">Select individual products</h3><p className="mt-1 text-sm leading-6 text-[#574B39]">Search or filter the list, then tick Include on the products you want. Searching does not change your selection.</p></div>
+              <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_auto]"><label className="flex min-w-0 flex-col gap-2 text-sm">Search by name or SKU<input type="search" placeholder="Type a product name or SKU" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="min-w-0 rounded border border-[#999A61]/50 bg-white p-3" /></label><label className="flex flex-col gap-2 text-sm">Filter by category<select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }} className="rounded border border-[#999A61]/50 bg-white p-3"><option value="">All categories</option>{categories.map(name => <option key={name} value={name}>{categoryLabel(name)}</option>)}</select></label><label className="flex flex-col gap-2 text-sm">Products per page<select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} className="rounded border border-[#999A61]/50 bg-white p-3">{[10,20,50,100].map(size => <option key={size}>{size}</option>)}</select></label></div>
+              <div className="flex flex-wrap items-center justify-between gap-3 text-sm"><p aria-live="polite">{filtered.length} results · {selectedIds.length} selected</p><button type="button" disabled={!selectedIds.length} onClick={() => setSelectedIds([])} className="text-[#574B39] underline disabled:opacity-40">Clear selection</button></div>
+              <section aria-label="Choose catalog products" className="space-y-4">{visible.length ? visible.map(product => <ProductCard key={product.id} product={product} user={user} isLoggedIn mode="select" selected={selectedIds.includes(product.id)} onSelect={() => toggleProduct(product.id)} />) : <p className="py-6 text-[#574B39]">No products match. Try another name or clear the category filter.</p>}</section>
+              {pages > 1 && <nav aria-label="Catalog selection pages" className="flex flex-wrap items-center justify-center gap-4"><button disabled={page === 1} onClick={() => setPage(page - 1)} className={secondary}>Previous</button><span className="text-sm">Page {page} of {pages}</span><button disabled={page === pages} onClick={() => setPage(page + 1)} className={secondary}>Next</button></nav>}
+            </div>
+          </div>}
+        </>}
+        {step === 3 && <>
+          <dl className="grid gap-6 rounded-lg bg-[#999933]/10 p-5 sm:grid-cols-3"><div><dt className="text-sm text-[#574B39]">Format</dt><dd className="mt-2 font-bold">{format === "detailed" ? "Detailed catalog" : "Compact price list"}</dd></div><div><dt className="text-sm text-[#574B39]">Products included</dt><dd className="mt-2 font-bold">{count} products · {allProducts ? "Complete catalog" : "Custom selection"}</dd></div><div><dt className="text-sm text-[#574B39]">Download</dt><dd className="mt-2 font-bold">PDF · Prices in EUR</dd></div></dl>
+          {scope === "custom" && !selectedIds.length && <p className="text-sm text-[#6F4C16]">You have not selected any products, so your PDF will include the complete catalog. Go back to choose specific products.</p>}
+          {!allProducts && <details className="rounded border border-[#999A61]/40 p-4"><summary className="cursor-pointer font-semibold">Review selected products ({count})</summary><ul className="mt-4 space-y-2 text-sm text-[#574B39]">{products.filter(p => selectedIds.includes(p.id)).map(p => <li key={p.id}>{p.name}</li>)}</ul></details>}
+          <p className="text-sm leading-6 text-[#574B39]">Available sizes and price ranges follow the online catalog. Final quantities, shipping and applicable taxes are confirmed on your invoice.</p>
+          {generated && <p role="status" className="rounded bg-[#999933]/10 p-4 font-semibold text-[#4C4C31]">Your PDF has opened in a new tab. Use the PDF viewer to save or print it.</p>}
+          {generating && <p role="status">Preparing your PDF. Please keep this page open.</p>}
+        </>}
+        <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-4 border-t border-[#999A61]/30 bg-white py-4">
+          {step > 1 ? <button type="button" onClick={() => changeStep(step - 1)} disabled={generating} className={secondary}>Back</button> : <span className="text-sm text-[#574B39]">You can change these choices before downloading.</span>}
+          {step < 3 ? <button type="button" onClick={() => changeStep(step + 1)} disabled={step === 2 && (loading || !products.length)} className={primary}>{step === 1 ? "Continue to products" : "Review catalog"}</button> : <button type="button" onClick={generate} disabled={loading || generating || !products.length} className={primary}>{generating ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}{generating ? "Generating catalog..." : "Generate catalog"}</button>}
+        </div>
       </section>
-      {error && <div role="alert" className="rounded border border-[#D9962B] p-4">{error} {products.length === 0 && <button onClick={() => setRetry(retry + 1)} className="ml-3 underline">Try again</button>}</div>}
-      <fieldset disabled={loading || generating} className="rounded-lg border border-white/15 p-5"><legend className="px-2 font-bold">Include entire categories</legend><div className="flex flex-wrap gap-5">{categories.map(name => <label key={name} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={products.filter(p => p.category === name).every(p => selectedIds.includes(p.id))} onChange={() => toggleCategory(name)} className="h-4 w-4 accent-[#999933]" />{categoryLabel(name)}</label>)}</div><p className="mt-4 text-xs text-white/60">Sacred Snuff is our own Hapé brand.</p></fieldset>
-      <div className="flex flex-wrap items-end gap-4">
-        <label className="flex min-w-52 flex-1 flex-col gap-2 text-sm">Find products<input type="search" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="rounded border border-[#999933]/40 bg-[#f0ecdf] p-3" /></label>
-        <label className="flex flex-col gap-2 text-sm">Category<select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }} className="rounded border border-[#999933]/40 bg-[#f0ecdf] p-3"><option value="">All categories</option>{categories.map(name => <option key={name} value={name}>{categoryLabel(name)}</option>)}</select></label>
-        <label className="flex flex-col gap-2 text-sm">Products per page<select aria-label="Products per page" value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} className="rounded border border-[#999933]/40 bg-[#f0ecdf] p-3">{[10,20,50,100].map(size => <option key={size}>{size}</option>)}</select></label>
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#999933]/40 p-5"><p aria-live="polite">{selectedIds.length ? selectedIds.length + (selectedIds.length === 1 ? " product selected" : " products selected") : "No selection — generate the complete catalog"}</p><div className="flex flex-wrap gap-4"><button type="button" onClick={() => setSelectedIds([])} disabled={!selectedIds.length || generating} className="text-sm underline disabled:opacity-40">Clear selection</button><button type="button" onClick={generate} disabled={loading || generating || !products.length} className="catalog-primary-action inline-flex items-center gap-2 rounded bg-[#984C27] px-5 py-3 font-bold text-white hover:bg-[#7D3E20] disabled:opacity-50">{generating ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}{generating ? "Generating catalog…" : "Generate catalog"}</button></div></div>
-      {generating && <p role="status">Preparing your PDF. Please keep this page open.</p>}
-      <section aria-label="Choose catalog products" aria-busy={loading} className="space-y-5">{loading ? <p role="status">Loading products and available sizes…</p> : visible.length ? visible.map(product => <ProductCard key={product.id} product={product} user={user} isLoggedIn mode="select" selected={selectedIds.includes(product.id)} onSelect={() => toggleProduct(product.id)} />) : <p>No products match your search.</p>}</section>
-      {pages > 1 && <nav aria-label="Catalog selection pages" className="flex items-center justify-center gap-5"><button disabled={page === 1} onClick={() => setPage(page - 1)} className="rounded border p-3 disabled:opacity-40">Previous</button><span>Page {page} of {pages}</span><button disabled={page === pages} onClick={() => setPage(page + 1)} className="rounded border p-3 disabled:opacity-40">Next</button></nav>}
     </main><Footer />
   </div>;
 }
