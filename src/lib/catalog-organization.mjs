@@ -9,7 +9,7 @@ export function categoryLabel(value) {
   if (["sacred snuff", "sacred snuff hape", "shamanic snuff", "rape shamanic"].includes(key)) return HAPE_CATEGORIES[1];
   if (["tobacco free", "tobacco-free hape", "tobacco free hape", "shamanic tobacco free", "tobacco-free rape", "tobacco free rape"].includes(key)) return HAPE_CATEGORIES[2];
   if (["rapeh tools", "rape tools", "hape tools"].includes(key)) return "Accessories";
-  if (["rape", "rapeh"].includes(key)) return "Hapé";
+  if (["rape", "rapeh"].includes(key)) return "Rapé";
   return value || "Other";
 }
 
@@ -38,11 +38,11 @@ export function catalogGroups(products) {
 
 export const productFormats = (product) => [...new Set((product.options || []).map((option) => option.name || (option.weightGrams ? `${option.weightGrams} g` : "Single format")))].join(", ");
 
-// Present the five Hapé ranges as categories while preserving their original
+// Keep the five Hapé ranges under Rapé while preserving their original
 // WooCommerce path for traceability. Price rules are not edited here.
 export function organizeCatalogProduct(product) {
-  const path = product.categoryPath?.length ? product.categoryPath : [product.category, product.subcategory, product.childCategory].filter(Boolean);
-  if (categoryLabel(path[0]) !== "Hapé" || !HAPE_CATEGORIES.includes(categoryLabel(path[1]))) return product;
-  const categoryPath = [categoryLabel(path[1]), ...path.slice(2)];
+  const path = product.sourceCategoryPath?.length ? product.sourceCategoryPath : product.categoryPath?.length ? product.categoryPath : [product.category, product.subcategory, product.childCategory].filter(Boolean);
+  if (categoryLabel(path[0]) !== "Rapé" || !HAPE_CATEGORIES.includes(categoryLabel(path[1]))) return product;
+  const categoryPath = ["Rapé", categoryLabel(path[1]), ...path.slice(2)];
   return { ...product, sourceCategoryPath: path, categoryPath, category: categoryPath[0], subcategory: categoryPath[1] || "", childCategory: categoryPath[2] || "" };
 }

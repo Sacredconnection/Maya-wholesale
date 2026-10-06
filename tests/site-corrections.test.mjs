@@ -17,9 +17,13 @@ const product = (id, category, subcategory = "") => ({ id, storeId: "maya-herbs"
 
 test("confirmed Hapé paths have the requested category order without renaming other Shamanic products", () => {
   const products = ["Ashes", "Rapéh Tools", "Tobacco Free", "Shamanic Snuff", "Tribal"].map((subcategory, i) => organizeCatalogProduct({ ...product(i, "Rapé", subcategory), categoryPath: ["Rapé", subcategory, "Source"] }));
-  assert.deepEqual(products.sort(compareCatalogProducts).map(p => p.category), HAPE_CATEGORIES);
+  assert.deepEqual(products.sort(compareCatalogProducts).map(p => p.subcategory), HAPE_CATEGORIES);
   assert.equal(categoryLabel("Shamanic"), "Shamanic");
-  assert.equal(products[0].subcategory, "Source");
+  assert.ok(products.every(p => p.category === "Rapé"));
+  assert.equal(products[0].childCategory, "Source");
+  assert.deepEqual(organizeCatalogProduct(products[0]), products[0]);
+  const accessories = product("other", "Accessories");
+  assert.deepEqual(organizeCatalogProduct(accessories), accessories);
   assert.deepEqual(products[0].sourceCategoryPath, ["Rapé", "Tribal", "Source"]);
 });
 
