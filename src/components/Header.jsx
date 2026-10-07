@@ -24,6 +24,7 @@ export default function Header({ onOpenLogin }) {
   const closeMenu = () => setMobileMenuOpen(false);
   const actions = <>
     {isLoggedIn ? <>
+      <Link href="/catalog" onClick={closeMenu} className={actionClass}>Products</Link>
       <Link href="/my-shelf" onClick={closeMenu} className={actionClass}>
         <Bookmark className={"h-4 w-4 " + (shelfCount ? "fill-current" : "")} aria-hidden="true" /> My Shelf {shelfCount > 0 && "(" + shelfCount + ")"}
       </Link>
