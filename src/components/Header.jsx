@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/AuthContext";
@@ -9,7 +9,6 @@ import { useShelf } from "@/components/ShelfContext";
 import { Menu, X, Bookmark, LogOut, ShoppingBag } from "lucide-react";
 export default function Header({ onOpenLogin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
   const router = useRouter();
   const { isLoggedIn, user, logout } = useAuth();
   const { cartSubtotal, cartTotalItems, setIsCartOpen } = useCart();
@@ -23,12 +22,6 @@ export default function Header({ onOpenLogin }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileMenuOpen]);
   const closeMenu = () => setMobileMenuOpen(false);
-  const handleLogo = (event) => {
-    if (isLoggedIn || pathname === "/") {
-      event.preventDefault(); closeMenu();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
   const actions = <>
     {isLoggedIn ? <>
       <Link href="/my-shelf" onClick={closeMenu} className={actionClass}>
@@ -48,7 +41,7 @@ export default function Header({ onOpenLogin }) {
   </>;
   return <header className="site-header sticky top-0 z-50 w-full border-b-[6px] border-[#999933] bg-white text-[#262019] shadow-sm">
     <div className="site-content-shell flex h-20 items-center justify-between gap-5 sm:h-24 xl:h-28">
-      <Link href={isLoggedIn ? pathname : "/"} onClick={handleLogo} className="shrink-0" aria-label={isLoggedIn ? "Maya Herbs — back to top" : "Maya Herbs home"}>
+      <Link href="/catalog" onClick={closeMenu} className="shrink-0" aria-label="Maya Herbs catalog">
         <Image src="/banner/maya-wholesale/logo-maya-wholesale.svg" alt="Maya Herbs Wholesale" width={494} height={201} unoptimized className="h-12 w-auto sm:h-16 xl:h-[4.5rem]" />
       </Link>
       <nav aria-label="Primary navigation" className="hidden items-center gap-3 xl:flex">{actions}</nav>
