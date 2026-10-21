@@ -11,8 +11,8 @@ import Footer from "./Footer";
 import LoginModal from "./LoginModal";
 import { Lock } from "lucide-react";
 
-export default function AuthGate({ loading = false }) {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+export default function AuthGate({ loading = false, openLogin = false }) {
+  const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
 
   return (
     <div className="site-background-page bg-[#131313] text-[#f2f2f2] min-h-screen flex flex-col font-sans antialiased">

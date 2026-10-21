@@ -1,14 +1,16 @@
+import { ORDER_CONFIRMATION } from "../src/lib/payment-methods.js";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
+import { isIP } from "node:net";
 import { loadModule } from "./helpers/load-module.mjs";
 import { calculateDiscountedLines } from "../src/lib/order-totals.mjs";
+import { customerMeta, isApprovedWholesaleCustomer } from "../src/lib/wholesale-approval.mjs";
 
 const securityError = (error, status) => Response.json({ error }, { status });
 const store = { id: "maya-herbs", name: "Maya", baseUrl: "https://store.test", consumerKey: "test", consumerSecret: "test" };
 const product = { id: 10, name: "Pack", sku: "pack", status: "publish", type: "simple", price: "12.50", weight: "", stock_status: "instock", stock_quantity: 20, categories: [], attributes: [], meta_data: [] };
-const mapper = await loadModule("src/lib/wc-mappers.js", ["extractWeightGrams", "roleBasedPrices", "isApprovedWholesaleCustomer", "customerMeta"]);
-const { customerMeta, isApprovedWholesaleCustomer } = mapper;
+const mapper = await loadModule("src/lib/wc-mappers.js", ["extractWeightGrams", "roleBasedPrices"]);
 const pricing = await loadModule("src/lib/pricing.js", ["progressivePerGramRate", "progressiveTableKeyFor", "NEW_CUSTOMER_ROLE"]);
 
 async function orderFixture({ parent = {}, variation = {}, discountRate = 0, role = "customer" } = {}) {
@@ -38,7 +40,7 @@ async function orderFixture({ parent = {}, variation = {}, discountRate = 0, rol
     getPaymentGateway: async () => ({ enabled: true }),
     createOrder: async (payload) => { created.push(payload); return { id: created.length, ...payload }; },
     getOrdersByEmail: async () => [], mapOrder: (order) => order, securityError,
-    bankTransferOrderNote: () => "", MANUAL_BANK_TRANSFER: { id: "bacs", title: "Bank" }, BUNQ_CARD_PAYMENT: { id: "card" },
+    ORDER_CONFIRMATION, bankTransferOrderNote: () => "", MANUAL_BANK_TRANSFER: { id: "bacs", title: "Bank" }, BUNQ_CARD_PAYMENT: { id: "card" },
     cleanText: (value) => String(value || ""), toWcAddress: (address) => address,
   });
   return {
@@ -168,3 +170,22 @@ test("rejected accounts never receive pending or approval messages", async () =>
   assert.deepEqual(fixture.calls, { received: 0, notification: 0, approved: 0 });
 });
 
+test("rate limit diagnostics distinguish HTTP, malformed responses and timeouts without secrets", async () => {
+  for (const [failure, upstreamStatus, fetch] of [
+    ["upstream_http", 404, async () => Response.json({ secret: "DO-NOT-LOG" }, { status: 404 })],
+    ["invalid_response", 200, async () => new Response("DO-NOT-LOG")],
+    ["invalid_response", 200, async () => Response.json(null)],
+    ["timeout", null, async () => { const error = new Error("DO-NOT-LOG"); error.name = "TimeoutError"; throw error; }],
+  ]) {
+    const logs = [];
+    const { enforceRateLimit } = await loadModule("src/lib/auth-rate-limit.js", ["enforceRateLimit"], {
+      createHmac, isIP, securityError, getWooCommerceBaseUrl: () => store.baseUrl, fetch,
+      process: { env: { SESSION_SECRET: "s".repeat(32), WP_ADMIN_USER: "DO-NOT-LOG", WP_APP_PASSWORD: "DO-NOT-LOG" } },
+      console: { error: (...args) => logs.push(args) },
+    });
+    assert.equal((await enforceRateLimit(new Request("https://portal.test"), "order", "DO-NOT-LOG")).status, 503);
+    assert.equal(logs[0][1].failure, failure);
+    assert.equal(logs[0][1].upstreamStatus, upstreamStatus);
+    assert.equal(JSON.stringify(logs).includes("DO-NOT-LOG"), false);
+  }
+});

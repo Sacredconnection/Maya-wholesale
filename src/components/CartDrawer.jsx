@@ -33,12 +33,12 @@ export default function CartDrawer() {
   const closeButtonRef = useRef(null);
   const closeCart = () => setIsCartOpen(false);
 
-  useDialogAccessibility(isCartOpen && !isLoginOpen, closeCart, {
+  useDialogAccessibility(isLoggedIn && isCartOpen && !isLoginOpen, closeCart, {
     containerRef: drawerRef,
     initialFocusRef: closeButtonRef,
   });
 
-  if (!isCartOpen && !isLoginOpen) return null;
+  if (!isLoggedIn || (!isCartOpen && !isLoginOpen)) return null;
 
   const perGramRates =
     isLoggedIn && user?.role === NEW_CUSTOMER_ROLE

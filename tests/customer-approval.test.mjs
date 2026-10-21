@@ -1,20 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { isApprovedWholesaleCustomer } from "../src/lib/wholesale-approval.mjs";
 
-// Resolve the project's Next.js alias for the Node test runner.
-const source = (await readFile(new URL("../src/lib/wc-mappers.js", import.meta.url), "utf8"))
-  .replace("@/lib/lead-time-policy.mjs", new URL("../src/lib/lead-time-policy.mjs", import.meta.url).href);
-const { isApprovedWholesaleCustomer } = await import(
-  `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
-);
-
-test("Customer role is approved even with stale pending markers", () => {
+test("Customer role requires explicit approval and cannot override pending markers", () => {
   assert.equal(isApprovedWholesaleCustomer({ role: "customer", meta_data: [
     { key: "maya_account_status", value: "pending_approval" },
     { key: "sc_approval_status", value: "pending" },
-  ] }), true);
-  assert.equal(isApprovedWholesaleCustomer({ role: "customer" }), true);
+  ] }), false);
+  assert.equal(isApprovedWholesaleCustomer({ role: "customer" }), false);
 });
 
 test("pending roles cannot gain access from stale approved metadata", () => {

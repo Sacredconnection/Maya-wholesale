@@ -1,3 +1,5 @@
+import { after } from "next/server";
+import { enforceRateLimit, trustedClientIp } from "@/lib/auth-rate-limit";
 import { requestWordPressPasswordReset } from "@/lib/wp-auth";
 import { wordpressPasswordResetUrl } from "@/lib/deployment-urls.mjs";
 import {
@@ -27,18 +29,13 @@ export async function POST(request) {
   const email = cleanText(body.email, 254).toLowerCase();
   if (!isValidEmail(email)) return securityError("Enter a valid email address.", 400);
 
-  const forwardedFor = request.headers.get("x-forwarded-for") || "";
-  const clientIp = cleanText(forwardedFor.split(",")[0], 64);
-
-  try {
-    await requestWordPressPasswordReset(email, clientIp);
-  } catch (error) {
-    console.error("POST /api/auth/forgot-password failed:", error);
-    if (error?.status === 429) {
-      return securityError("Too many requests. Please wait before trying again.", 429);
-    }
-    return securityError("Password recovery is temporarily unavailable. Please try again.", 502);
-  }
+  const rateError = await enforceRateLimit(request, "forgot", email);
+  if (rateError) return rateError;
+  const clientIp = trustedClientIp(request);
+  after(async () => {
+    try { await requestWordPressPasswordReset(email, clientIp); }
+    catch { console.error("Password recovery processing failed."); }
+  });
 
   return Response.json(
     { message: "If an account matches that email, a reset link is on its way." },

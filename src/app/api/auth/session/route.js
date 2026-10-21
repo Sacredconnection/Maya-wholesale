@@ -1,3 +1,4 @@
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import { getCustomerByEmail, isWooCommerceConfigured } from "@/lib/woocommerce";
 import { isApprovedWholesaleCustomer, mapCustomerToUser } from "@/lib/wc-mappers";
 import { createSession, deleteSession, getSession } from "@/lib/session";
@@ -42,7 +43,7 @@ export async function GET(request) {
     const customer = await getCustomerByEmail(session.email);
     if (
       !isApprovedWholesaleCustomer(customer) ||
-      customer.id !== session.customerId ||
+      !isSessionCurrent(session, customer) ||
       (customer.email || "").toLowerCase() !== session.email
     ) {
       await deleteSession();

@@ -142,6 +142,7 @@ export default function ProductPurchaseControls({
               Out of stock
             </span>
           </div>
+          <p className="text-xs leading-5 text-white/65">Temporarily out of stock. Contact our sales team for an estimated availability date.</p>
           <LeadTimeAvailability product={activeProduct} option={selectedOption} compact={compact} />
         </div>
       ) : (

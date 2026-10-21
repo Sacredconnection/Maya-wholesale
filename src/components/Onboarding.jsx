@@ -80,12 +80,6 @@ export default function Onboarding() {
                 for professional botanical buyers.
               </p>
             </header>
-
-            <div className={styles.actionBar}>
-              <Link href="/register" className={styles.cta}>
-                Create B2B account
-              </Link>
-            </div>
           </div>
 
           <div className={styles.journey}>

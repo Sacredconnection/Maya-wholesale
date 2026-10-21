@@ -6,6 +6,7 @@ function add_action( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
 	$GLOBALS['registered_actions'][ $hook ][ $priority ][] = $callback;
 }
 function add_filter( ...$args ) {}
+function register_activation_hook( ...$args ) {}
 function get_user_by( $field, $id ) {
 	return 42 === $id ? (object) array( 'user_login' => 'buyer+shop@example.com' ) : false;
 }

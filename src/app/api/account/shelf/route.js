@@ -1,3 +1,4 @@
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import {
   getCustomerByEmail,
   isWooCommerceConfigured,
@@ -53,7 +54,7 @@ async function authenticatedCustomer() {
   const customer = await getCustomerByEmail(session.email);
   if (
     !isApprovedWholesaleCustomer(customer) ||
-    customer.id !== session.customerId ||
+    !isSessionCurrent(session, customer) ||
     (customer.email || "").toLowerCase() !== session.email
   ) {
     return null;

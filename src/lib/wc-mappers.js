@@ -5,6 +5,9 @@ import {
   leadTimeModeFromMeta,
   outOfStockLeadTimePolicy,
 } from "@/lib/lead-time-policy.mjs";
+import { isApprovedWholesaleCustomer } from "@/lib/wholesale-approval.mjs";
+
+export { isApprovedWholesaleCustomer } from "@/lib/wholesale-approval.mjs";
 
 const decodeHtmlEntities = (value) =>
   String(value || "")
@@ -277,25 +280,6 @@ const customerMeta = (customer, key) => {
   }
   return undefined;
 };
-
-export function isApprovedWholesaleCustomer(customer) {
-  if (!customer) return false;
-
-  const role = String(customer.role || "").toLowerCase();
-  if (["pending", "pending_approval"].includes(role)) return false;
-  if (role === "customer") return true;
-
-  const approvalStatus = String(
-    customerMeta(customer, "maya_account_status") ||
-      customerMeta(customer, "sc_approval_status") ||
-      ""
-  ).toLowerCase();
-
-  if (["pending", "pending_approval"].includes(approvalStatus)) return false;
-  if (approvalStatus === "approved") return true;
-
-  return Boolean(role);
-}
 
 // Maps a WooCommerce customer to the user shape the UI stores in AuthContext.
 // Wholesale discounts live in customer meta so the team can manage them from

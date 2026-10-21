@@ -332,15 +332,14 @@ export default function RegisterPage() {
 
               <div>
                 <h3 className="font-headline-md text-2xl font-bold text-white mb-2">
-                  Registration Submitted!
+                  Request received
                 </h3>
                 <p className="text-sm text-white/60 font-body-md max-w-sm mx-auto leading-relaxed">
-                  Your wholesale account has been created and is <strong className="text-white">pending
-                  approval by the administration</strong>.
+                  Check your email for guidance on accessing your account.
                 </p>
                 <p className="text-xs text-white/40 font-body-md max-w-sm mx-auto leading-relaxed mt-2">
-                  Our team will review your business profile and assign your wholesale
-                  access level. You will be able to sign in once your account is approved.
+                  New wholesale applications require manual review. Access becomes available
+                  after our team approves the account.
                 </p>
               </div>
 
@@ -355,7 +354,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
                   <span className="text-white/40">STATUS:</span>
-                  <span className="text-yellow-400 font-bold uppercase sm:text-right">PENDING APPROVAL</span>
+                  <span className="text-yellow-400 font-bold uppercase sm:text-right">REQUEST RECEIVED</span>
                 </div>
               </div>
 

@@ -1,3 +1,5 @@
+import { enforceRateLimit } from "@/lib/auth-rate-limit";
+import { isSessionCurrent } from "@/lib/session-customer.mjs";
 import {
   getCustomerByEmail,
   getProductBySlug,
@@ -22,9 +24,6 @@ import {
 } from "@/lib/transactional-email";
 
 const MAX_REQUEST_BYTES = 16 * 1024;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 5;
-const rateLimitState = new Map();
 
 function parseProductIdentifier(identifier) {
   if (typeof identifier !== "string" || identifier.length > 240) return null;
@@ -34,20 +33,6 @@ function parseProductIdentifier(identifier) {
   if (!/^[a-z0-9-]+$/i.test(storeId) || !/^[a-z0-9-]+$/i.test(slug)) return null;
   const store = getRequiredCommerceStores().find((entry) => entry.id === storeId);
   return store ? { store, slug } : null;
-}
-
-function isRateLimited(customerId) {
-  const now = Date.now();
-  const recent = (rateLimitState.get(customerId) || []).filter(
-    (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
-  );
-  if (recent.length >= MAX_REQUESTS_PER_WINDOW) {
-    rateLimitState.set(customerId, recent);
-    return true;
-  }
-  recent.push(now);
-  rateLimitState.set(customerId, recent);
-  return false;
 }
 
 export async function POST(request) {
@@ -95,13 +80,12 @@ export async function POST(request) {
       getCustomerByEmail(session.email),
       getProductBySlug(identity.slug, identity.store.id, { revalidate: 0 }),
     ]);
-    if (!isApprovedWholesaleCustomer(customer) || customer.id !== session.customerId) {
+    if (!isApprovedWholesaleCustomer(customer) || !isSessionCurrent(session, customer)) {
       return securityError("Authentication required.", 401);
     }
     if (!wcProduct) return securityError("Product not found.", 404);
-    if (isRateLimited(customer.id)) {
-      return securityError("Too many requests. Please wait a minute and try again.", 429);
-    }
+    const rateError = await enforceRateLimit(request, "lead-time", session.email);
+    if (rateError) return rateError;
 
     const variations =
       wcProduct.type === "variable"

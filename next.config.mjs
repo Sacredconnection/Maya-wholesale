@@ -87,6 +87,13 @@ const nextConfig = {
         headers: securityHeaders,
       },
       {
+        source: "/reset-password",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
         source: "/icons/hero-authentic-tribes-01.svg",
         headers: [
           {

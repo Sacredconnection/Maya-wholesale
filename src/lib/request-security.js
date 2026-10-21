@@ -1,15 +1,11 @@
 import "server-only";
 
+import { readLimitedBody, RequestBodyError } from "@/lib/body-limits.mjs";
+export { RequestBodyError } from "@/lib/body-limits.mjs";
+
 const JSON_CONTENT_TYPE = "application/json";
 const MAX_JSON_BYTES = 64 * 1024;
 
-export class RequestBodyError extends Error {
-  constructor(message, status) {
-    super(message);
-    this.name = "RequestBodyError";
-    this.status = status;
-  }
-}
 
 export function isSameOrigin(request) {
   const origin = request.headers.get("origin");
@@ -27,31 +23,14 @@ export async function readJsonBody(request, maxBytes = MAX_JSON_BYTES) {
     throw new RequestBodyError("Expected an application/json request body.", 415);
   }
 
-  const contentLength = Number(request.headers.get("content-length"));
-  if (Number.isFinite(contentLength) && (contentLength < 0 || contentLength > maxBytes)) {
-    throw new RequestBodyError(`JSON body exceeds the ${maxBytes}-byte limit.`, 413);
+  const bytes = await readLimitedBody(request, maxBytes);
+  let body;
+  try { body = JSON.parse(bytes.toString("utf8")); }
+  catch { throw new RequestBodyError("Invalid JSON body.", 400); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new RequestBodyError("Expected a JSON object.", 400);
   }
-  if (!request.body) throw new RequestBodyError("Missing JSON body.", 400);
-
-  const reader = request.body.getReader();
-  const chunks = [];
-  let totalBytes = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    totalBytes += value.byteLength;
-    if (totalBytes > maxBytes) {
-      await reader.cancel();
-      throw new RequestBodyError(`JSON body exceeds the ${maxBytes}-byte limit.`, 413);
-    }
-    chunks.push(Buffer.from(value));
-  }
-
-  try {
-    return JSON.parse(Buffer.concat(chunks, totalBytes).toString("utf8"));
-  } catch {
-    throw new RequestBodyError("Invalid JSON body.", 400);
-  }
+  return body;
 }
 
 export function cleanText(value, maxLength, { multiline = false } = {}) {

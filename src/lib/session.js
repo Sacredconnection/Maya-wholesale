@@ -49,13 +49,14 @@ function decodeSession(value) {
   }
 }
 
-export async function createSession({ email, customerId, localDev = false }) {
+export async function createSession({ email, customerId, localDev = false, sessionVersion = "" }) {
   const expiresAt = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
   const value = encodeSession({
     email: email.toLowerCase(),
     customerId: Number.isInteger(customerId) ? customerId : null,
     localDev: localDev === true,
     expiresAt,
+    sessionVersion,
   });
 
   const cookieStore = await cookies();
