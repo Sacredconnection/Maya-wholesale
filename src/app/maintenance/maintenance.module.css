@@ -1,0 +1,44 @@
+.page {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: 64px 24px 32px;
+  background: #fff;
+  color: #473d2e;
+  text-align: center;
+  border-top: 5px solid #cc6633;
+  isolation: isolate;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("/patterns/maya-brand-pattern.svg") center / 720px repeat;
+  opacity: 0.18;
+  pointer-events: none;
+  mask-image: linear-gradient(to right, #000, transparent 35%, transparent 65%, #000);
+}
+
+.content { width: min(100%, 680px); margin: auto 0; }
+.logo { width: min(260px, 70%); height: auto; margin: 0 auto 56px; }
+.eyebrow { margin: 0 0 20px; color: #707026; font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; }
+.title { margin: 0; color: #984c27; font-size: clamp(46px, 8vw, 80px); font-weight: 400; line-height: 1.04; letter-spacing: -0.045em; }
+.description { margin: 28px auto 0; max-width: 460px; font-size: 16px; line-height: 1.8; }
+.divider { width: 40px; height: 2px; margin: 32px auto; background: #999933; }
+.contact { margin: 0; font-size: 13px; line-height: 1.8; }
+.contact a { display: block; width: fit-content; margin: 5px auto 0; color: #984c27; font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
+.contact a:hover { color: #63311a; }
+.contact a:focus-visible { outline: 2px solid #707026; outline-offset: 6px; }
+.footer { margin: 48px 0 0; font-size: 11px; letter-spacing: 0.12em; color: #675943; }
+
+@media (max-width: 480px) {
+  .page { padding: 40px 24px 24px; }
+  .logo { width: 210px; margin-bottom: 40px; }
+  .desktopBreak { display: none; }
+}

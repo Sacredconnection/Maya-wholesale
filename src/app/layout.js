@@ -5,6 +5,7 @@ import { ProductsProvider } from "@/components/ProductsContext";
 import { ShelfProvider } from "@/components/ShelfContext";
 import CartDrawer from "@/components/CartDrawer";
 import BackToTop from "@/components/BackToTop";
+import { isMaintenanceMode } from "@/lib/maintenance.mjs";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -23,6 +24,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const maintenance = isMaintenanceMode();
   return (
     <html
       lang="en"
@@ -33,7 +35,7 @@ export default function RootLayout({ children }) {
         className="min-h-full flex flex-col text-[#2D2D2D]"
         suppressHydrationWarning
       >
-        <AuthProvider>
+        {maintenance ? children : <AuthProvider>
           <ProductsProvider>
             <ShelfProvider>
               <CartProvider>
@@ -43,7 +45,7 @@ export default function RootLayout({ children }) {
               </CartProvider>
             </ShelfProvider>
           </ProductsProvider>
-        </AuthProvider>
+        </AuthProvider>}
       </body>
     </html>
   );

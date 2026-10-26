@@ -1,5 +1,14 @@
 # Maya Herbs Wholesale
 
+## Maintenance mode
+
+The storefront currently displays a branded “Coming soon” page.
+Maintenance is enabled by default. Set `MAINTENANCE_MODE=false` in the hosting
+environment and redeploy (or restart the local server) to reopen the site.
+Pages and storefront APIs return HTTP 503 with no-cache headers while maintenance
+is active. Signed WooCommerce webhooks and WordPress admin access remain available.
+The original storefront is preserved.
+
 Welcome to **Maya Herbs Wholesale**. This Next.js application serves approved retailers, practitioners and distributors sourcing ethnobotanical herbs, Aya plants, Kratom, Rapéh, superfoods, incense and related botanical products.
 
 ---
