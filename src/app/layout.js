@@ -35,17 +35,17 @@ export default function RootLayout({ children }) {
         className="min-h-full flex flex-col text-[#2D2D2D]"
         suppressHydrationWarning
       >
-        {maintenance ? children : <AuthProvider>
+        <AuthProvider>
           <ProductsProvider>
             <ShelfProvider>
               <CartProvider>
                 {children}
-                <CartDrawer />
-                <BackToTop />
+                {!maintenance && <CartDrawer />}
+                {!maintenance && <BackToTop />}
               </CartProvider>
             </ShelfProvider>
           </ProductsProvider>
-        </AuthProvider>}
+        </AuthProvider>
       </body>
     </html>
   );
