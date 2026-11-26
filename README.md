@@ -145,8 +145,7 @@ PDF exports always bypass the WooCommerce data cache, so every generated file us
 Create active WooCommerce webhooks for **Product created**, **Product updated**, **Product deleted**, **Product restored**, **Customer created**, and **Customer updated**. Use `https://wholesale.mayaherbs.com/api/webhooks/woocommerce` as the delivery URL and the exact `WC_WEBHOOK_SECRET` value as the secret for every webhook. Product events expire the tagged catalog cache and customer events retry the application-received email.
 
 New portal accounts receive the real `pending` role and pending approval
-metadata. Access requires explicit approval in WordPress; a default `customer`
-role alone never grants portal access. Manual approval synchronizes
+metadata. Assigning the WordPress `customer` role approves the account. Manual approval synchronizes
 `sc_approval_status`, `maya_account_status` and New User Approve `pw_user_status`.
 
 1. Upload [`maya-wholesale-core.zip`](maya-wholesale-core.zip) in **WP Admin → Plugins → Add Plugin → Upload Plugin** and activate it.
@@ -157,10 +156,7 @@ role alone never grants portal access. Manual approval synchronizes
 
 Administrators can approve a pending account by changing its role, using the
 row action **Approve as Customer**, or selecting **Approve as Customer** from
-the bulk actions menu in WordPress. Profile updates and plugin upgrades never
-approve applications. Existing portal accounts with unresolved approval markers
-are returned to Pending approval during the upgrade. Previously approved records
-are retained; accounts incorrectly approved by older versions require manual review.
+the bulk actions menu in WordPress. The customer role grants access when legacy approval fields are missing or pending. Profile updates and upgrades synchronize those fields for wholesale portal customers. Explicit denials still block access.
 The
 action webhook sends the approval email once; repeated deliveries are
 idempotent and invalid signatures are rejected.
@@ -198,7 +194,7 @@ authentication state are never stored in browser `localStorage`.
 
 ### Security update: registration and authentication
 
-Install **Maya Wholesale Core 1.0.3** from [maya-wholesale-core-v1.0.3.zip](maya-wholesale-core-v1.0.3.zip) before deploying the updated portal. Keep Core and standalone Admin Tools mutually exclusive. Admin Tools 1.4.3 includes the shared counters and session revocation, but Core is the recommended package because it also provides the password-recovery bridge.
+Install **Maya Wholesale Core 1.1.2** from [maya-wholesale-core-v1.1.2.zip](maya-wholesale-core-v1.1.2.zip) before deploying the updated portal. Keep Core and standalone Admin Tools mutually exclusive. Admin Tools 1.4.4 includes the shared counters and session revocation, but Core is the recommended package because it also provides the password-recovery bridge.
 
 Configure existing server secrets `WP_ADMIN_USER`, `WP_APP_PASSWORD` (administrator with `manage_options`), `SESSION_SECRET`, WooCommerce credentials and transactional email. These values stay server-side. Authentication and protected write endpoints return 503 if the shared rate-limit service is missing or unavailable; they never silently disable throttling.
 
