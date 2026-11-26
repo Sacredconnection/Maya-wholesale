@@ -79,10 +79,8 @@ export async function POST(request) {
     return securityError("A valid email address with no more than 60 characters is required.", 400);
   }
   if (
-    !vatNumber ||
     !address.street ||
     !address.city ||
-    !address.state ||
     !address.zip ||
     !address.country
   ) {

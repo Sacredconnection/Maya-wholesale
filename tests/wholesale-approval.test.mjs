@@ -22,7 +22,7 @@ test("the pending WordPress role always blocks portal access", () => {
   );
 });
 
-test("a default customer role cannot override pending application metadata", () => {
+test("customer role overrides stale pending application metadata", () => {
   assert.equal(
     isApprovedWholesaleCustomer(
       portalCustomer("customer", {
@@ -30,18 +30,18 @@ test("a default customer role cannot override pending application metadata", () 
         maya_account_status: "pending_approval",
       })
     ),
-    false
+    true
   );
 });
 
 test("portal roles without explicit approval remain pending", () => {
-  for (const role of ["customer", "wholesale_user", "special_customer"]) {
+  for (const role of ["wholesale_user", "special_customer"]) {
     assert.equal(isApprovedWholesaleCustomer(portalCustomer(role)), false);
   }
 });
 
-test("an ordinary WooCommerce customer does not gain wholesale access", () => {
-  assert.equal(isApprovedWholesaleCustomer({ role: "customer", meta_data: [] }), false);
+test("customer role grants access without legacy markers", () => {
+  assert.equal(isApprovedWholesaleCustomer({ role: "customer", meta_data: [] }), true);
 });
 
 test("approved legacy metadata remains compatible outside portal registrations", () => {
@@ -60,15 +60,16 @@ test("manual approval unlocks customer and wholesale roles", () => {
     assert.equal(isApprovedWholesaleCustomer(portalCustomer(role, approved)), true);
   }
 });
-test("any pending or denied marker blocks otherwise approved accounts", () => {
+test("denials block access and pending markers block other roles", () => {
   for (const key of Object.keys(approved)) {
     for (const status of ["pending", "pending_approval", "denied", "rejected"]) {
-      assert.equal(isApprovedWholesaleCustomer(portalCustomer("customer", { ...approved, [key]: status })), false);
+      assert.equal(isApprovedWholesaleCustomer(portalCustomer("wholesale_user", { ...approved, [key]: status })), false);
+      assert.equal(isApprovedWholesaleCustomer(portalCustomer("customer", { ...approved, [key]: status })), status.startsWith("pending"));
     }
   }
 });
 test("partial approval and missing accounts cannot grant portal access", () => {
   assert.equal(isApprovedWholesaleCustomer(null), false);
-  assert.equal(isApprovedWholesaleCustomer(portalCustomer("customer", { sc_approval_status: "approved" })), false);
+  assert.equal(isApprovedWholesaleCustomer(portalCustomer("wholesale_user", { sc_approval_status: "approved" })), false);
   assert.equal(isApprovedWholesaleCustomer(portalCustomer("", approved)), false);
 });

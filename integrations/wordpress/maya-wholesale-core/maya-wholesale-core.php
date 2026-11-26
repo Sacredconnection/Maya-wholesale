@@ -2,14 +2,14 @@
 /**
  * Plugin Name: Maya Wholesale Core
  * Description: Provides wholesale approvals, product lead-time controls, registration compatibility, webhooks, and branded password recovery.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Maya Herbs
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const MAYA_WHOLESALE_CORE_PORTAL_ORIGIN = 'https://wholesale.mayaherbs.com';
-const MAYA_WHOLESALE_CORE_VERSION = '1.0.3';
+const MAYA_WHOLESALE_CORE_VERSION = '1.0.4';
 
 /**
  * Replace the WordPress reset screen in recovery emails with the branded
@@ -515,8 +515,8 @@ function maya_wholesale_core_sync_approval_status( $user_id, $role, $notify = tr
 	} ) ) > 0;
 	$already_approved = ! $blocked && 'approved' === $sc_status && 'approved' === $maya_status;
 
-	// Profile saves, API requests and upgrades must never grant approval.
-	if ( 'pending' !== $role && ! $manual_approval ) {
+	$customer_approved = 'customer' === $role && ! array_diff( $statuses, array( '', 'approved', 'pending', 'pending_approval' ) );
+	if ( 'pending' !== $role && ! $manual_approval && ! $customer_approved ) {
 		if ( $already_approved ) {
 			return true;
 		}

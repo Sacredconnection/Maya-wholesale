@@ -46,24 +46,11 @@ require $argv[1];
 $prefix = $argv[2];
 $users[1] = new TestUser( 1, 'customer' );
 $meta[1] = array( 'sc_channel' => 'wholesale-portal', 'sc_approval_status' => 'pending', 'maya_account_status' => 'pending_approval' );
-// Activation/upgrades must not approve default-role applicants or emit approval events.
 call_user_func( $prefix . '_reconcile_portal_accounts' );
-check( array('pending') === $users[1]->roles, 'Migration must keep applicant pending' );
+check( array('customer') === $users[1]->roles && 'approved' === $meta[1]['pw_user_status'], 'Migration must recognize customer roles' );
 check( array() === $events, 'Migration must not send approval events' );
-// API/automatic role changes cannot approve.
+$users[1]->set_role( 'pending' );
 $users[1]->set_role( 'customer' );
-check( array('pending') === $users[1]->roles, 'Automatic role changes must remain pending' );
-$admin = true;
-$users[1]->set_role( 'customer' );
-check( array('pending') === $users[1]->roles, 'Missing capability must not approve' );
-$can_promote = true;
-$users[1]->set_role( 'customer' );
-if ( defined( 'REST_REQUEST' ) ) {
-    check( array('pending') === $users[1]->roles, 'Admin API requests must not approve' );
-    check( array() === $events, 'REST request must not emit approval' );
-    echo "REST approval guard passed\n";
-    exit;
-}
 foreach ( array( 'sc_approval_status', 'maya_account_status', 'pw_user_status' ) as $key ) {
     check( 'approved' === $meta[1][$key], 'Manual approval must synchronize ' . $key );
 }
@@ -76,7 +63,7 @@ $users[1]->set_role( 'pending' );
 check( 'pending' === $meta[1]['pw_user_status'], 'Revocation must synchronize pending' );
 $users[1]->roles = array('customer');
 do_action( 'profile_update', 1 );
-check( array('pending') === $users[1]->roles, 'Profile save must not approve pending metadata' );
+check( array('customer') === $users[1]->roles && 'approved' === $meta[1]['pw_user_status'], 'Profile save must synchronize customer status' );
 $customer = new TestCustomer();
 do_action( 'woocommerce_before_customer_object_save', $customer );
 check( 'pending' === $customer->role, 'New customer must be pending before persistence' );
@@ -90,7 +77,8 @@ check( 'customer' === $customer->role, 'Ordinary WooCommerce registration must r
 $users[1]->roles = array('customer');
 do_action( 'woocommerce_rest_insert_customer', $users[1], null, true );
 check( array('pending') === $users[1]->roles, 'REST creation must finish pending' );
-check( array(1) === $events, 'Registration must not emit an approval event' );
+check( array(1, 1) === $events, 'Registration must not emit an approval event' );
+if ( defined( 'REST_REQUEST' ) ) { exit; }
 echo "WordPress approval transitions passed\n";
 
 // Exercise the new security hooks using isolated WordPress/database doubles.

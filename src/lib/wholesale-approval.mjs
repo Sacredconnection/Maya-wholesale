@@ -11,10 +11,6 @@ export function customerMeta(customer, key) {
   return undefined;
 }
 
-/**
- * Default WooCommerce roles are not proof of manual approval. Pending or
- * rejected markers block access, including when metadata disagrees.
- */
 export function isApprovedWholesaleCustomer(customer) {
   if (!customer) return false;
 
@@ -27,6 +23,10 @@ export function isApprovedWholesaleCustomer(customer) {
     customerMeta(customer, "pw_user_status"),
   ].map(normalize);
 
+  if (role === "customer") {
+    return approvalStatuses.every((status) => ["", "approved", "pending", "pending_approval"].includes(status));
+  }
+
   if (approvalStatuses.some((status) => status && status !== "approved")) {
     return false;
   }
@@ -37,8 +37,6 @@ export function isApprovedWholesaleCustomer(customer) {
   }
   if (approvalStatuses.includes("approved")) return true;
 
-  // Preserve the previous protection against ordinary WooCommerce customers
-  // gaining wholesale access without a portal application.
   return new Set(["administrator", "shop_manager", "wholesale_customer", "wholesale_user",
     "new customer", "special customer", "old customer", "new_customer", "special_customer", "old_customer"]).has(role);
 }

@@ -53,10 +53,8 @@ export default function RegisterPage() {
     ) {
       return "A valid email address with no more than 60 characters is required.";
     }
-    if (!form.vatNumber.trim()) return "VAT Number is required.";
     if (!form.address.trim()) return "Address is required.";
     if (!form.city.trim()) return "City is required.";
-    if (!form.state.trim()) return "State / Province is required.";
     if (!form.zip.trim()) return "Postcode / ZIP is required.";
     if (!form.country) return "Please select your Country.";
     return null;
@@ -186,7 +184,7 @@ export default function RegisterPage() {
                 {/* VAT Number */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="register-vat-number" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    VAT Number
+                    VAT Number (optional)
                   </label>
                   <input
                     id="register-vat-number"
@@ -198,7 +196,6 @@ export default function RegisterPage() {
                     onChange={set("vatNumber")}
                     placeholder="e.g. NL123456789B01"
                     className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
-                    required
                   />
                 </div>
 
@@ -243,7 +240,7 @@ export default function RegisterPage() {
                 {/* State / Province */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="register-state" className="text-[10px] font-mono uppercase text-white/60 tracking-wider font-label-sm">
-                    State / Province
+                    State / Province (optional)
                   </label>
                   <input
                     id="register-state"
@@ -255,7 +252,6 @@ export default function RegisterPage() {
                     onChange={set("state")}
                     placeholder="North Holland"
                     className="bg-[#131313] border border-white/10 focus:border-[#999933] text-sm text-white px-4 py-3 rounded-sm outline-none transition-colors w-full"
-                    required
                   />
                 </div>
 

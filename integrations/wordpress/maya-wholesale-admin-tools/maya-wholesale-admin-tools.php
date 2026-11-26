@@ -2,14 +2,14 @@
 /**
  * Plugin Name: Maya Herbs Wholesale Admin Tools
  * Description: Adds wholesale account approval tools and product lead-time controls for the Maya partner portal.
- * Version: 1.4.3
+ * Version: 1.4.4
  * Author: Maya Herbs
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const MAYA_WHOLESALE_PORTAL_ORIGIN = 'https://wholesale.mayaherbs.com';
-const MAYA_WHOLESALE_ADMIN_TOOLS_VERSION = '1.4.3';
+const MAYA_WHOLESALE_ADMIN_TOOLS_VERSION = '1.4.4';
 
 /**
  * Keep customer password-recovery links and form submissions on the public
@@ -441,8 +441,8 @@ function maya_wholesale_sync_approval_status( $user_id, $role, $notify = true, $
 	} ) ) > 0;
 	$already_approved = ! $blocked && 'approved' === $sc_status && 'approved' === $maya_status;
 
-	// Profile saves, API requests and upgrades must never grant approval.
-	if ( 'pending' !== $role && ! $manual_approval ) {
+	$customer_approved = 'customer' === $role && ! array_diff( $statuses, array( '', 'approved', 'pending', 'pending_approval' ) );
+	if ( 'pending' !== $role && ! $manual_approval && ! $customer_approved ) {
 		if ( $already_approved ) {
 			return true;
 		}
